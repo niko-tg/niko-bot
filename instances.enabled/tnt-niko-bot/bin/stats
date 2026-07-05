@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+stats() {
+  local files=0
+  local lines=0
+
+  local path
+  for path in "$@"; do
+    if [ -f "$path" ]; then
+      files=$((files + 1))
+      lines=$((lines + $(wc -l < "$path")))
+      continue
+    fi
+
+    if [ -d "$path" ]; then
+      while IFS= read -r -d '' file; do
+        files=$((files + 1))
+        lines=$((lines + $(wc -l < "$file")))
+      done < <(
+        find "$path" -type f \
+          \( -name '*.lua' -o -name '*.conf' -o -name '*.sh' -o -name '*.yaml' \) \
+          -not -path '*/.*' \
+          -print0
+      )
+    fi
+  done
+
+  echo "Files: ${files}"
+  echo "Lines: ${lines}"
+}
+
+echo -e \
+"Total" \
+"\n-=-=-=-=-=-=-=-=-=-=-" \
+"\n$(stats src/ app.lua)" \
+"\n-=-=-=-=-=-=-=-=-=-=-"

@@ -1,0 +1,36 @@
+groups:
+  group001:
+    replicasets:
+      replicaset001:
+        instances:
+          instance001:
+            database:
+              mode: rw
+              use_mvcc_engine: true
+            
+            iproto:
+              listen:
+                - uri: '0.0.0.0:3301'
+
+            memtx:
+              memory: 268435456 # 256MB
+
+config:
+  context:
+    god_password:
+      from: env
+      env: TT_GOD_PASSWORD
+
+credentials:
+  users:
+    god:
+      password: '{{ context.god_password }}'
+      roles: [read, write]
+      privileges:
+        - permissions: [execute]
+          universe: true
+        - permissions: [read]
+          spaces: [sessions, users, notifications]
+
+app:
+  file: 'app.lua'

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+docker run --rm \
+  -v "$(pwd):/app" \
+  -w /app \
+  ghcr.io/lunarmodules/luacheck:latest \
+    app.lua \
+    bootstrap.lua \
+    src/

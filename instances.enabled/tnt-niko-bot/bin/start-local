@@ -1,0 +1,12 @@
+#!/bin/env bash
+
+export $(grep -v '^#' ../../.env | xargs)
+
+export BOT_MODE="dev"
+
+mkdir -p var/storage/snap
+mkdir -p var/storage/xlog
+
+tarantool \
+  --name instance001 \
+  --config config.yaml

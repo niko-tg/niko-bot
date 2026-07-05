@@ -1,0 +1,13 @@
+.env
+.env.dev
+.claude/
+*.kate-swp
+instances.enabled/*/.rocks/
+instances.enabled/*/var/
+instances.enabled/*/docs/
+instances.enabled/*/smoke/
+instances.enabled/*/bin/download-storage
+bin/config.sh
+bin/build
+bin/start-prod
+bin/sync

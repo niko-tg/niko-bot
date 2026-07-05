@@ -1,0 +1,7 @@
+[submodule "bin/vendor/bash-libs"]
+	path = bin/vendor/bash-libs
+	url = https://github.com/bash-labs/bash-libs
+[submodule "instances.enabled/tnt-niko-bot/vendor/tnt-tg-bot"]
+	path = instances.enabled/tnt-niko-bot/vendor/tnt-tg-bot
+	url = https://github.com/TNT-Bots/tnt-tg-bot
+	branch = master

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Starting Tarantool Instance..."
+
+cd "${BOT_INSTANCE_SRC}"
+
+echo "Working directory: $(pwd)"
+echo "Contents:"
+echo "-----------------"
+ls -la
+echo "-----------------"
+
+if [ -f "./app.pre-build.sh" ]; then
+  echo "Installed dependencies..."
+
+  chmod +x ./app.pre-build.sh && ./app.pre-build.sh
+fi
+
+echo "Starting application..."
+
+exec tarantool \
+  --name instance001 \
+  --config config.yaml

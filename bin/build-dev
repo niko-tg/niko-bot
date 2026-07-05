@@ -1,0 +1,10 @@
+#!/bin/env bash
+
+source "$(dirname "$0")/config-dev.sh"
+source "$(dirname "$0")/lib/log.sh"
+
+log::info "Docker build: ${DOCKER_IMAGE}"
+
+docker build \
+  --no-cache \
+  -t "${DOCKER_IMAGE}" .

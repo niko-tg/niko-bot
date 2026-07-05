@@ -1,0 +1,8 @@
+#!/bin/env bash
+
+export TT_LOG_LEVEL="verbose"
+export TT_LOG_FORMAT="plain"
+
+rm -f ./var/run/instance001/tarantool.control
+
+bash bin/start-local

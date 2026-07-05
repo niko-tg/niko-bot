@@ -1,0 +1,28 @@
+#!/bin/env bash
+set -euo pipefail
+
+source "$(dirname "$0")/config-dev.sh"
+source "$(dirname "$0")/lib/log.sh"
+
+readonly LOG_LEVEL="${TT_LOG_LEVEL:-verbose}"
+readonly LOG_FORMAT="${TT_LOG_FORMAT:-plain}"
+
+log::info "[DEV] Docker container: ${DOCKER_CONTAINER_NAME}"
+log::info "[DEV] Docker image: ${DOCKER_IMAGE}"
+log::info "[DEV] Log level: ${LOG_LEVEL}"
+log::info "[DEV] Log format: ${LOG_FORMAT}"
+
+docker run -it --rm \
+  --name "${DOCKER_CONTAINER_NAME}" \
+  \
+  -p 127.0.0.1:9091:9091 \
+  \
+  -v "${INSTANCE_DIR}:/opt/tarantool/instances.enabled/${INSTANCE_NAME}" \
+  -v "${INSTANCE_DIR}/.rocks:/opt/tarantool/instances.enabled/${INSTANCE_NAME}/.rocks" \
+  \
+  --env-file .env.dev \
+  -e TT_LOG_LEVEL="${LOG_LEVEL}" \
+  -e TT_LOG_FORMAT=${LOG_FORMAT} \
+  -e BOT_MODE="dev" \
+  \
+  "${DOCKER_IMAGE}"
