@@ -8,6 +8,8 @@ local Command = require('bot.classes.Command')
 local usersService = require('src.services.users')
 local mineSessionsService = require('src.services.mine_sessions')
 local render = require('src.commands.public.mines.render')
+local getErrType = require('src.utils.services.getErrType')
+local services_error_type = require('src.enums.services.services_error_type')
 
 local command = Command:new {
   commands = { 'cb_mines' },
@@ -85,15 +87,29 @@ local function onStart(ctx, user, bid, mines)
   -- Резерв ставки (атомарно; не хватает -> ошибка, ничего не списано).
   local _, reserveErr = usersService.reserve(user.id, bid)
   if reserveErr then
+    -- Нехватка средств - штатный отказ, в лог не пишем.
+    if getErrType(reserveErr) == services_error_type.INSUFFICIENT_FUNDS then
+      ctx:answer({
+        text = 'Недостаточно средств',
+        show_alert = true
+      })
+
+      edit(ctx, {
+        text = '💸 Партия отменена: недостаточно средств.'
+      })
+
+      return
+    end
+
     log.error(reserveErr)
 
     ctx:answer({
-      text = 'Недостаточно средств',
+      text = 'Не удалось сделать ставку',
       show_alert = true
     })
 
     edit(ctx, {
-      text = '💸 Партия отменена: недостаточно средств.'
+      text = '⚠️ Партия отменена: внутренняя ошибка.'
     })
 
     return

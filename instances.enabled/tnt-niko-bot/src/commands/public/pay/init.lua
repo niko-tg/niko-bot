@@ -8,6 +8,8 @@ local Command = require('bot.classes.Command')
 local separateNumbers = require('src.utils.separateNumbers')
 local decodeMoneyString = require('src.utils.decodeMoneyString')
 local usersService = require('src.services.users')
+local getErrType = require('src.utils.services.getErrType')
+local services_error_type = require('src.enums.services.services_error_type')
 
 local command = Command:new {
   commands = { '/pay', 'дать' },
@@ -86,6 +88,13 @@ function command.call(ctx)
   -- Атомарный перевод.
   local _, transferErr = usersService.transfer(sender.id, recipient.id, amount)
   if transferErr then
+    -- Пре-чек выше смотрел на command.user - к моменту транзакции баланс
+    -- мог уйти (параллельные переводы/игры). Штатный отказ, в лог не пишем.
+    if getErrType(transferErr) == services_error_type.INSUFFICIENT_FUNDS then
+      ctx:replyToMessage('ℹ️ <b>Недостаточно средств</b>')
+      return
+    end
+
     log.error(transferErr)
     ctx:replyToMessage('⚠️ Не удалось выполнить перевод')
     return

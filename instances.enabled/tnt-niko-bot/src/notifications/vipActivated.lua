@@ -25,7 +25,7 @@ local function vipActivated(user, untilDate)
   })
 
   if err then
-    if tgErrors.isBotBlocked(err) or tgErrors.isChatNotFound(err) then
+    if tgErrors.isPMUnavailable(err) or tgErrors.isChatNotFound(err) then
       log.verbose(err)
     else
       log.error(err)

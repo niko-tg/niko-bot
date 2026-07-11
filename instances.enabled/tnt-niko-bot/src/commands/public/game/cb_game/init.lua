@@ -7,6 +7,8 @@ local Command = require('bot.classes.Command')
 local usersService = require('src.services.users')
 local gamingService = require('src.services.gaming_sessions')
 local render = require('src.commands.public.game.render')
+local getErrType = require('src.utils.services.getErrType')
+local services_error_type = require('src.enums.services.services_error_type')
 
 local command = Command:new {
   commands = { 'cb_game' },
@@ -95,14 +97,25 @@ function command.call(ctx)
     -- Резерв ставок (атомарно; не хватает -> ошибка, ничего не списано).
     local _, reserveErr = usersService.reservePair(initiatorId, opponentId, bid)
     if reserveErr then
+      -- Нехватка средств - штатный отказ, в лог не пишем.
+      if getErrType(reserveErr) == services_error_type.INSUFFICIENT_FUNDS then
+        ctx:answer({
+          text = 'У кого-то недостаточно средств',
+          show_alert = true
+        })
+
+        edit(ctx, { text = '💸 Игра отменена: недостаточно средств.' })
+        return
+      end
+
       log.error(reserveErr)
 
       ctx:answer({
-        text = 'У кого-то недостаточно средств',
+        text = 'Не удалось сделать ставки',
         show_alert = true
       })
 
-      edit(ctx, { text = '💸 Игра отменена: недостаточно средств.' })
+      edit(ctx, { text = '⚠️ Игра отменена: внутренняя ошибка.' })
       return
     end
 

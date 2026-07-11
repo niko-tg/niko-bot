@@ -10,6 +10,7 @@ local chatService = require('src.services.chats')
 local userInChatService = require('src.services.user_in_chat')
 local usersService = require('src.services.users')
 local syncChatStaff = require('src.utils.syncChatStaff')
+local tgErrors = require('src.utils.tgErrors')
 local antifloodCheck = require('src.utils.antifloodCheck')
 local banSenderChat = require('src.utils.messageFilters.banSenderChat')
 local deleteLinks = require('src.utils.messageFilters.deleteLinks')
@@ -19,6 +20,12 @@ local IS_GROUP = {
   [chat_type.GROUP] = true,
   [chat_type.SUPERGROUP] = true,
 }
+
+-- Кулдаун повторного cold-start sync после ошибки: иначе в чате, где Telegram
+-- не отдаёт список админов (скрытые участники и т.п.), getChatAdministrators
+-- дёргался бы на каждое сообщение.
+local SYNC_RETRY_COOLDOWN = 300
+local staffSyncRetryAt = {}  -- chat_id -> os.time(), после которого можно повторить
 
 local function onChatMessage(ctx)
   local chat = ctx:getChat()
@@ -64,12 +71,24 @@ local function onChatMessage(ctx)
   -- чтобы role-check фильтров нашёл uic. Ошибку не считаем фатальной.
   --
   if not chatItem.staff_synced then
-    local _, syncErr = syncChatStaff(chat.id)
+    local retryAt = staffSyncRetryAt[chat.id]
 
-    if syncErr then
-      log.error(syncErr)
-    else
-      chatItem.staff_synced = true
+    if retryAt == nil or os.time() >= retryAt then
+      local _, syncErr = syncChatStaff(chat.id)
+
+      if syncErr then
+        staffSyncRetryAt[chat.id] = os.time() + SYNC_RETRY_COOLDOWN
+
+        -- Скрытый список участников - ограничение Telegram, не сбой.
+        if tgErrors.isMemberListInaccessible(syncErr) then
+          log.verbose(syncErr)
+        else
+          log.error(syncErr)
+        end
+      else
+        staffSyncRetryAt[chat.id] = nil
+        chatItem.staff_synced = true
+      end
     end
   end
   --

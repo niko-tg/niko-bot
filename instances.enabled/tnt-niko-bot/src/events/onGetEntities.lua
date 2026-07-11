@@ -10,7 +10,17 @@ local PATTERN_BOT_CMD = '(/.+)@'..config.bot.username
 
 local function onGetEntities(ctx)
   local entities = ctx:getEntities()
-  local entity = entities[1]
+  local entity = entities and entities[1]
+
+  -- Телеграм может прислать message с пустым entities - обрабатываем как
+  -- обычное сообщение, а не команду.
+  if entity == nil then
+    if ctx.message.text then
+      return bot.events.onGetMessageText(ctx)
+    end
+
+    return bot.events.onChatMessage(ctx)
+  end
 
   -- Первое entity не bot_command. Это может быть текстовый алиас команды с
   -- аргументом-упоминанием ("мут @user 1m"): из-за @mention у сообщения

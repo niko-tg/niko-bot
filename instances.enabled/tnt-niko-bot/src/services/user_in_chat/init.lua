@@ -7,6 +7,7 @@ local UserInChat = require('src.models.UserInChat')
 
 local services_error_type = require('src.enums.services.services_error_type')
 local setErrType = require('src.utils.services.setErrType')
+local retryTxnConflict = require('src.utils.services.retryTxnConflict')
 
 local service = {}
 
@@ -156,17 +157,21 @@ end
 --- status='member' (дефолт модели). Растит count_messages и last_activity.
 --- Read-modify-write безопасен: между read и upsert нет yield (memtx).
 function service.incMessages(chat_id, user_id)
-  local uic, err = service.read(chat_id, user_id)
-  if err then
-    return nil, err
-  end
+  -- Read-modify-write одного кортежа: под MVCC конкурентные сообщения
+  -- одного юзера конфликтуют - ретраим всю связку чтение+upsert.
+  return retryTxnConflict(function()
+    local uic, err = service.read(chat_id, user_id)
+    if err then
+      return nil, err
+    end
 
-  return service.upsert({
-    chat_id = chat_id,
-    user_id = user_id,
-    count_messages = (uic and uic.count_messages or 0) + 1,
-    last_activity = datetime.new({ timestamp = os.time() }),
-  })
+    return service.upsert({
+      chat_id = chat_id,
+      user_id = user_id,
+      count_messages = (uic and uic.count_messages or 0) + 1,
+      last_activity = datetime.new({ timestamp = os.time() }),
+    })
+  end)
 end
 
 --- Получение всех записей user_in_chat по пользователю и статусу

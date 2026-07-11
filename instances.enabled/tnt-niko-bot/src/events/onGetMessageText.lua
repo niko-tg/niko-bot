@@ -11,7 +11,13 @@ local function onGetMessageText(ctx)
     return bot.events.onChatMessage(ctx)
   end
 
-  local commandName = utf8.lower(ctx.message.text:match('(%S+)'))
+  -- Нет ни одного слова (текст из пробелов/переносов) - точно не команда.
+  local firstToken = ctx.message.text and ctx.message.text:match('(%S+)')
+  if not firstToken then
+    return bot.events.onChatMessage(ctx)
+  end
+
+  local commandName = utf8.lower(firstToken)
 
   if bot.commands[commandName] then
     return processCommand(ctx, {

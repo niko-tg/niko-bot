@@ -90,9 +90,10 @@ end
 -- Та же настройка, что у мод-логов: per-chat ~1 сообщение в 1.1с.
 local queue = sendQueue.new({ interval = 1.1, max_queue = 20 })
 
---- Ошибка отправки: бот заблокирован / не запущен админом - не ошибка.
+--- Ошибка отправки: ЛС недоступна (бот заблокирован / не запущен админом /
+-- админ - бот) либо чат не найден - штатные отказы, не ошибка.
 local function onSendError(err)
-  if tgErrors.isBotBlocked(err) or tgErrors.isChatNotFound(err) then
+  if tgErrors.isPMUnavailable(err) or tgErrors.isChatNotFound(err) then
     log.verbose(err)
   else
     log.error(err)

@@ -5,6 +5,7 @@ local User = require('src.models.User')
 
 local services_error_type = require('src.enums.services.services_error_type')
 local setErrType = require('src.utils.services.setErrType')
+local retryTxnConflict = require('src.utils.services.retryTxnConflict')
 
 local service = {}
 
@@ -266,6 +267,10 @@ function service.upsert(data)
   return service.read(defaultUser.id)
 end
 
+-- Маркер нехватки средств: бросается таблицей из sql.atomic, pcall доносит
+-- её до классификатора без искажений (error со строкой добавил бы file:line).
+local INSUFFICIENT_FUNDS_CODE = 'insufficient_funds'
+
 --- Проверка, что юзер существует. SQL UPDATE по несуществующему ключу молча
 -- ничего не делает, а денежным операциям нужен откат всей транзакции - поэтому
 -- перед арифметикой убеждаемся, что запись есть. Вызывать внутри sql.atomic.
@@ -288,6 +293,47 @@ local function assertUserExists(user_id, label)
   end
 end
 
+--- Проверка достаточности средств перед списанием. Вызывать внутри sql.atomic
+-- после assertUserExists. Поле balance unsigned и упало бы само, но с невнятным
+-- "Type mismatch: can not convert integer(-N) to unsigned" - а нехватка средств
+-- это штатная ситуация, ей нужен свой тип ошибки, а не storage error в логе.
+-- MVCC не даст сработать на устаревшем чтении: конкурентная транзакция откатится.
+-- @param user_id (number)
+-- @param amount (number) сколько собираемся списать
+-- @param label (string) контекст для сообщения об ошибке
+local function assertEnoughBalance(user_id, amount, label)
+  local rows = sql.check(sql([[
+    SELECT
+      balance
+    FROM
+      users
+    WHERE
+      id = ${user_id}
+  ]], {
+    user_id = user_id,
+  }))
+
+  local have = rows and rows[1] and rows[1].balance or 0
+
+  if have < amount then
+    error({
+      code = INSUFFICIENT_FUNDS_CODE,
+      message = ('%s %s: balance %s < %s'):format(
+        label, tostring(user_id), tostring(have), tostring(amount)),
+    })
+  end
+end
+
+--- Классификация ошибки денежной операции из sql.atomic:
+-- маркер нехватки средств -> INSUFFICIENT_FUNDS, всё остальное -> STORAGE_ERROR.
+local function moneyErr(err)
+  if type(err) == 'table' and err.code == INSUFFICIENT_FUNDS_CODE then
+    return setErrType({ err.message }, services_error_type.INSUFFICIENT_FUNDS)
+  end
+
+  return setErrType({ err }, services_error_type.STORAGE_ERROR)
+end
+
 --- Атомарный перевод amount валюты с баланса from_id на to_id.
 -- Арифметические SQL-операции внутри транзакции: без lost-update.
 -- balance - unsigned, поэтому уход в минус = ошибка и откат всей операции.
@@ -299,6 +345,7 @@ end
 function service.transfer(from_id, to_id, amount)
   local _, err = sql.atomic(function()
     assertUserExists(from_id, 'transfer: sender')
+    assertEnoughBalance(from_id, amount, 'transfer: sender')
     sql.check(sql([[
       UPDATE users
       SET
@@ -324,7 +371,7 @@ function service.transfer(from_id, to_id, amount)
   end)
 
   if err then
-    return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)
+    return nil, moneyErr(err)
   end
 
   return true, nil
@@ -467,28 +514,34 @@ end
 
 --- Отметка последней активности юзера (для "активных сегодня" в статистике).
 -- Любое взаимодействие: команда (любой чат, включая ЛС) или сообщение в группе.
+-- Горячий путь: конкурентные апдейты одного юзера конфликтуют под MVCC - ретраим.
 -- @param user_id (number)
 -- @return[1] res
 -- @return[2] err
 function service.touchActivity(user_id)
-  return service.update({ last_activity = os.time() }, { id = user_id })
+  return retryTxnConflict(function()
+    return service.update({ last_activity = os.time() }, { id = user_id })
+  end)
 end
 
 --- Инкремент счётчика команд юзера (для "команд за день" в статистике).
 -- Любой чат, включая ЛС. Одиночный UPDATE атомарен сам по себе.
+-- Горячий путь: делит кортеж юзера с touchActivity - под MVCC ретраим конфликт.
 -- @param user_id (number)
 -- @return[1] true
 -- @return[2] err
 function service.incCommands(user_id)
-  local _, err = sql([[
-    UPDATE users
-    SET
-      commands_count = commands_count + 1
-    WHERE
-      id = ${user_id}
-  ]], {
-    user_id = user_id,
-  })
+  local _, err = retryTxnConflict(function()
+    return sql([[
+      UPDATE users
+      SET
+        commands_count = commands_count + 1
+      WHERE
+        id = ${user_id}
+    ]], {
+      user_id = user_id,
+    })
+  end)
 
   if err then
     return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)
@@ -576,12 +629,13 @@ function service.settleReserve(user_id, reservedAmount, payout)
 end
 
 --- Резерв ставки: balance -> reserved_balance (атомарно).
--- balance unsigned -> если не хватает, SQL-операция падает и резерв не проходит.
+-- Не хватает средств -> ошибка типа INSUFFICIENT_FUNDS, ничего не списано.
 -- @return[1] true
 -- @return[2] err
 function service.reserve(user_id, amount)
   local _, err = sql.atomic(function()
     assertUserExists(user_id, 'reserve: user')
+    assertEnoughBalance(user_id, amount, 'reserve: user')
     sql.check(sql([[
       UPDATE users
       SET
@@ -596,7 +650,7 @@ function service.reserve(user_id, amount)
   end)
 
   if err then
-    return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)
+    return nil, moneyErr(err)
   end
 
   return true, nil
@@ -680,12 +734,13 @@ function service.refundGame(player1_id, player2_id, bid)
 end
 
 --- Резерв ставки сразу у обоих игроков (атомарно). Если у любого не хватает -
--- SQL-операция падает, оба отката, резерв не проходит.
+-- ошибка типа INSUFFICIENT_FUNDS, оба отката, резерв не проходит.
 -- @return[1] true
 -- @return[2] err
 function service.reservePair(player1_id, player2_id, amount)
   local _, err = sql.atomic(function()
     assertUserExists(player1_id, 'reservePair: player1')
+    assertEnoughBalance(player1_id, amount, 'reservePair: player1')
     sql.check(sql([[
       UPDATE users
       SET
@@ -699,6 +754,7 @@ function service.reservePair(player1_id, player2_id, amount)
     }))
 
     assertUserExists(player2_id, 'reservePair: player2')
+    assertEnoughBalance(player2_id, amount, 'reservePair: player2')
     sql.check(sql([[
       UPDATE users
       SET
@@ -713,7 +769,7 @@ function service.reservePair(player1_id, player2_id, amount)
   end)
 
   if err then
-    return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)
+    return nil, moneyErr(err)
   end
 
   return true, nil

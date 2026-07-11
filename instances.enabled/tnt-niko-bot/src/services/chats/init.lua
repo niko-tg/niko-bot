@@ -6,6 +6,7 @@ local Chat = require('src.models.Chat')
 
 local services_error_type = require('src.enums.services.services_error_type')
 local setErrType = require('src.utils.services.setErrType')
+local retryTxnConflict = require('src.utils.services.retryTxnConflict')
 
 local service = {}
 
@@ -248,19 +249,23 @@ function service.takeCashbox(chat_id)
 end
 
 --- Атомарный инкремент счётчика активности чата (+1 на сообщение).
+-- Самый контендящийся кортеж: все сообщения чата бьют в одну запись,
+-- под MVCC параллельные файберы конфликтуют - ретраим.
 -- @param chat_id (number)
 -- @return[1] true
 -- @return[2] err
 function service.incTotalMessages(chat_id)
-  local _, err = sql([[
-    UPDATE chats
-    SET
-      total_messages = total_messages + 1
-    WHERE
-      id = ${chat_id}
-  ]], {
-    chat_id = chat_id,
-  })
+  local _, err = retryTxnConflict(function()
+    return sql([[
+      UPDATE chats
+      SET
+        total_messages = total_messages + 1
+      WHERE
+        id = ${chat_id}
+    ]], {
+      chat_id = chat_id,
+    })
+  end)
 
   if err then
     return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)

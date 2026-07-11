@@ -76,6 +76,21 @@ function M.isBotBlocked(err)
   return descriptionContains(err, 'bot was blocked by the user')
 end
 
+--- ЛС недоступна: юзер заблокировал бота, не начинал с ним диалог,
+-- либо адресат - другой бот (ботам писать ботам нельзя).
+-- Ожидаемые отказы при рассылке в личку - не повод для error-лога.
+function M.isPMUnavailable(err)
+  return M.isBotBlocked(err)
+    or descriptionContains(err, "bot can't initiate conversation with a user")
+    or descriptionContains(err, 'USER_BOT_TO_BOT_DISABLED')
+end
+
+--- Список участников чата недоступен боту (скрытые участники / нет прав).
+-- Внешнее ограничение Telegram, а не сбой в коде.
+function M.isMemberListInaccessible(err)
+  return descriptionContains(err, 'member list is inaccessible')
+end
+
 --- Telegram просит притормозить: слишком много запросов (flood, код 429).
 function M.isFloodWait(err)
   if not err then

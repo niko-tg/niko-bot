@@ -42,7 +42,7 @@ local function notify(record)
   })
 
   if sendErr then
-    if tgErrors.isBotBlocked(sendErr) or tgErrors.isChatNotFound(sendErr) then
+    if tgErrors.isPMUnavailable(sendErr) or tgErrors.isChatNotFound(sendErr) then
       log.verbose(sendErr)
     else
       log.error(sendErr)
