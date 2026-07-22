@@ -21,7 +21,9 @@ local helloMessageService = require('src.services.hello_message')
 local formatHelloMessage = require('src.utils.formatHelloMessage')
 
 -- luacheck: ignore ctx
-local function on_new_member(ctx)
+--- Новый участник чата.
+-- @tparam table ctx контекст обновления
+local function onNewMember(ctx)
   log.verbose('[event] %s', 'on_new_member')
 
   local chat = ctx:getChat()
@@ -109,4 +111,4 @@ local function on_new_member(ctx)
   --
 end
 
-return on_new_member
+return onNewMember

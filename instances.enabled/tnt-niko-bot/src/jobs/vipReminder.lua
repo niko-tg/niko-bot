@@ -42,7 +42,7 @@ local function notify(record)
   })
 
   if sendErr then
-    if tgErrors.isBotBlocked(sendErr) or tgErrors.isChatNotFound(sendErr) then
+    if tgErrors.isPMUnavailable(sendErr) or tgErrors.isChatNotFound(sendErr) then
       log.verbose(sendErr)
     else
       log.error(sendErr)
@@ -59,6 +59,7 @@ local function notify(record)
   end
 end
 
+--- Один проход: рассылка напоминаний по истекающим подпискам.
 local function tick()
   local records, err = vipUsersService.listExpiringSoon(REMINDER_WINDOW)
 
@@ -71,12 +72,14 @@ local function tick()
     return
   end
 
-  for _, record in ipairs(records) do
+  for i = 1, #records do
+    local record = records[i]
     notify(record)
     fiber.sleep(SEND_DELAY)
   end
 end
 
+--- Запуск фонового файбера напоминалки.
 local function start()
   fiber.create(function()
     fiber.self():name('vip-reminder')

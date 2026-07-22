@@ -12,11 +12,12 @@ end
 
 local payload = {}
 
---- Разобрать payload. Возвращает type, count при корректном формате и
---- известном типе, иначе nil.
--- @param str (string|nil)
--- @return[1] type (string), count (number)
--- @return[2] nil
+--- Разобрать payload доната.
+-- Возвращает тип и количество при корректном формате и известном типе,
+-- иначе nil.
+-- @tparam ?string str строка payload вида '<type>-<count>'
+-- @treturn ?string тип доната
+-- @treturn ?number количество
 function payload.parse(str)
   local donatType, count = (str or ''):match('^(%a+)-(%d+)$')
   if not donatType or not knownTypes[donatType] then

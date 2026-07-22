@@ -6,17 +6,19 @@ local render = require('src.commands.public.like.render')
 local usersService = require('src.services.users')
 local likesService = require('src.services.likes')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/like', 'лайк' },
   flags = {
     Command.enum.IN_CHAT,
-    Command.enum.REPLY
-  }
-}
+    Command.enum.REPLY,
+  },
+})
 
 -- Награда получателю за полученный лайк.
 local LIKE_XP = 10
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local reply = ctx.message.reply_to_message
 

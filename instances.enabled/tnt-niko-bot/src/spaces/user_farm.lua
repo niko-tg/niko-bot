@@ -6,28 +6,28 @@
 --           чтобы не менять format живого спейса при добавлении животных.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- PK
   {
     name = 'user_id',
-    type = 'number'
+    type = 'number',
   },
 
   -- Грядки: слот -> { crop, ready_at }
   {
     name = 'plots',
-    type = 'map'
+    type = 'map',
   },
 
   -- Животные (фаза 2): id -> состояние
   {
     name = 'animals',
-    type = 'map'
+    type = 'map',
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'user_id',
@@ -39,7 +39,7 @@ local index = {
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

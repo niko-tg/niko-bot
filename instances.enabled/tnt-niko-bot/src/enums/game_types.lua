@@ -18,7 +18,8 @@ local M = {
   byEmoji = {},
 }
 
-for _, game in ipairs(GAMES) do
+for i = 1, #GAMES do
+  local game = GAMES[i]
   M.byKey[game.key] = game
   M.byEmoji[game.emoji] = game
 end

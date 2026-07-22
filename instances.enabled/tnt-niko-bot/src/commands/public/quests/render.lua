@@ -1,4 +1,4 @@
---- Рендер контрактов: список целей дня, прогресс, кнопки «Забрать».
+--- Рендер контрактов: список целей дня, прогресс, кнопки 'Забрать'.
 --
 local hdec = require('bot.libs.hdec')
 local separateNumbers = require('src.utils.separateNumbers')
@@ -33,13 +33,14 @@ ${sep}
 Обновление через <b>${countdown}</b>]]
 
 --- Экран контрактов.
--- @param state (table) из gathering.questState
--- @return table { text, keyboard }
+-- @tparam table state из gathering.questState
+-- @treturn table { text, keyboard }
 function render.list(state)
   local lines = {}
   local rows = {}
 
-  for _, entry in ipairs(state.list) do
+  for i = 1, #state.list do
+    local entry = state.list[i]
     local def = entry.def
 
     local status
@@ -55,7 +56,7 @@ function render.list(state)
       emoji = def.emoji,
       name = def.name,
       status = status,
-      reward = rewardLabel(def.reward)
+      reward = rewardLabel(def.reward),
     }))
 
     if entry.complete and not entry.claimed then
@@ -64,14 +65,14 @@ function render.list(state)
           text = CLAIM_BTN:f({
             emoji = def.emoji,
             name = def.name,
-            reward = rewardLabel(def.reward)
+            reward = rewardLabel(def.reward),
           }),
           callback = {
               command = 'cb_quests',
               arguments = {
               action = 'claim',
-              quest = def.id
-            }
+              quest = def.id,
+            },
           },
         },
       })
@@ -85,8 +86,8 @@ function render.list(state)
         command = 'cb_quests',
         arguments = {
           action = 'refresh',
-          quest = '0'
-        }
+          quest = '0',
+        },
       },
     },
   })

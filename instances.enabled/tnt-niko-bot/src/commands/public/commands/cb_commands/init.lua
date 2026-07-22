@@ -5,12 +5,15 @@ local auth = require('src.auth')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.commands.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_commands' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action' },
-}
+})
 
+--- Перерисовка меню на месте (правка исходного сообщения).
+-- @tparam table ctx контекст обновления
+-- @tparam table view { text, keyboard }
 local function editView(ctx, view)
   bot:editMessageText({
     chat_id = ctx:getChatId(),
@@ -20,6 +23,8 @@ local function editView(ctx, view)
   })
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local action = command.arguments.action
   local isOwner = auth.isBotOwner(command.user)
@@ -34,7 +39,7 @@ function command.call(ctx)
   if not view then
     ctx:answer({
       text = 'Недоступно',
-      show_alert = true
+      show_alert = true,
     })
     return
   end

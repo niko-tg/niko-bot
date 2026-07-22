@@ -5,14 +5,16 @@ local Command = require('bot.classes.Command')
 local render = require('src.commands.public.marry.render')
 local marriagesService = require('src.services.marriages')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/marry', 'вбрак' },
   flags = {
     Command.enum.IN_CHAT,
-    Command.enum.REPLY
-  }
-}
+    Command.enum.REPLY,
+  },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local reply = ctx.message.reply_to_message
 

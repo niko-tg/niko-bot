@@ -9,10 +9,10 @@ local hdec = require('bot.libs.hdec')
 local runBroadcast = require('src.broadcast.runner')
 local usersService = require('src.services.users')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/advusers' },
   flags = { Command.enum.MAINTENANCE },
-}
+})
 
 local USAGE = ([[
 ℹ️ <b>Рассылка по юзерам</b>
@@ -21,6 +21,8 @@ ${sep}
 кто запускал бота.
 ]]):f({ sep = hdec.sep })
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local reply = ctx:getReplyToMessage()
 

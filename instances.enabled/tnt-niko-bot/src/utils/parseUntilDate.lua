@@ -1,9 +1,13 @@
---- Парсит until_date, unit
+--- Парсит until_date, unit.
 --
 local utf8 = require('utf8')
 
 local DEFAULT_UNTIL_SEC = 60 * 5
 
+--- Разбор срока ограничения в абсолютное время.
+-- @tparam ?string str строка вида 10м, 2ч, 3д (по умолчанию 5 минут)
+-- @treturn ?number unix-время окончания
+-- @treturn ?string срок словами (для сообщения)
 local function parseUntilDate(str)
   if str == nil then
     return os.time() + DEFAULT_UNTIL_SEC, (DEFAULT_UNTIL_SEC/60)..' минут'

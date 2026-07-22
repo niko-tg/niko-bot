@@ -1,4 +1,4 @@
----
+--- Главная страница настроек чата: выбор раздела.
 --
 local bot = require('bot')
 local inlineCallbackKeyboard = require('bot.middlewares.inlineCallbackKeyboard')
@@ -7,6 +7,9 @@ local TEMPLATE = [[
 <b>Настройки</b>
 ]]
 
+--- Показ главной страницы настроек.
+-- @tparam table ctx контекст обновления
+-- @tparam table arguments аргументы callback-кнопки
 local function showMainPage(ctx, arguments)
   local keyboard = inlineCallbackKeyboard({
     {
@@ -15,9 +18,9 @@ local function showMainPage(ctx, arguments)
         command = 'cb_settings',
         arguments = {
           page = 'settings',
-          action = 'show'
-        }
-      }
+          action = 'show',
+        },
+      },
     },
     {
       text = '👑 VIP настройки',
@@ -25,19 +28,19 @@ local function showMainPage(ctx, arguments)
         command = 'cb_settings',
         arguments = {
           page = 'vip_settings',
-          action = 'show'
-        }
-      }
+          action = 'show',
+        },
+      },
     },
     {
-     text = '💬 Приветственное сообщение',
+      text = '💬 Приветственное сообщение',
       callback = {
         command = 'cb_settings',
         arguments = {
           page = 'hello_message',
-          action = 'show'
-        }
-      }
+          action = 'show',
+        },
+      },
     },
   })
 
@@ -54,7 +57,7 @@ local function showMainPage(ctx, arguments)
 
   ctx:replyToMessage({
     text = TEMPLATE,
-    reply_markup = keyboard
+    reply_markup = keyboard,
   })
 end
 

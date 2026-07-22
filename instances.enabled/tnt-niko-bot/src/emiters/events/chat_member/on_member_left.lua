@@ -1,11 +1,13 @@
----
+--- Событие chat_member: Участник вышел из чата сам.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
 local chatService = require('src.services.chats')
 
 -- luacheck: ignore ctx
-local function on_member_left(ctx)
+--- Участник вышел из чата сам.
+-- @tparam table ctx контекст обновления
+local function onMemberLeft(ctx)
   log.verbose('[event] %s', 'on_member_left')
 
   local chat = ctx:getChat()
@@ -35,4 +37,4 @@ local function on_member_left(ctx)
   --
 end
 
-return on_member_left
+return onMemberLeft

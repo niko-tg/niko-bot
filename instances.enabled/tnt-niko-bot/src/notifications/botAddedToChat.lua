@@ -24,7 +24,7 @@ ${sep}
 [<code>${from_user_id}</code>]: ${from_user}
 ]]):f({ sep = hdec.sep })
 
---- @param ctx (table) my_chat_member context
+--- @tparam table ctx my_chat_member context.
 local function botAddedToChat(ctx)
   local oldStatus = ctx:getOldChatMemberStatus()
 

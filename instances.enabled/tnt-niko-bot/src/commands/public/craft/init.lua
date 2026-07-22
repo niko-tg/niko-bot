@@ -5,11 +5,13 @@ local Command = require('bot.classes.Command')
 local inventoryService = require('src.services.inventory')
 local render = require('src.commands.public.craft.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/craft', 'крафт' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
 

@@ -9,10 +9,10 @@ local hdec = require('bot.libs.hdec')
 local runBroadcast = require('src.broadcast.runner')
 local chatsService = require('src.services.chats')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/advchats' },
   flags = { Command.enum.MAINTENANCE },
-}
+})
 
 local USAGE = ([[
 ℹ️ <b>Рассылка по чатам</b>
@@ -21,6 +21,8 @@ ${sep}
 по всем чатам с ботом.
 ]]):f({ sep = hdec.sep })
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local reply = ctx:getReplyToMessage()
 

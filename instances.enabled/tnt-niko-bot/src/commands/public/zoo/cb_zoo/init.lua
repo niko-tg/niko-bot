@@ -8,13 +8,13 @@ local render = require('src.commands.public.zoo.render')
 local petsService = require('src.services.pets')
 local vipUsersService = require('src.services.vip_users')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_zoo' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'a', 'b' },
-}
+})
 
--- Показать экран (всегда фото) через editMessageMedia.
+--- Показать экран (всегда фото) через editMessageMedia.
 local function showView(ctx, view)
   if not view then
     return
@@ -38,7 +38,7 @@ local function showView(ctx, view)
   end
 end
 
--- Покупка питомца.
+--- Покупка питомца.
 local function buyPet(ctx, user, breed, color)
   local isVip, vipErr = vipUsersService.isActive(user.id)
   if vipErr then
@@ -58,7 +58,7 @@ local function buyPet(ctx, user, breed, color)
   if result.status == 'limit' then
     ctx:answer({
       text = 'Достигнут лимит питомцев ('..result.max..').\nVIP даёт больше - /donat',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -78,7 +78,7 @@ local function buyPet(ctx, user, breed, color)
   showView(ctx, render.petBought())
 end
 
--- Покупка зоотовара.
+--- Покупка зоотовара.
 local function buySupply(ctx, user, supplyId)
   local result, err = petsService.buySupply(user.id, supplyId)
   if err then
@@ -113,6 +113,8 @@ local NAV = {
   sview = function(a) return render.supplyDetail(a) end,
 }
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local args = command.arguments
   local action = args.action

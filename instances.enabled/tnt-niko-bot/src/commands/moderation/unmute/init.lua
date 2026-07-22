@@ -15,13 +15,13 @@ local resolveTargetUser = require('src.utils.resolveTargetUser')
 local missingRightsWarner = require('src.utils.missingRightsWarner')
 local tgErrors = require('src.utils.tgErrors')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/unmute', 'анмут' },
   flags = {
     Command.enum.IN_CHAT,
     Command.enum.MODERATION,
   },
-}
+})
 
 local FULL_PERMS = {
   can_send_messages = true,
@@ -86,6 +86,8 @@ local function parseArgs(text)
   return asTarget(tokens[1])
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local message = ctx.message
   local reply = message.reply_to_message

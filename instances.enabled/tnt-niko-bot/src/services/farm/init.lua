@@ -37,9 +37,9 @@ local function slotCount(level)
 end
 
 --- Состояние фермы игрока: грядки с готовностью + сводка.
--- @param user_id (number)
--- @return[1] table { slots = { { index, empty } | { index, crop, ready_at, ready } }, total, free }
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table { slots = { { index, empty } | { index, crop, ready_at, ready } }, total, free }
+-- @treturn[2] table err
 function service.state(user_id)
   local row = box.space.user_farm:get(user_id)
   local plots = row and copyMap(row.plots) or {}
@@ -69,10 +69,10 @@ function service.state(user_id)
 end
 
 --- Посадить культуру в первый свободный слот. Списывает семя из инвентаря.
--- @param user_id (number)
--- @param cropId (string)
--- @return[1] table { status = 'ok'|'unknown'|'no_seed'|'no_slot', crop, ready_at }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string cropId
+-- @treturn[1] table { status = 'ok'|'unknown'|'no_seed'|'no_slot', crop, ready_at }
+-- @treturn[2] table err
 function service.plant(user_id, cropId)
   local crop = crops.get(cropId)
   if crop == nil then
@@ -145,10 +145,10 @@ function service.plant(user_id, cropId)
 end
 
 --- Собрать урожай с готового слота. Освобождает слот, выдаёт продукт в инвентарь.
--- @param user_id (number)
--- @param slotIndex (number|string)
--- @return[1] table { status = 'ok'|'empty'|'not_ready'|'full', product, count }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam number|string slotIndex
+-- @treturn[1] table { status = 'ok'|'empty'|'not_ready'|'full', product, count }
+-- @treturn[2] table err
 function service.collect(user_id, slotIndex)
   local slot = tostring(slotIndex)
   local result = { status = 'ok' }
@@ -226,9 +226,9 @@ function service.collect(user_id, slotIndex)
 end
 
 --- Состояние загона: для каждого животного - куплено/готов продукт/таймер/открыто.
--- @param user_id (number)
--- @return[1] table { list = { { def, owned, ready, ready_at, unlocked } }, level }
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table { list = { { def, owned, ready, ready_at, unlocked } }, level }
+-- @treturn[2] table err
 function service.animalState(user_id)
   local row = box.space.user_farm:get(user_id)
   local owned = row and copyMap(row.animals) or {}
@@ -236,7 +236,8 @@ function service.animalState(user_id)
   local now = os.time()
 
   local list = {}
-  for _, key in ipairs(animals.order) do
+  for i = 1, #animals.order do
+    local key = animals.order[i]
     local def = animals[key]
     local state = owned[key]
     list[#list + 1] = {
@@ -252,10 +253,10 @@ function service.animalState(user_id)
 end
 
 --- Купить животное в загон (одно каждого типа). Списывает баланс.
--- @param user_id (number)
--- @param animalId (string)
--- @return[1] table { status = 'ok'|'unknown'|'locked'|'funds'|'already'|'unavailable', price, min_level }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string animalId
+-- @treturn[1] table { status = 'ok'|'unknown'|'locked'|'funds'|'already'|'unavailable', price, min_level }
+-- @treturn[2] table err
 function service.buyAnimal(user_id, animalId)
   local def = animals.get(animalId)
   if def == nil then
@@ -311,10 +312,10 @@ function service.buyAnimal(user_id, animalId)
 end
 
 --- Собрать продукт с готового животного. Сбрасывает таймер, выдаёт продукт.
--- @param user_id (number)
--- @param animalId (string)
--- @return[1] table { status = 'ok'|'unknown'|'none'|'not_ready'|'full', product, count }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string animalId
+-- @treturn[1] table { status = 'ok'|'unknown'|'none'|'not_ready'|'full', product, count }
+-- @treturn[2] table err
 function service.collectAnimal(user_id, animalId)
   local def = animals.get(animalId)
   if def == nil then

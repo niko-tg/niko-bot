@@ -30,6 +30,8 @@ local function finish(ctx, session, data)
   ctx:reply(render.gameResult(session, data, player1, player2))
 end
 
+--- Обработчик игральных кубиков (dice).
+-- @tparam table ctx контекст обновления
 local function onDice(ctx)
   -- Пересланный кубик - не бросок (можно переслать чужой с нужным числом).
   -- Отдаём в общий чат: там отработает фильтр форвардов.

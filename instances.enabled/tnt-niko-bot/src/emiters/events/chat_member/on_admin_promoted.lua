@@ -1,4 +1,4 @@
----
+--- Событие chat_member: Участник повышен до администратора.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
@@ -6,7 +6,9 @@ local chatService = require('src.services.chats')
 local Permissions = require('src.models.Permissions')
 local moderationLog = require('src.notifications.moderationLog')
 
-local function on_admin_promoted(ctx)
+--- Участник повышен до администратора: обновление записи и лог в мод-чат.
+-- @tparam table ctx контекст обновления
+local function onAdminPromoted(ctx)
   log.verbose('[event] %s', 'on_admin_promoted')
 
   local chat = ctx:getChat()
@@ -41,4 +43,4 @@ local function on_admin_promoted(ctx)
   end
 end
 
-return on_admin_promoted
+return onAdminPromoted

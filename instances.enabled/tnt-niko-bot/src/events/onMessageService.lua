@@ -1,9 +1,11 @@
 --- Диспетчер сервисных сообщений (migrate_to/from_chat_id, chat_owner_changed,
---- new_chat_title, *_chat_created, forum_topic_*, general_forum_topic_*)
+-- new_chat_title, *_chat_created, forum_topic_*, general_forum_topic_*).
 --
 local emitter = require('src.emiters.events.message_service')
 local event_message_service = require('src.enums.events.event_message_service')
 
+--- Диспетчер сервисных сообщений по конкретному полю.
+-- @tparam table ctx контекст обновления
 local function onMessageService(ctx)
   local message = ctx.message
 

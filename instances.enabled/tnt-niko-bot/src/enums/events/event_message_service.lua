@@ -1,4 +1,4 @@
----
+--- Энам сервисных сообщений чата (миграции, создание, форум-топики).
 --
 local event_message_service = {
   MIGRATE_TO = 'migrate_to',

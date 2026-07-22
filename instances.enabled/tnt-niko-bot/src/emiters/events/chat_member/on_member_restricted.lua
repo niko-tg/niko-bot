@@ -7,7 +7,9 @@ local Permissions = require('src.models.Permissions')
 local moderationLog = require('src.notifications.moderationLog')
 local cancelGame = require('src.commands.public.game.cancel')
 
-local function on_member_restricted(ctx)
+--- Участнику выданы ограничения: обновление статуса и прав.
+-- @tparam table ctx контекст обновления
+local function onMemberRestricted(ctx)
   log.verbose('[event] %s', 'on_member_restricted')
 
   local chat = ctx:getChat()
@@ -44,4 +46,4 @@ local function on_member_restricted(ctx)
   cancelGame(chat.id, newChatMember.user, 'замучен')
 end
 
-return on_member_restricted
+return onMemberRestricted

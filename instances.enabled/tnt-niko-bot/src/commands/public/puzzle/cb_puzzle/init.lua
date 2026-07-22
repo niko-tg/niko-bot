@@ -1,4 +1,4 @@
---- Callback «Пазла»: start (сложность) / memorized (фаза повтора) / tap (ввод).
+--- Callback 'Пазла': start (сложность) / memorized (фаза повтора) / tap (ввод).
 -- Ownership даёт дефолтный isSameUser-гейт (одиночная игра, не MULTI_USER).
 --
 local log = require('log')
@@ -10,12 +10,15 @@ local vipUsersService = require('src.services.vip_users')
 local userGameStatsService = require('src.services.user_game_stats')
 local render = require('src.commands.public.puzzle.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_puzzle' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'len', 'idx' },
-}
+})
 
+--- Перерисовка карточки на месте (правка исходного сообщения).
+-- @tparam table ctx контекст обновления
+-- @tparam table view { text, keyboard }
 local function edit(ctx, view)
   bot:editMessageText({
     chat_id = ctx:getChatId(),
@@ -25,7 +28,7 @@ local function edit(ctx, view)
   })
 end
 
--- Генерация последовательности из len разных индексов эмодзи.
+--- Генерация последовательности из len разных индексов эмодзи.
 local function genSequence(len)
   local pool = {}
   for i = 1, #config.puzzle.emojis do
@@ -42,15 +45,16 @@ local function genSequence(len)
   return seq
 end
 
--- Завершение пазла: кулдаун + очистка активного.
+--- Завершение пазла: кулдаун + очистка активного.
 local function finishCooldown(user_id)
   return userGameStatsService.finishPuzzle(user_id, os.time() + config.puzzle.cooldown)
 end
 
--- START: выбор сложности -> генерация и фаза «запомни».
+--- START: выбор сложности -> генерация и фаза 'запомни'.
 local function onStart(ctx, user, len)
   local valid = false
-  for _, allowed in ipairs(config.puzzle.lengths) do
+  for i = 1, #config.puzzle.lengths do
+    local allowed = config.puzzle.lengths[i]
     if allowed == len then
       valid = true
       break
@@ -81,7 +85,7 @@ local function onStart(ctx, user, len)
     return
   end
 
-  -- VIP получает увеличенный выигрыш. Ошибку проверки трактуем как «не VIP».
+  -- VIP получает увеличенный выигрыш. Ошибку проверки трактуем как 'не VIP'.
   local isVip, vipErr = vipUsersService.isActive(user.id)
   if vipErr then
     log.error(vipErr)
@@ -98,7 +102,7 @@ local function onStart(ctx, user, len)
     seq = seq,
     pos = 1,
     phase = 'memorize',
-    win = win
+    win = win,
   }
 
   local _, saveErr = userGameStatsService.savePuzzle(user.id, active)
@@ -112,7 +116,7 @@ local function onStart(ctx, user, len)
   edit(ctx, render.memorize(active))
 end
 
--- MEMORIZED: «запомнил» -> фаза «повтори» (порядок скрыт).
+--- MEMORIZED: 'запомнил' -> фаза 'повтори' (порядок скрыт).
 local function onMemorized(ctx, user)
   local state, err = userGameStatsService.readPuzzle(user.id)
   if err then
@@ -135,7 +139,7 @@ local function onMemorized(ctx, user)
 
     ctx:answer({
       text = 'Ошибка',
-      show_alert = true
+      show_alert = true,
     })
 
     return
@@ -145,7 +149,7 @@ local function onMemorized(ctx, user)
   edit(ctx, render.recall(active))
 end
 
--- TAP: ввод эмодзи в фазе «повтори».
+--- TAP: ввод эмодзи в фазе 'повтори'.
 local function onTap(ctx, user, idx)
   if not idx then
     ctx:answer()
@@ -173,7 +177,7 @@ local function onTap(ctx, user, idx)
 
       ctx:answer({
         text = 'Ошибка, попробуй ещё',
-        show_alert = true
+        show_alert = true,
       })
 
       return
@@ -181,7 +185,7 @@ local function onTap(ctx, user, idx)
 
     ctx:answer({
       text = '💥 Мимо!',
-      show_alert = true
+      show_alert = true,
     })
 
     edit(ctx, render.lose(active))
@@ -202,7 +206,7 @@ local function onTap(ctx, user, idx)
 
       ctx:answer({
         text = 'Ошибка, попробуй ещё',
-        show_alert = true
+        show_alert = true,
       })
 
       return
@@ -233,6 +237,8 @@ local function onTap(ctx, user, idx)
   edit(ctx, render.recall(active))
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Аргументы в локали ДО первого yield (command - общий объект).
   local user = command.user

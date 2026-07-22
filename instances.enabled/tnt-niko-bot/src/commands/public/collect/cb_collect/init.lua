@@ -1,4 +1,4 @@
---- Callback сбора: «Собрать» готовой задачи и «Повторить» после завершения.
+--- Callback сбора: 'Собрать' готовой задачи и 'Повторить' после завершения.
 -- Ownership: одиночное взаимодействие, дефолтный isSameUser-гейт.
 --
 local log = require('log')
@@ -9,12 +9,15 @@ local userActivityService = require('src.services.user_activity')
 local gatheringService = require('src.services.gathering')
 local render = require('src.render.gather')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_collect' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'activity' },
-}
+})
 
+--- Перерисовка карточки на месте (правка исходного сообщения).
+-- @tparam table ctx контекст обновления
+-- @tparam table view { text, keyboard }
 local function edit(ctx, view)
   bot:editMessageText({
     chat_id = ctx:getChatId(),
@@ -34,7 +37,7 @@ local function repeatActivity(ctx, user_id, activityKey)
 
     ctx:answer({
       text = 'Ошибка, попробуй ещё',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -42,7 +45,7 @@ local function repeatActivity(ctx, user_id, activityKey)
   if res.status == 'busy' then
     ctx:answer({
       text = 'У тебя уже идёт добыча',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -50,7 +53,7 @@ local function repeatActivity(ctx, user_id, activityKey)
   if res.status == 'no_tool' then
     ctx:answer({
       text = 'Нет инструмента - загляни в /shop',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -58,7 +61,7 @@ local function repeatActivity(ctx, user_id, activityKey)
   if res.status == 'full' then
     ctx:answer({
       text = 'Рюкзак полон - продай ресурсы',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -68,6 +71,8 @@ local function repeatActivity(ctx, user_id, activityKey)
   userActivityService.setMessage(user_id, ctx:getMessageId())
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
   local action = command.arguments.action
@@ -85,7 +90,7 @@ function command.call(ctx)
 
     ctx:answer({
       text = 'Ошибка сбора, попробуй ещё',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -93,7 +98,7 @@ function command.call(ctx)
   if res.status == 'none' then
     ctx:answer({
       text = 'Уже собрано',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -101,7 +106,7 @@ function command.call(ctx)
   if res.status == 'not_ready' then
     ctx:answer({
       text = 'Ещё не готово: ' .. render.clock(res.remaining),
-      show_alert = true
+      show_alert = true,
     })
 
     edit(ctx, render.inProgress(res.activity, os.time() + res.remaining))

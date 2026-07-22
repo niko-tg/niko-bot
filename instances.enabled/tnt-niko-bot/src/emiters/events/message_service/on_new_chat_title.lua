@@ -3,7 +3,9 @@
 local log = require('log')
 local chatService = require('src.services.chats')
 
-local function on_new_chat_title(ctx)
+--- Сменилось название чата: обновление title в записи чата.
+-- @tparam table ctx контекст обновления
+local function onNewChatTitle(ctx)
   log.verbose('[event] %s', 'on_new_chat_title')
 
   local chat = ctx:getChat()
@@ -15,4 +17,4 @@ local function on_new_chat_title(ctx)
   end
 end
 
-return on_new_chat_title
+return onNewChatTitle

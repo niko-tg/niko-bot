@@ -1,5 +1,5 @@
 --- Личное меню: "мой брак" / "мои друзья" / "мои питомцы". Диспетчер по второму
---- слову; переиспользует рендеры одноимённых команд.
+-- слову; переиспользует рендеры одноимённых команд.
 --
 local log = require('log')
 local bot = require('bot')
@@ -9,15 +9,15 @@ local marriageRender = require('src.commands.public.marriage.render')
 local friendsRender = require('src.commands.public.friends.render')
 local petsRender = require('src.commands.public.pets.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/my', 'мой', 'мои' },
   flags = {
     Command.enum.PUBLIC,
-    Command.enum.NO_REPLY
+    Command.enum.NO_REPLY,
   },
-}
+})
 
--- Брак: карточка (как команда "брак").
+--- Брак: карточка (как команда "брак").
 local function showMarriage(ctx, userId)
   local view, err = marriageRender.card(userId)
   if err then
@@ -32,7 +32,7 @@ local function showMarriage(ctx, userId)
   ctx:replyToMessage({ text = view.text, reply_markup = view.keyboard })
 end
 
--- Друзья: список (как команда "друзья").
+--- Друзья: список (как команда "друзья").
 local function showFriends(ctx, userId)
   local view, err = friendsRender.list(userId, 1)
   if err then
@@ -47,7 +47,7 @@ local function showFriends(ctx, userId)
   ctx:replyToMessage({ text = view.text, reply_markup = view.keyboard })
 end
 
--- Питомцы: фото-список (как команда "питомцы").
+--- Питомцы: фото-список (как команда "питомцы").
 local function showPets(ctx, userId)
   local view, err = petsRender.list(userId)
   if err then
@@ -76,6 +76,8 @@ local DISPATCH = {
   ['питомцы'] = showPets,
 }
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local what = ctx:getArguments({ count = 2 })[2]
   if not what then

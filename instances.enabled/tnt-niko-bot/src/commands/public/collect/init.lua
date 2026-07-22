@@ -6,19 +6,21 @@ local Command = require('bot.classes.Command')
 local gatheringService = require('src.services.gathering')
 local render = require('src.render.gather')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/collect', 'собрать' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
 local EMPTY_TASK = ([[
 🎒 <b>Нет активной добычи</b>
 ${sep}
 Начни: /fishing /mining /sawmill
 ]]):f({
-  sep = hdec.sep
+  sep = hdec.sep,
 })
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
 

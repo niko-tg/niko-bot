@@ -1,4 +1,4 @@
---- Рендер добычи: экран «в процессе», результат сбора, служебные сообщения.
+--- Рендер добычи: экран 'в процессе', результат сбора, служебные сообщения.
 --
 local hdec = require('bot.libs.hdec')
 local config = require('conf.config')
@@ -26,36 +26,36 @@ end
 
 render.clock = clock
 
---- Кнопка «Собрать» (действует на единственную активную задачу игрока).
+--- Кнопка 'Собрать' (действует на единственную активную задачу игрока).
 local function collectKeyboard()
   return inlineCallbackKeyboard({
     {
       text = '🧺 Собрать',
       callback = {
         command = 'cb_collect',
-        arguments = { action = 'collect', activity = '0' }
+        arguments = { action = 'collect', activity = '0' },
       },
     },
   })
 end
 
---- Кнопка «Повторить» (запускает ту же активность заново).
+--- Кнопка 'Повторить' (запускает ту же активность заново).
 local function repeatKeyboard(activityKey)
   return inlineCallbackKeyboard({
     {
       text = '🔄 Повторить',
       callback = {
         command = 'cb_collect',
-        arguments = { action = 'repeat', activity = activityKey }
+        arguments = { action = 'repeat', activity = activityKey },
       },
     },
   })
 end
 
 --- Экран идущей задачи.
--- @param activityKey (string)
--- @param untilDate (number) время готовности (unix)
--- @return table { text, keyboard }
+-- @tparam string activityKey
+-- @tparam number untilDate время готовности (unix)
+-- @treturn table { text, keyboard }
 function render.inProgress(activityKey, untilDate)
   local activity = activities[activityKey]
 
@@ -84,19 +84,21 @@ local SKILL_LINE = '📈 <code>${name}</code>: ур. <b>${level}</b> (+${xp} xp)
 local LEVELUP_LINE = '🎉 Новый уровень навыка - открылся лут получше!'
 
 --- Экран результата сбора.
--- @param result (table) из gathering.collect (status='done')
--- @return table { text, keyboard }
+-- @tparam table result из gathering.collect (status='done')
+-- @treturn table { text, keyboard }
 function render.result(result)
   local activity = activities[result.activity]
 
   -- Лут в стабильном порядке реестра.
   local counts = {}
-  for _, drop in ipairs(result.loot) do
+  for i = 1, #result.loot do
+    local drop = result.loot[i]
     counts[drop.id] = (counts[drop.id] or 0) + drop.count
   end
 
   local lines = {}
-  for _, id in ipairs(items.resourceOrder) do
+  for i = 1, #items.resourceOrder do
+    local id = items.resourceOrder[i]
     if counts[id] then
       table.insert(lines, LOOT_LINE:f({ label = items.label(id), count = counts[id] }))
     end
@@ -139,11 +141,12 @@ ${sep}
 ${rows}]]
 
 --- Экран навыков добычи.
--- @param skills (table) { fishing = { xp, level }, ... } из gathering.skills
--- @return string
+-- @tparam table skills { fishing = { xp, level }, ... } из gathering.skills
+-- @treturn string
 function render.skills(skills)
   local lines = {}
-  for _, key in ipairs(activities.order) do
+  for i = 1, #activities.order do
+    local key = activities.order[i]
     local activity = activities[key]
     local skill = skills[key]
     local need = config.gathering.level_base * skill.level
@@ -167,7 +170,7 @@ local BUSY_TEXT = ([[
 ${sep}
 Дождись или забери: /collect
 ]]):f({
-  sep = hdec.sep
+  sep = hdec.sep,
 })
 
 local FULL_TEXT = ([[
@@ -175,7 +178,7 @@ local FULL_TEXT = ([[
 ${sep}
 Продай ресурсы: /sell всё
 ]]):f({
-  sep = hdec.sep
+  sep = hdec.sep,
 })
 
 -- Нет инструмента: своё сообщение на активность (с нужным инструментом).
@@ -185,7 +188,7 @@ fishing = ([[
 ${sep}
 Загляни в /shop
 ]]):f({
-  sep = hdec.sep
+  sep = hdec.sep,
 }),
 
 mining = ([[
@@ -193,7 +196,7 @@ mining = ([[
 ${sep}
 Загляни в /shop
 ]]):f({
-  sep = hdec.sep
+  sep = hdec.sep,
 }),
 
 sawmill = ([[
@@ -201,7 +204,7 @@ sawmill = ([[
 ${sep}
 Загляни в /shop
 ]]):f({
-  sep = hdec.sep
+  sep = hdec.sep,
   }),
 }
 
@@ -210,7 +213,7 @@ ${emoji} ${name} ещё в процессе
 ${sep}
 ⏳ Осталось: <b>${clock}</b>
 ]]):f({
-  sep = hdec.sep
+  sep = hdec.sep,
 })
 
 --- Уже занят другой задачей.
@@ -224,14 +227,14 @@ function render.fullText()
 end
 
 --- Нет инструмента для активности.
--- @param activityKey (string)
+-- @tparam string activityKey
 function render.noToolText(activityKey)
   return NO_TOOL_TEXT[activityKey]
 end
 
 --- Ещё не готово.
--- @param remaining (number) секунд
--- @param activityKey (string)
+-- @tparam number remaining секунд
+-- @tparam string activityKey
 function render.notReadyText(remaining, activityKey)
   local activity = activities[activityKey]
   return NOT_READY_TEXT:f({

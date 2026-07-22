@@ -1,4 +1,4 @@
---- Регистрация обработчиков событий onMyChatMember
+--- Регистрация обработчиков событий onMyChatMember.
 --
 local EventEmitter = require('bot.interfaces.EventEmitter')
 local event = require('src.enums.events.event_my_chat_member')

@@ -1,4 +1,4 @@
---- Ручка проверка статуса webhook
+--- Ручка проверка статуса webhook.
 --
 local bot = require('bot')
 local json = require('json')
@@ -6,7 +6,11 @@ local http = require('http.client')
 
 -- luacheck: ignore req
 -- luacheck: ignore res
-local getWebHookInfo = function(req, res)
+--- Обработчик GET /v1/getWebHookInfo: статус webhook (url скрыт).
+-- @tparam table req запрос
+-- @tparam table res ответ
+-- @treturn table HTTP-ответ с JSON-телом
+local function getWebHookInfo(req, res)
   -- Request
   local urlFmt = bot.api_url..'%s/%s'
   local data = http.post(urlFmt:format(bot.token, 'getWebHookInfo'))
@@ -16,9 +20,9 @@ local getWebHookInfo = function(req, res)
     return {
       status = 200,
       headers = {
-        ['content-type'] = 'text/plain'
+        ['content-type'] = 'text/plain',
       },
-      body = 'Error decode body'
+      body = 'Error decode body',
     }
   end
 
@@ -30,9 +34,9 @@ local getWebHookInfo = function(req, res)
   return {
     status = 200,
     headers = {
-      ['content-type'] = 'text/plain'
+      ['content-type'] = 'text/plain',
     },
-    body = json.encode(body)
+    body = json.encode(body),
   }
 end
 

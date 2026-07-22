@@ -1,4 +1,4 @@
---- Отправка invoice по выбранному типу доната
+--- Отправка invoice по выбранному типу доната.
 --
 local uri = require('uri')
 local bot = require('bot')
@@ -7,14 +7,17 @@ local Command = require('bot.classes.Command')
 local donat_types = require('src.enums.donat_types')
 local separateNumbers = require('src.utils.separateNumbers')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_donat' },
   flags = {
     Command.enum.CALLBACK,
   },
-  arguments_schema = { 'type', 'count' }
-}
+  arguments_schema = { 'type', 'count' },
+})
 
+--- Сборка payload инвойса из аргументов кнопки.
+-- @tparam table arguments аргументы callback-кнопки
+-- @treturn string payload вида '<type>-<count>'
 local function genPayload(arguments)
   return arguments.type .. '-' .. arguments.count
 end
@@ -52,7 +55,7 @@ local function buildInvoice(arguments)
         photo = 'donat/diamond.jpeg' },
       [5] = {
         amount = config.donat.five_crystals_price_stars,
-        photo = 'donat/diamonds5.jpg'
+        photo = 'donat/diamonds5.jpg',
       },
     }
 
@@ -113,6 +116,8 @@ local function buildInvoice(arguments)
   end
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arguments = command.arguments
 
@@ -137,7 +142,7 @@ function command.call(ctx)
       {
         label = genPayload(arguments),
         amount = invoice.amount,
-      }
+      },
     },
     photo_url = config.bot.url_assets..uri.escape(invoice.photo),
     photo_width = invoice.photo_width,

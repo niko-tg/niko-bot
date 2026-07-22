@@ -41,55 +41,55 @@ local function selectRow(query, params)
 end
 
 --- Живой расчёт всех метрик.
--- @param sinceTs (number) нижняя граница окна "активных" (unix-ts)
--- @param beforeTs (number|nil) верхняя граница окна. Без неё - открытое окно
+-- @tparam number sinceTs нижняя граница окна "активных" (unix-ts)
+-- @tparam ?number beforeTs верхняя граница окна. Без неё - открытое окно
 --   ">= since" (живой /botstats: "активны сегодня"). С ней - полуинтервал
 --   [since, before) для "активны за прошедший день" в ежедневной джобе.
--- @return[1] table метрик (тоталы + live)
--- @return[2] err
+-- @treturn[1] table метрик (тоталы + live)
+-- @treturn[2] table err
 function service.computeCurrent(sinceTs, beforeTs)
   local queries = {
     usersRow   = {
-      [[ SELECT COUNT(*) AS "cnt" FROM users ]]
+      [[ SELECT COUNT(*) AS "cnt" FROM users ]],
     },
     chatsRow   = {
-      [[ SELECT COUNT(*) AS "cnt" FROM chats ]]
+      [[ SELECT COUNT(*) AS "cnt" FROM chats ]],
     },
     startedRow = {
       [[ SELECT COUNT(*) AS "cnt" FROM users WHERE is_started_bot = ${s} ]],
-      { s = true }
+      { s = true },
     },
     gamesRow   = {
-      [[ SELECT COUNT(*) AS "cnt" FROM gaming_sessions ]]
+      [[ SELECT COUNT(*) AS "cnt" FROM gaming_sessions ]],
     },
     minesRow   = {
-      [[ SELECT COUNT(*) AS "cnt" FROM mine_sessions ]]
+      [[ SELECT COUNT(*) AS "cnt" FROM mine_sessions ]],
     },
     vipRow     = {
       [[ SELECT COUNT(*) AS "cnt" FROM vip_users WHERE until_date > ${now} ]],
-      { now = os.time() }
+      { now = os.time() },
     },
     usersSum   = {
-      [[ SELECT SUM(balance) AS "balance", SUM(crystals) AS "crystals" FROM SEQSCAN users ]]
+      [[ SELECT SUM(balance) AS "balance", SUM(crystals) AS "crystals" FROM SEQSCAN users ]],
     },
     chatsSum   = {
       [[ SELECT SUM(members) AS "members", SUM(total_messages) AS "messages", SUM(casino_cashier) AS "cashbox"]]
-      .. [[ FROM SEQSCAN chats ]]
+      .. [[ FROM SEQSCAN chats ]],
     },
     donatSum   = {
-      [[ SELECT SUM(amount) AS "donations" FROM SEQSCAN transactions WHERE refunded = FALSE ]]
+      [[ SELECT SUM(amount) AS "donations" FROM SEQSCAN transactions WHERE refunded = FALSE ]],
     },
     commandsRow = {
-      [[ SELECT SUM(commands_count) AS "cnt" FROM SEQSCAN users ]]
+      [[ SELECT SUM(commands_count) AS "cnt" FROM SEQSCAN users ]],
     },
     activeRow = beforeTs
       and {
         [[ SELECT COUNT(*) AS "cnt" FROM users WHERE last_activity >= ${since} AND last_activity < ${before} ]],
-        { since = sinceTs, before = beforeTs }
+        { since = sinceTs, before = beforeTs },
       }
       or {
           [[ SELECT COUNT(*) AS "cnt" FROM users WHERE last_activity >= ${since} ]],
-          { since = sinceTs }
+          { since = sinceTs },
         },
   }
 
@@ -125,13 +125,14 @@ function service.computeCurrent(sinceTs, beforeTs)
 end
 
 --- Сохранение/перезапись снапшота на дату (только SNAPSHOT_FIELDS).
--- @param date (number) начало дня
--- @param stats (table) результат computeCurrent
--- @return[1] true
--- @return[2] err
+-- @tparam number date начало дня
+-- @tparam table stats результат computeCurrent
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.saveSnapshot(date, stats)
   local record = { date = date }
-  for _, field in ipairs(SNAPSHOT_FIELDS) do
+  for i = 1, #SNAPSHOT_FIELDS do
+    local field = SNAPSHOT_FIELDS[i]
     record[field] = stats[field] or 0
   end
 
@@ -145,8 +146,8 @@ end
 
 --- Самый свежий снапшот (макс. дата) - для дельт.
 -- date зарезервировано в SQL, поэтому читаем через box-индекс, не SELECT.
--- @return[1] table|nil
--- @return[2] err
+-- @treturn[1] ?table
+-- @treturn[2] table err
 function service.getLatest()
   local ok, tuple = pcall(function()
     return box.space.bot_stats_daily.index.date:max()

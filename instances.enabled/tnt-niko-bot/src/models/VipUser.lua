@@ -1,7 +1,12 @@
---- Модель пользователя с VIP подпиской
+--- Модель пользователя с VIP подпиской.
 --
 local Errors = require('src.models.Errors')
 
+--- Конструктор модели VipUser.
+-- @tparam table data сырые поля (из запроса или из БД)
+-- @tparam[opt] table opts опции { init = true } - инициализация всех полей
+-- @treturn[1] table model
+-- @treturn[2] table errs
 local function VipUser(data, opts)
   local init = opts and opts.init
 

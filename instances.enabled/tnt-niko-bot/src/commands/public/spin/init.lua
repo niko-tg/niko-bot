@@ -1,4 +1,4 @@
---- Слот-машина «Спин» (PVE): ставка -> барабаны -> выплата. Касса чата - джекпот.
+--- Слот-машина 'Спин' (PVE): ставка -> барабаны -> выплата. Касса чата - джекпот.
 --
 local log = require('log')
 local config = require('conf.config')
@@ -10,11 +10,13 @@ local chatsService = require('src.services.chats')
 local render = require('src.commands.public.spin.render')
 local rng = require('src.commands.public.spin.rng')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/spin', 'спин', 'казино' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
   local chatId = ctx:getChatId()

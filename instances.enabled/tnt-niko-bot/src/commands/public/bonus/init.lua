@@ -8,14 +8,16 @@ local usersService = require('src.services.users')
 local vipUsersService = require('src.services.vip_users')
 local userGameStatsService = require('src.services.user_game_stats')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/bonus', 'бонус' },
   flags = {
     Command.enum.PUBLIC,
-    Command.enum.NO_REPLY
-  }
-}
+    Command.enum.NO_REPLY,
+  },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
   local bonus = config.daily_bonus
@@ -33,7 +35,7 @@ function command.call(ctx)
     return
   end
 
-  -- VIP получает больше. Ошибку проверки трактуем как «не VIP».
+  -- VIP получает больше. Ошибку проверки трактуем как 'не VIP'.
   local isVip, vipErr = vipUsersService.isActive(user.id)
   if vipErr then
     log.error(vipErr)

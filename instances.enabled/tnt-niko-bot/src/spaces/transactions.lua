@@ -1,7 +1,7 @@
---- Успешные транзакции (донаты)
+--- Успешные транзакции (донаты).
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- Уникальный идентификатор платежа от Telegram.
   -- Первичный ключ - даёт идемпотентность: повторная доставка
@@ -41,15 +41,15 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'primary',
     options = {
       parts = { 'telegram_payment_charge_id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   -- Все транзакции пользователя / статистика
   {
@@ -57,12 +57,12 @@ local index = {
     options = {
       parts = { 'user_id' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

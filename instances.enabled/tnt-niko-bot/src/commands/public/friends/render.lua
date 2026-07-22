@@ -115,17 +115,17 @@ local function backToListRow(page)
       text = '⬅️ К списку',
       callback = {
         command = 'cb_friends',
-        arguments = { action = 'page', friend = 0, page = page }
-      }
-    }
+        arguments = { action = 'page', friend = 0, page = page },
+      },
+    },
   }
 end
 
 --- Страница списка друзей пользователя ownerId: кнопка на друга + навигация.
--- @param ownerId (number)
--- @param page (number)
--- @return[1] { text, keyboard }
--- @return[2] err
+-- @tparam number ownerId
+-- @tparam number page
+-- @treturn[1] table { text, keyboard }
+-- @treturn[2] table err
 function render.list(ownerId, page)
   local total, countErr = friendsService.countFriends(ownerId)
   if countErr then
@@ -143,7 +143,9 @@ function render.list(ownerId, page)
 
   -- Кнопки: по другу в ряд.
   local keyboardRows = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(keyboardRows, {
       {
         text = resolveButtonName(row.friend_id),
@@ -152,10 +154,10 @@ function render.list(ownerId, page)
           arguments = {
             action = 'view',
             friend = row.friend_id,
-            page = page
-          }
-        }
-      }
+            page = page,
+          },
+        },
+      },
     })
   end
 
@@ -171,9 +173,9 @@ function render.list(ownerId, page)
         arguments = {
           action = 'page',
           friend = 0,
-          page = page - 1
-        }
-      }
+          page = page - 1,
+        },
+      },
     })
   end
 
@@ -185,9 +187,9 @@ function render.list(ownerId, page)
         arguments = {
           action = 'page',
           friend = 0,
-          page = page + 1
-        }
-      }
+          page = page + 1,
+        },
+      },
     })
   end
 
@@ -203,17 +205,17 @@ function render.list(ownerId, page)
 
   return {
     text = text,
-    keyboard = inlineCallbackKeyboard(keyboardRows)
+    keyboard = inlineCallbackKeyboard(keyboardRows),
   }, nil
 end
 
 --- Карточка друга: упоминание, чат, сколько дней дружат + кнопки.
 -- Если дружбы уже нет (удалили в другом окне) - возвращаем список.
--- @param ownerId (number)
--- @param friendId (number)
--- @param page (number)
--- @return[1] { text, keyboard }
--- @return[2] err
+-- @tparam number ownerId
+-- @tparam number friendId
+-- @tparam number page
+-- @treturn[1] table { text, keyboard }
+-- @treturn[2] table err
 function render.card(ownerId, friendId, page)
   local friendship, err = friendsService.read(ownerId, friendId)
   if err then
@@ -248,25 +250,25 @@ function render.card(ownerId, friendId, page)
           arguments = {
             action = 'del',
             friend = friendId,
-            page = page
-          }
-        }
-      }
+            page = page,
+          },
+        },
+      },
     },
     backToListRow(page),
   })
 
   return {
     text = text,
-    keyboard = keyboard
+    keyboard = keyboard,
   }, nil
 end
 
 --- Подтверждение удаления друга.
--- @param friendId (number)
--- @param page (number)
--- @return[1] { text, keyboard }
--- @return[2] err
+-- @tparam number friendId
+-- @tparam number page
+-- @treturn[1] table { text, keyboard }
+-- @treturn[2] table err
 function render.confirmDelete(friendId, page)
   local text = CONFIRM:f({ friend = resolveName(friendId) })
 
@@ -279,9 +281,9 @@ function render.confirmDelete(friendId, page)
           arguments = {
             action = 'delyes',
             friend = friendId,
-            page = page
-          }
-        }
+            page = page,
+          },
+        },
       },
       {
         text = '🩵 Нет',
@@ -290,9 +292,9 @@ function render.confirmDelete(friendId, page)
           arguments = {
             action = 'view',
             friend = friendId,
-            page = page
-          }
-        }
+            page = page,
+          },
+        },
       },
     },
   })
@@ -301,15 +303,15 @@ function render.confirmDelete(friendId, page)
 end
 
 --- Друг удалён: текст + возврат к списку.
--- @param page (number)
--- @return[1] { text, keyboard }
--- @return[2] err
+-- @tparam number page
+-- @treturn[1] table { text, keyboard }
+-- @treturn[2] table err
 function render.deleted(page)
   local keyboard = inlineCallbackKeyboard({ backToListRow(page) })
 
   return {
     text = DELETED,
-    keyboard = keyboard
+    keyboard = keyboard,
   }, nil
 end
 

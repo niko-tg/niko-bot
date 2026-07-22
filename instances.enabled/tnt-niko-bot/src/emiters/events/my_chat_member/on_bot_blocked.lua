@@ -1,4 +1,4 @@
---- Заблокировали бота
+--- Заблокировали бота.
 --
 local log = require('log')
 local chat_type = require('bot.enums.chat_type')
@@ -7,7 +7,9 @@ local uicService = require('src.services.user_in_chat')
 local Permissions = require('src.models.Permissions')
 
 -- luacheck: ignore ctx
-local function on_bot_blocked(ctx)
+--- Заблокировали бота.
+-- @tparam table ctx контекст обновления
+local function onBotBlocked(ctx)
   log.verbose('[event] %s', 'on_bot_blocked')
 
   local chat = ctx:getChat()
@@ -43,4 +45,4 @@ local function on_bot_blocked(ctx)
   end
 end
 
-return on_bot_blocked
+return onBotBlocked

@@ -1,7 +1,12 @@
---- Модель фермы пользователя
+--- Модель фермы пользователя.
 --
 local Errors = require('src.models.Errors')
 
+--- Конструктор модели UserFarm.
+-- @tparam table data сырые поля (из запроса или из БД)
+-- @tparam[opt] table opts опции { init = true } - инициализация всех полей
+-- @treturn[1] table model
+-- @treturn[2] table errs
 local function UserFarm(data, opts)
   local init = opts and opts.init
 

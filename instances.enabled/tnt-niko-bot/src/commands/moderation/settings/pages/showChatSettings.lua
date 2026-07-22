@@ -1,4 +1,4 @@
----
+--- Страница настроек чата: переключатели модерации и антифлуда.
 --
 local bot = require('bot')
 local hdec = require('bot.libs.hdec')
@@ -18,6 +18,9 @@ ${sep}
 Для изменения параметра - нажмите на него.
 ]]):f({ sep = hdec.sep })
 
+--- Подпись переключателя настройки.
+-- @tparam boolean flag значение настройки
+-- @treturn string 'ON' либо 'OFF'
 local function flagToText(flag)
   if flag then
     return 'ON'
@@ -26,6 +29,10 @@ local function flagToText(flag)
   return 'OFF'
 end
 
+--- Показ страницы настроек.
+-- @tparam table ctx контекст обновления
+-- @tparam table arguments аргументы callback-кнопки
+-- @tparam table pchat модель чата с настройками
 local function showVipSettingsPage(ctx, arguments, pchat)
   if arguments.action ~= 'show' then
     return
@@ -43,29 +50,29 @@ local function showVipSettingsPage(ctx, arguments, pchat)
   local keyboard = inlineCallbackKeyboard({
     {
       text = ('Антифлуд: ${has_enable_antiflood}'):f({
-        has_enable_antiflood = flagToText(hasEnableAntiflood)
+        has_enable_antiflood = flagToText(hasEnableAntiflood),
       }),
       callback = {
         command = 'cb_set_setting',
         arguments = {
           page = arguments_dict.page.settings,
           param = arguments_dict.param.has_enable_antiflood,
-          value = tostring(not hasEnableAntiflood)
-        }
-      }
+          value = tostring(not hasEnableAntiflood),
+        },
+      },
     },
     {
       text = ('Модераторские команды: ${has_enable_moderation_commands}'):f({
-        has_enable_moderation_commands = flagToText(hasEnableModerationCommands)
+        has_enable_moderation_commands = flagToText(hasEnableModerationCommands),
       }),
       callback = {
         command = 'cb_set_setting',
         arguments = {
           page = arguments_dict.page.settings,
           param = arguments_dict.param.has_enable_moderation_commands,
-          value = tostring(not hasEnableModerationCommands)
-        }
-      }
+          value = tostring(not hasEnableModerationCommands),
+        },
+      },
     },
     {
       text = '◀️ Назад',
@@ -73,9 +80,9 @@ local function showVipSettingsPage(ctx, arguments, pchat)
         command = 'cb_settings',
         arguments = {
           page = 'main',
-          action = 'edit'
-        }
-      }
+          action = 'edit',
+        },
+      },
     },
   })
 

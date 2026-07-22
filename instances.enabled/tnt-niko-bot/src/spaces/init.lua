@@ -1,4 +1,4 @@
---- Инициализация спейсов хранилища
+--- Инициализация спейсов хранилища.
 --
 
 local users = require('src.spaces.users')
@@ -19,6 +19,8 @@ local marriages = require('src.spaces.marriages')
 local pets = require('src.spaces.pets')
 local pet_supplies = require('src.spaces.pet_supplies')
 local user_farm = require('src.spaces.user_farm')
+local boss_sessions = require('src.spaces.boss_sessions')
+local boss_hits = require('src.spaces.boss_hits')
 
 return {
   users = users,
@@ -39,4 +41,6 @@ return {
   pets = pets,
   pet_supplies = pet_supplies,
   user_farm = user_farm,
+  boss_sessions = boss_sessions,
+  boss_hits = boss_hits,
 }

@@ -1,4 +1,4 @@
---- Получение инфы по чату
+--- Получение инфы по чату.
 --
 local log = require('log')
 local hdec = require('bot.libs.hdec')
@@ -6,11 +6,14 @@ local Command = require('bot.classes.Command')
 local chatService = require('src.services.chats')
 local tableRender = require('src.utils.tableRender')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/chatinfo' },
-  flags = { Command.enum.MAINTENANCE }
-}
+  flags = { Command.enum.MAINTENANCE },
+})
 
+--- Разбор аргументов вида key=value из текста команды.
+-- @tparam string text текст сообщения
+-- @treturn table пары ключ-значение
 local function parseArgs(text)
   local args = {}
 
@@ -29,6 +32,8 @@ Chat ID: <code>${chat_id}</code>
 ${sep}
 ]]
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local args = parseArgs(ctx:getText())
   local chatId

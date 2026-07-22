@@ -8,14 +8,16 @@ local Command = require('bot.classes.Command')
 local helloMessageService = require('src.services.hello_message')
 local chatService = require('src.services.chats')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/rmhello' },
   flags = {
     Command.enum.IN_CHAT,
     Command.enum.ADMINISTRATIVE,
-  }
-}
+  },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local chat = command.chat
 

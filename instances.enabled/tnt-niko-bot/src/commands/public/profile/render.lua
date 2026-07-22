@@ -41,7 +41,7 @@ ${vampire_emoji} Кусей: <b>${kuses}</b>
 💍 Брак: ${marriage}
 ]]
 
--- Приглашение команды смены расы (и при «назад» из превью в режиме change).
+-- Приглашение команды смены расы (и при 'назад' из превью в режиме change).
 local CHANGE_PROMPT = ([[
 🧬 <b>Смена расы</b>
 ${sep}
@@ -55,14 +55,15 @@ ${sep}
 Выбери пол
 ]]):f({ sep = hdec.sep })
 
-local womanVampireEmoji = "🧛‍♀️"
-local manVampireEmoji = "🧛"
+local womanVampireEmoji = '🧛‍♀️'
+local manVampireEmoji = '🧛'
 
 -- Порядок рас для кнопок выбора (anonymous из dict - не раса).
 local RACE_ORDER = { 'wizard', 'elf', 'human', 'demon' }
 
 local RACE_SET = {}
-for _, key in ipairs(RACE_ORDER) do
+for i = 1, #RACE_ORDER do
+  local key = RACE_ORDER[i]
   RACE_SET[key] = true
 end
 
@@ -83,6 +84,9 @@ local GENDERS = {
   woman = { label = 'Девушка', emoji = '👩' },
 }
 
+--- Известен ли такой ключ пола.
+-- @tparam string key ключ пола
+-- @treturn boolean
 function render.isGender(key)
   return GENDERS[key] ~= nil
 end
@@ -93,7 +97,7 @@ function render.genderLabel(key)
 end
 --
 
--- Полных лет по дате рождения (datetime).
+--- Полных лет по дате рождения (datetime).
 local function ageInYears(birthday)
   local now = os.date('*t')
   local born = os.date('*t', birthday.timestamp)
@@ -106,7 +110,7 @@ local function ageInYears(birthday)
   return years
 end
 
--- Русское склонение: 1 год / 2 года / 5 лет.
+--- Русское склонение: 1 год / 2 года / 5 лет.
 local function yearsWord(n)
   local mod10 = n % 10
   local mod100 = n % 100
@@ -120,7 +124,7 @@ local function yearsWord(n)
   return 'лет'
 end
 
---- Текст профиля (с VIP-префиксом и строкой «В чате», если уместно).
+--- Текст профиля (с VIP-префиксом и строкой 'В чате', если уместно).
 local function buildProfileText(user, chat)
   local isVip, err = vipUsersService.isActive(user.id)
   if err then
@@ -163,7 +167,7 @@ local function buildProfileText(user, chat)
     vampireEmoji = manVampireEmoji
   end
 
-  -- Брак: партнёр (с учётом приватности) и дни вместе, или «свободен».
+  -- Брак: партнёр (с учётом приватности) и дни вместе, или 'свободен'.
   local marriageStatus = 'свободен'
   local marriage, marriageErr = marriagesService.read(user.id)
   if marriageErr then
@@ -233,7 +237,7 @@ local function buildProfileText(user, chat)
   return profileText
 end
 
--- Кнопка «Установить расу» (из профиля, ведёт в выбор). owner - id владельца.
+--- Кнопка 'Установить расу' (из профиля, ведёт в выбор). owner - id владельца.
 local function setRaceButton(owner)
   return {
     text = '🧬 Установить расу',
@@ -243,13 +247,13 @@ local function setRaceButton(owner)
         action = 'menu',
         race = '_',
         owner = owner,
-        mode = 'set'
-      }
+        mode = 'set',
+      },
     },
   }
 end
 
--- Кнопка «Указать пол» (из профиля, ведёт в выбор).
+--- Кнопка 'Указать пол' (из профиля, ведёт в выбор).
 local function setGenderButton(owner)
   return {
     text = '👫 Указать пол',
@@ -258,14 +262,14 @@ local function setGenderButton(owner)
       arguments = {
         action = 'menu',
         gender = '_',
-        owner = owner
-      }
+        owner = owner,
+      },
     },
   }
 end
 
--- Кнопки выбора пола. action = 'set' (профиль, одноразово) | 'change' (команда).
--- withBack добавляет «Назад» (нужно в профиле, не в команде смены).
+--- Кнопки выбора пола. action = 'set' (профиль, одноразово) | 'change' (команда).
+-- withBack добавляет 'Назад' (нужно в профиле, не в команде смены).
 local function genderChoiceKeyboard(owner, action, withBack)
   local rows = {
     {
@@ -276,8 +280,8 @@ local function genderChoiceKeyboard(owner, action, withBack)
           arguments = {
             action = action,
             gender = 'man',
-            owner = owner
-          }
+            owner = owner,
+          },
         },
       },
       {
@@ -287,8 +291,8 @@ local function genderChoiceKeyboard(owner, action, withBack)
           arguments = {
             action = action,
             gender = 'woman',
-            owner = owner
-          }
+            owner = owner,
+          },
         },
       },
     },
@@ -303,8 +307,8 @@ local function genderChoiceKeyboard(owner, action, withBack)
           arguments = {
             action = 'back',
             gender = '_',
-            owner = owner
-          }
+            owner = owner,
+          },
         },
       },
     })
@@ -315,13 +319,14 @@ end
 
 render.genderChoiceKeyboard = genderChoiceKeyboard
 
--- Кнопки выбора расы (2 в ряд). Клик -> превью (action='preview').
+--- Кнопки выбора расы (2 в ряд). Клик -> превью (action='preview').
 -- mode - что делать после подтверждения: 'set' (профиль) | 'change' (команда).
 local function raceChoiceKeyboard(owner, mode)
   local rows = {}
   local row = {}
 
-  for _, key in ipairs(RACE_ORDER) do
+  for i = 1, #RACE_ORDER do
+    local key = RACE_ORDER[i]
     local race = races[key]
 
     table.insert(row, {
@@ -332,8 +337,8 @@ local function raceChoiceKeyboard(owner, mode)
           action = 'preview',
           race = key,
           owner = owner,
-          mode = mode
-        }
+          mode = mode,
+        },
       },
     })
 
@@ -352,7 +357,7 @@ end
 
 render.raceChoiceKeyboard = raceChoiceKeyboard
 
---- Превью расы: описание + кнопки «Выбрать» (action=mode) и «Назад».
+--- Превью расы: описание + кнопки 'Выбрать' (action=mode) и 'Назад'.
 function render.racePreview(raceKey, owner, mode)
   local race = races[raceKey]
 
@@ -370,8 +375,8 @@ function render.racePreview(raceKey, owner, mode)
             action = mode,
             race = raceKey,
             owner = owner,
-            mode = mode
-          }
+            mode = mode,
+          },
         },
       },
     },
@@ -384,8 +389,8 @@ function render.racePreview(raceKey, owner, mode)
             action = 'back',
             race = '_',
             owner = owner,
-            mode = mode
-          }
+            mode = mode,
+          },
         },
       },
     },
@@ -396,7 +401,7 @@ end
 
 --- Профиль -> { text, keyboard }.
 -- opts.raceChoice = true -> кнопки выбора расы; opts.genderChoice = true -> выбор пола.
--- Иначе: для незаданных расы/пола - кнопки «Установить расу» / «Указать пол».
+-- Иначе: для незаданных расы/пола - кнопки 'Установить расу' / 'Указать пол'.
 function render.profile(user, chat, opts)
   local text = buildProfileText(user, chat)
   local keyboard

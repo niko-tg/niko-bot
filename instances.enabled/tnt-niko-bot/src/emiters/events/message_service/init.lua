@@ -1,4 +1,4 @@
---- Регистрация обработчиков сервисных сообщений
+--- Регистрация обработчиков сервисных сообщений.
 --
 local EventEmitter = require('bot.interfaces.EventEmitter')
 local event = require('src.enums.events.event_message_service')

@@ -7,11 +7,11 @@ local inventoryService = require('src.services.inventory')
 local gatheringService = require('src.services.gathering')
 local render = require('src.commands.public.craft.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_craft' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'recipe' },
-}
+})
 
 --- Перерисовка списка крафта актуальным инвентарём.
 local function refresh(ctx, user_id)
@@ -31,6 +31,8 @@ local function refresh(ctx, user_id)
   })
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
   local action = command.arguments.action
@@ -43,7 +45,7 @@ function command.call(ctx)
 
       ctx:answer({
         text = 'Ошибка крафта, попробуй ещё',
-        show_alert = true
+        show_alert = true,
       })
       return
     end
@@ -51,7 +53,7 @@ function command.call(ctx)
     if res.status == 'missing' then
       ctx:answer({
         text = 'Не хватает ресурсов',
-        show_alert = true
+        show_alert = true,
       })
       return
     end
@@ -59,7 +61,7 @@ function command.call(ctx)
     if res.status ~= 'ok' then
       ctx:answer({
         text = 'Рецепт недоступен',
-        show_alert = true
+        show_alert = true,
       })
       return
     end

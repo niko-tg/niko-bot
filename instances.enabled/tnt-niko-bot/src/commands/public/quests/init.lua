@@ -5,11 +5,13 @@ local Command = require('bot.classes.Command')
 local gatheringService = require('src.services.gathering')
 local render = require('src.commands.public.quests.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/quests', 'квесты', 'задания' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
 

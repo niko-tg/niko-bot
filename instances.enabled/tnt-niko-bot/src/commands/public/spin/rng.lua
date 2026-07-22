@@ -8,7 +8,7 @@ local config = require('conf.config')
 local generator = lcg()
 local plays = 0
 
--- Случайный сид из пула good_seeds.
+--- Случайный сид из пула good_seeds.
 local function reseed()
   local seeds = config.spin.good_seeds
   generator.seed(seeds[math.random(#seeds)])
@@ -19,7 +19,7 @@ reseed()
 local rng = {}
 
 --- Прокрут: 3 барабана через LCG, категория исхода по числу совпадений.
--- @return table { category = 'lose'|'win2'|'jackpot'|'ultra', reels = string }
+-- @treturn table { category = 'lose'|'win2'|'jackpot'|'ultra', reels = string }
 function rng.spin()
   plays = plays + 1
   if plays >= config.spin.reseed_every then
@@ -34,7 +34,8 @@ function rng.spin()
 
   -- Самый частый символ среди трёх барабанов.
   local counts = {}
-  for _, i in ipairs(idx) do
+  for k = 1, #idx do
+    local i = idx[k]
     counts[i] = (counts[i] or 0) + 1
   end
 
@@ -56,7 +57,8 @@ function rng.spin()
   end
 
   local reelArr = {}
-  for _, i in ipairs(idx) do
+  for k = 1, #idx do
+    local i = idx[k]
     table.insert(reelArr, symbols[i])
   end
 

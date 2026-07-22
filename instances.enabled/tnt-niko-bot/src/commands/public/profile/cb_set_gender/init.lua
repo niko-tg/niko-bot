@@ -6,13 +6,13 @@ local Command = require('bot.classes.Command')
 local usersService = require('src.services.users')
 local render = require('src.commands.public.profile.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_set_gender' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'gender', 'owner' },
-}
+})
 
--- Редактирует текущее сообщение в переданный view { text, keyboard }.
+--- Редактирует текущее сообщение в переданный view { text, keyboard }.
 local function editView(ctx, view)
   bot:editMessageText({
     chat_id = ctx:getChatId(),
@@ -22,6 +22,8 @@ local function editView(ctx, view)
   })
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arguments = command.arguments
   local owner = tonumber(arguments.owner)
@@ -30,7 +32,7 @@ function command.call(ctx)
   if command.user.id ~= owner then
     ctx:answer({
       text = 'Это не твой профиль 🙃',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -56,7 +58,7 @@ function command.call(ctx)
     if user.gender ~= box.NULL then
       ctx:answer({
         text = 'Пол уже установлен 🔒',
-        show_alert = true
+        show_alert = true,
       })
 
       editView(ctx, render.profile(user, ctx:getChat()))
@@ -66,7 +68,7 @@ function command.call(ctx)
     if not render.isGender(arguments.gender) then
       ctx:answer({
         text = 'Неизвестный пол',
-        show_alert = true
+        show_alert = true,
       })
 
       return
@@ -78,7 +80,7 @@ function command.call(ctx)
 
       ctx:answer({
         text = 'Не удалось сохранить пол',
-        show_alert = true
+        show_alert = true,
       })
 
       return
@@ -95,7 +97,7 @@ function command.call(ctx)
     if not render.isGender(arguments.gender) then
       ctx:answer({
         text = 'Неизвестный пол',
-        show_alert = true
+        show_alert = true,
       })
 
       return
@@ -107,7 +109,7 @@ function command.call(ctx)
 
       ctx:answer({
         text = 'Не удалось сохранить пол',
-        show_alert = true
+        show_alert = true,
       })
 
       return

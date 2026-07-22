@@ -11,14 +11,14 @@ local hdec = require('bot.libs.hdec')
 local parseTags = require('src.utils.parseTags')
 local helloMessageService = require('src.services.hello_message')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/mkhello' },
   flags = {
     Command.enum.IN_CHAT,
     Command.enum.ADMINISTRATIVE,
     Command.enum.REPLY,
-  }
-}
+  },
+})
 
 --- Извлекает file (photo/animation/video) из сообщения. Возвращает {} если нет.
 local function extractFile(message)
@@ -52,6 +52,8 @@ ${sep}
 Настройки чата: /settings
 ]]
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local reply = ctx.message.reply_to_message
 

@@ -9,7 +9,8 @@ local render = {}
 
 --- Хватает ли входов рецепта.
 local function canCraft(itemsMap, recipe)
-  for _, input in ipairs(recipe.inputs) do
+  for i = 1, #recipe.inputs do
+    local input = recipe.inputs[i]
     if (itemsMap[input.id] or 0) < input.count then
       return false
     end
@@ -27,20 +28,22 @@ ${sep}
 ${lines}]]
 
 --- Экран крафта.
--- @param inv (table|nil) инвентарь игрока
--- @return table { text, keyboard }
+-- @tparam ?table inv инвентарь игрока
+-- @treturn table { text, keyboard }
 function render.list(inv)
   local itemsMap = (inv and inv.items) or {}
 
   local lines = {}
   local rows = {}
 
-  for _, recipe in ipairs(recipes) do
+  for i = 1, #recipes do
+    local recipe = recipes[i]
     local inputs = {}
-    for _, input in ipairs(recipe.inputs) do
+    for j = 1, #recipe.inputs do
+      local input = recipe.inputs[j]
       table.insert(inputs, INPUT_FRAG:f({
         label = items.label(input.id),
-        count = input.count
+        count = input.count,
       }))
     end
 
@@ -59,8 +62,8 @@ function render.list(inv)
           command = 'cb_craft',
           arguments = {
             action = 'craft',
-            recipe = recipe.id
-          }
+            recipe = recipe.id,
+          },
         },
       },
     })
@@ -73,15 +76,15 @@ function render.list(inv)
         command = 'cb_craft',
         arguments = {
           action = 'refresh',
-          recipe = '0'
-        }
+          recipe = '0',
+        },
       },
     },
   })
 
   local text = CRAFT_TEXT:f({
     sep = hdec.sep,
-    lines = table.concat(lines, '\n')
+    lines = table.concat(lines, '\n'),
   })
 
   return {

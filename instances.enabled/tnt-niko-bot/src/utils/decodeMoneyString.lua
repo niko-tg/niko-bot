@@ -6,6 +6,9 @@ local utf8 = require('utf8')
 -- Максимум к-суффиксов: 10ккк = 10 млрд.
 local MAX_UNITS = 3
 
+--- Разбор строки суммы с к-суффиксами в число.
+-- @tparam ?string str строка вида 10, 10к, 10кк
+-- @treturn ?number сумма либо nil при некорректной строке
 local function decodeMoneyString(str)
   if str == nil then
     return nil

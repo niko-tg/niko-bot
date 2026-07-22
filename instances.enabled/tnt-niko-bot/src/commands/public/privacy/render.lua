@@ -13,6 +13,9 @@ ${sep}
 
 local render = {}
 
+--- Экран настройки приватности с переключателем.
+-- @tparam table user модель пользователя
+-- @treturn table { text, keyboard }
 function render.view(user)
   local isPrivate = user.is_private == true
 
@@ -27,15 +30,15 @@ function render.view(user)
       callback = {
         command = 'cb_privacy',
         arguments = {
-          owner = user.id
-        }
+          owner = user.id,
+        },
       },
     },
   })
 
   return {
     text = text,
-    keyboard = keyboard
+    keyboard = keyboard,
   }
 end
 

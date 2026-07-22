@@ -1,11 +1,13 @@
---- Понизили в админских правах
+--- Понизили в админских правах.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
 local Permissions = require('src.models.Permissions')
 
 -- luacheck: ignore ctx
-local function on_bot_admin_demoted(ctx)
+--- Понизили в админских правах.
+-- @tparam table ctx контекст обновления
+local function onBotAdminDemoted(ctx)
   log.verbose('[event] %s', 'on_bot_admin_demoted')
 
   local chat = ctx:getChat()
@@ -25,4 +27,4 @@ local function on_bot_admin_demoted(ctx)
   end
 end
 
-return on_bot_admin_demoted
+return onBotAdminDemoted

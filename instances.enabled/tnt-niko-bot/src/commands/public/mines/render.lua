@@ -1,4 +1,4 @@
---- Рендер «Мин»: меню риска, доска, итоги.
+--- Рендер 'Мин': меню риска, доска, итоги.
 --
 local hdec = require('bot.libs.hdec')
 local config = require('conf.config')
@@ -83,9 +83,9 @@ local render = {}
 render.countOpened = countOpened
 
 --- Честный множитель за `opened` вскрытых клеток при `mines` минах.
--- @param opened (number) вскрыто безопасных клеток
--- @param mines (number) число мин
--- @return number
+-- @tparam number opened вскрыто безопасных клеток
+-- @tparam number mines число мин
+-- @treturn number
 function render.multiplier(opened, mines)
   if opened <= 0 then
     return 1
@@ -102,10 +102,10 @@ function render.multiplier(opened, mines)
 end
 
 --- Выплата при заборе: floor(bid * множитель).
--- @param bid (number)
--- @param opened (number)
--- @param mines (number)
--- @return number
+-- @tparam number bid
+-- @tparam number opened
+-- @tparam number mines
+-- @treturn number
 function render.payout(bid, opened, mines)
   return math.floor(bid * render.multiplier(opened, mines))
 end
@@ -152,7 +152,7 @@ local function buildKeyboard(session)
             action = 'cashout',
             bid = 0,
             mines = 0,
-            pos = 0
+            pos = 0,
           },
         },
       },
@@ -190,11 +190,12 @@ local function buildTextGrid(opened, bombPos)
 end
 
 --- Меню выбора риска (число мин). Кнопка показывает стартовый множитель.
--- @param bid (number)
+-- @tparam number bid
 function render.riskMenu(bid)
   local row = {}
 
-  for _, mines in ipairs(config.mines.risk) do
+  for i = 1, #config.mines.risk do
+    local mines = config.mines.risk[i]
     local firstMult = render.multiplier(1, mines)
 
     table.insert(row, {
@@ -205,7 +206,7 @@ function render.riskMenu(bid)
           action = 'start',
           bid = bid,
           mines = mines,
-          pos = 0
+          pos = 0,
         },
       },
     })
@@ -221,8 +222,8 @@ function render.riskMenu(bid)
 end
 
 --- Доска во время игры.
--- @param session (table) модель партии
--- @param remainingSec (number) сколько секунд сессии осталось
+-- @tparam table session модель партии
+-- @tparam number remainingSec сколько секунд сессии осталось
 function render.board(session, remainingSec)
   local opCount = countOpened(session.opened)
   local mult = render.multiplier(opCount, session.mines)
@@ -252,7 +253,7 @@ end
 --- Клавиатура повтора для финальных экранов: та же ставка / x2.
 -- Обе кнопки переиспользуют action='start' (резерв + новая партия) с тем же
 -- числом мин. Хватает ли на x2 - проверит сам резерв в onStart.
--- @param session (table) только что завершённая партия
+-- @tparam table session только что завершённая партия
 local function replayKeyboard(session)
   local doubleBid = session.bid * 2
 
@@ -265,9 +266,9 @@ local function replayKeyboard(session)
             action = 'start',
             bid = session.bid,
             mines = session.mines,
-            pos = 0
+            pos = 0,
           },
-        }
+        },
       },
       {
         text = ('⬆️ Удвоить %sр'):format(separateNumbers(doubleBid)),
@@ -277,16 +278,16 @@ local function replayKeyboard(session)
             action = 'start',
             bid = doubleBid,
             mines = session.mines,
-            pos = 0
+            pos = 0,
           },
-        }
+        },
       },
     })
 end
 
 --- Итог: забрал выигрыш.
--- @param session (table) модель партии
--- @param payout (number) выплата
+-- @tparam table session модель партии
+-- @tparam number payout выплата
 function render.win(session, payout)
   local opCount = countOpened(session.opened)
   local mult = render.multiplier(opCount, session.mines)
@@ -305,8 +306,8 @@ function render.win(session, payout)
 end
 
 --- Итог: подорвался.
--- @param session (table) модель партии
--- @param bombPos (number) позиция мины
+-- @tparam table session модель партии
+-- @tparam number bombPos позиция мины
 function render.lose(session, bombPos)
   return {
     text = LOSE_TEXT:f({
@@ -321,7 +322,7 @@ function render.lose(session, bombPos)
 end
 
 --- Итог: партия истекла по TTL.
--- @param session (table) модель партии
+-- @tparam table session модель партии
 function render.expired(session)
   return {
     text = EXPIRED_TEXT:f({

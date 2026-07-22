@@ -5,11 +5,13 @@ local Command = require('bot.classes.Command')
 local farmService = require('src.services.farm')
 local render = require('src.commands.public.farm.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/farm', 'ферма' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
 

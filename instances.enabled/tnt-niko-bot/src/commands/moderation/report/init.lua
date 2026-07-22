@@ -16,10 +16,10 @@ local userInChatService = require('src.services.user_in_chat')
 local chat_member_status = require('bot.enums.chat_member_status')
 local chat_type = require('bot.enums.chat_type')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/report', 'репорт', 'жалоба' },
   flags = { Command.enum.IN_CHAT },
-}
+})
 
 local USAGE = ([[
 ℹ️ <b>Репорт модераторам</b>
@@ -68,14 +68,18 @@ local function collectAdminIds(chatId)
   local ids = {}
   local botId = bot:getBotId()
 
-  for _, status in ipairs({ chat_member_status.CREATOR, chat_member_status.ADMINISTRATOR }) do
+  local statuses = { chat_member_status.CREATOR, chat_member_status.ADMINISTRATOR }
+  for i = 1, #statuses do
+    local status = statuses[i]
     local list, err = userInChatService.getByStatus(chatId, status)
 
     if err then
       return ids, err
     end
 
-    for _, uic in ipairs(list or {}) do
+    list = list or {}
+    for j = 1, #list do
+      local uic = list[j]
       local perms = uic.permissions or {}
 
       if uic.user_id ~= botId and not perms.is_anonymous then
@@ -90,9 +94,10 @@ end
 -- Та же настройка, что у мод-логов: per-chat ~1 сообщение в 1.1с.
 local queue = sendQueue.new({ interval = 1.1, max_queue = 20 })
 
---- Ошибка отправки: бот заблокирован / не запущен админом - не ошибка.
+--- Ошибка отправки: ЛС недоступна (бот заблокирован / не запущен админом /
+-- админ - бот) либо чат не найден - штатные отказы, не ошибка.
 local function onSendError(err)
-  if tgErrors.isBotBlocked(err) or tgErrors.isChatNotFound(err) then
+  if tgErrors.isPMUnavailable(err) or tgErrors.isChatNotFound(err) then
     log.verbose(err)
   else
     log.error(err)
@@ -109,6 +114,8 @@ local function deliver(destId, headerText, markup)
   }, onSendError)
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local message = ctx.message
   local reply = message.reply_to_message
@@ -166,7 +173,8 @@ function command.call(ctx)
       return
     end
 
-    for _, adminId in ipairs(adminIds) do
+    for i = 1, #adminIds do
+      local adminId = adminIds[i]
       deliver(adminId, headerText, markup)
     end
   end

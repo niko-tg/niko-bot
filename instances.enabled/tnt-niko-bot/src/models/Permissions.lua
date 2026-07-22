@@ -1,4 +1,4 @@
---- Модель прав пользователя
+--- Модель прав пользователя.
 --
 local chat_member_status = require('bot.enums.chat_member_status')
 
@@ -47,13 +47,14 @@ local restricted_perms = {
   'can_invite_users',
   'can_pin_messages',
   'can_manage_topics',
-  'until_date'
+  'until_date',
 }
 
--- Паминг прав
+--- Паминг прав.
 local function mapping(member, perms)
   local result = {}
-  for _, field in ipairs(perms) do
+  for i = 1, #perms do
+    local field = perms[i]
     if member[field] ~= nil then
       result[field] = member[field]
     end
@@ -61,11 +62,11 @@ local function mapping(member, perms)
   return result
 end
 
---- Конструктор модели
+--- Конструктор модели.
 --
 -- @param data Исходные данные
--- @return[1] Сериализуемая модель
--- @return[2] Коллекция ошибок
+-- @treturn[1] table Сериализуемая модель
+-- @treturn[2] table Коллекция ошибок
 local function Permissions(data)
   local status = data.status
 

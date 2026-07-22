@@ -1,4 +1,4 @@
---- Событие получение сущностей
+--- Событие получение сущностей.
 --
 local utf8 = require('utf8')
 local bot = require('bot')
@@ -8,9 +8,21 @@ local processCommand = require('bot.processes.processCommand')
 -- Ex: /profile@niko_rp_bot
 local PATTERN_BOT_CMD = '(/.+)@'..config.bot.username
 
+--- Обработчик сообщений с сущностями: запуск команды по entity.
+-- @tparam table ctx контекст обновления
 local function onGetEntities(ctx)
   local entities = ctx:getEntities()
-  local entity = entities[1]
+  local entity = entities and entities[1]
+
+  -- Телеграм может прислать message с пустым entities - обрабатываем как
+  -- обычное сообщение, а не команду.
+  if entity == nil then
+    if ctx.message.text then
+      return bot.events.onGetMessageText(ctx)
+    end
+
+    return bot.events.onChatMessage(ctx)
+  end
 
   -- Первое entity не bot_command. Это может быть текстовый алиас команды с
   -- аргументом-упоминанием ("мут @user 1m"): из-за @mention у сообщения
@@ -44,7 +56,7 @@ local function onGetEntities(ctx)
 
     return processCommand(ctx, {
       is_text_command = true,
-      command = bot.commands[commandName]
+      command = bot.commands[commandName],
     })
   end
 

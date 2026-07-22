@@ -14,8 +14,8 @@ ${sep}
 ⏳ Активен до: <code>${untilDate}</code>
 ]]):f({ sep = hdec.sep })
 
---- @param user (table) кому выдали VIP (нужен user.id)
---- @param untilDate (number) unix-timestamp окончания VIP
+--- @tparam table user кому выдали VIP (нужен user.id)
+-- @tparam number untilDate unix-timestamp окончания VIP
 local function vipActivated(user, untilDate)
   local _, err = bot:sendMessage({
     chat_id = user.id,
@@ -25,7 +25,7 @@ local function vipActivated(user, untilDate)
   })
 
   if err then
-    if tgErrors.isBotBlocked(err) or tgErrors.isChatNotFound(err) then
+    if tgErrors.isPMUnavailable(err) or tgErrors.isChatNotFound(err) then
       log.verbose(err)
     else
       log.error(err)

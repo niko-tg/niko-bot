@@ -4,6 +4,9 @@
 --
 local hdec = require('bot.libs.hdec')
 
+--- Упоминание пользователя с учётом флага приватности.
+-- @tparam table user модель пользователя либо сырой Telegram-юзер
+-- @treturn string готовая HTML-разметка
 local function userMention(user)
   if user.is_private then
     return hdec.mono(hdec.user(user, { no_link = true }))

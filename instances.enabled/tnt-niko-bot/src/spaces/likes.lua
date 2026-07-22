@@ -1,7 +1,7 @@
---- Лайки (кто кому поставил)
+--- Лайки (кто кому поставил).
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- Кто поставил лайк.
   {
@@ -20,27 +20,27 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'primary',
     options = {
       parts = { 'liking_id', 'likee_id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   {
     name = 'likee',
     options = {
       parts = { 'likee_id', 'created' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

@@ -1,4 +1,4 @@
---- Callback «Мин»: start (выбор риска) / open (вскрытие) / cashout (забор).
+--- Callback 'Мин': start (выбор риска) / open (вскрытие) / cashout (забор).
 -- Ownership даёт дефолтный isSameUser-гейт (одиночная игра, не MULTI_USER).
 --
 local log = require('log')
@@ -8,13 +8,18 @@ local Command = require('bot.classes.Command')
 local usersService = require('src.services.users')
 local mineSessionsService = require('src.services.mine_sessions')
 local render = require('src.commands.public.mines.render')
+local getErrType = require('src.utils.services.getErrType')
+local services_error_type = require('src.enums.services.services_error_type')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_mines' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'bid', 'mines', 'pos' },
-}
+})
 
+--- Перерисовка карточки на месте (правка исходного сообщения).
+-- @tparam table ctx контекст обновления
+-- @tparam table view { text, keyboard }
 local function edit(ctx, view)
   bot:editMessageText({
     chat_id = ctx:getChatId(),
@@ -24,13 +29,13 @@ local function edit(ctx, view)
   })
 end
 
--- Перерисовка доски с актуальным остатком времени сессии.
+--- Перерисовка доски с актуальным остатком времени сессии.
 local function showBoard(ctx, session)
   local remaining = config.mines.ttl - (os.time() - session.created.timestamp)
   edit(ctx, render.board(session, remaining))
 end
 
--- XP за победу: от размера ставки, с нижним порогом. max(xp_min, floor(bid / xp_per)).
+--- XP за победу: от размера ставки, с нижним порогом. max(xp_min, floor(bid / xp_per)).
 local function grantXP(user_id, bid)
   local xp = math.max(config.mines.xp_min, math.floor(bid / config.mines.xp_per))
   if xp > 0 then
@@ -41,7 +46,7 @@ local function grantXP(user_id, bid)
   end
 end
 
--- Завершение партии забором (ручной cashout либо авто-победа на всех клетках).
+--- Завершение партии забором (ручной cashout либо авто-победа на всех клетках).
 local function cashout(ctx, session)
   local opCount = render.countOpened(session.opened)
   local payout = render.payout(session.bid, opCount, session.mines)
@@ -53,7 +58,7 @@ local function cashout(ctx, session)
 
     ctx:answer({
       text = 'Ошибка выплаты, попробуй ещё',
-      show_alert = true
+      show_alert = true,
     })
 
     return
@@ -66,7 +71,7 @@ local function cashout(ctx, session)
   edit(ctx, render.win(session, payout))
 end
 
--- START: выбор риска -> резерв ставки и создание партии (как cb_game.accept).
+--- START: выбор риска -> резерв ставки и создание партии (как cb_game.accept).
 local function onStart(ctx, user, bid, mines)
   if not bid or not mines then
     ctx:answer()
@@ -76,7 +81,7 @@ local function onStart(ctx, user, bid, mines)
   if mineSessionsService.getByUser(user.id) then
     ctx:answer({
       text = 'У тебя уже есть партия',
-      show_alert = true
+      show_alert = true,
     })
 
     return
@@ -85,15 +90,29 @@ local function onStart(ctx, user, bid, mines)
   -- Резерв ставки (атомарно; не хватает -> ошибка, ничего не списано).
   local _, reserveErr = usersService.reserve(user.id, bid)
   if reserveErr then
+    -- Нехватка средств - штатный отказ, в лог не пишем.
+    if getErrType(reserveErr) == services_error_type.INSUFFICIENT_FUNDS then
+      ctx:answer({
+        text = 'Недостаточно средств',
+        show_alert = true,
+      })
+
+      edit(ctx, {
+        text = '💸 Партия отменена: недостаточно средств.',
+      })
+
+      return
+    end
+
     log.error(reserveErr)
 
     ctx:answer({
-      text = 'Недостаточно средств',
-      show_alert = true
+      text = 'Не удалось сделать ставку',
+      show_alert = true,
     })
 
     edit(ctx, {
-      text = '💸 Партия отменена: недостаточно средств.'
+      text = '⚠️ Партия отменена: внутренняя ошибка.',
     })
 
     return
@@ -116,11 +135,11 @@ local function onStart(ctx, user, bid, mines)
 
     ctx:answer({
       text = 'Не удалось начать',
-      show_alert = true
+      show_alert = true,
     })
 
     edit(ctx, {
-      text = '⚠️ Не удалось начать игру'
+      text = '⚠️ Не удалось начать игру',
     })
 
     return
@@ -130,7 +149,7 @@ local function onStart(ctx, user, bid, mines)
   showBoard(ctx, session)
 end
 
--- OPEN: вскрытие клетки (ставка уже зарезервирована на старте).
+--- OPEN: вскрытие клетки (ставка уже зарезервирована на старте).
 local function onOpen(ctx, user, session, pos)
   if not pos or pos < 1 or pos > config.mines.cells then
     ctx:answer()
@@ -161,7 +180,7 @@ local function onOpen(ctx, user, session, pos)
 
     ctx:answer({
       text = '💥 БУМ!',
-      show_alert = true
+      show_alert = true,
     })
 
     edit(ctx, render.lose(session, pos))
@@ -190,6 +209,8 @@ local function onOpen(ctx, user, session, pos)
   showBoard(ctx, session)
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Все аргументы читаем в локали ДО первого yield: command - общий объект,
   -- за время yield (getByUser) параллельный вызов перезапишет command.arguments.

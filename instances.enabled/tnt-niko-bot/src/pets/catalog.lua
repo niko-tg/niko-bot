@@ -30,36 +30,36 @@ catalog.pets = {
       price = 5000,
       currency = 'money',
       description = 'Дружелюбная дворняжка с уравновешенным характером, подойдёт в качестве первого питомца',
-      emoji = '🐕'
+      emoji = '🐕',
     },
     hasky = {
       name = 'Хаски',
       price = 15000,
       currency = 'money',
       description = 'Энергичный и выносливый пёс с выразительными глазами, любит активное внимание',
-      emoji = '🐕'
+      emoji = '🐕',
     },
     pink = {
       name = 'Розовый Бигль',
       price = 100000,
       currency = 'money',
       description = 'Эксклюзивная порода с нежной шерстью, обладающая острым нюхом и дружелюбным нравом',
-      emoji = '🐕'
+      emoji = '🐕',
     },
     rubin = {
       name = 'Рубиновая бася',
       price = 1,
       currency = 'crystals',
       description = 'Редкая мистическая порода с переливающейся шерстью, приносит своему хозяину удачу',
-      emoji = '🐕'
+      emoji = '🐕',
     },
     diamond = {
       name = 'Бриллиантовая Бася',
       price = 5,
       currency = 'crystals',
       description = 'Уникальная порода с твёрдым, словно алмаз, характером и поразительной красотой',
-      emoji = '🐕'
-    }
+      emoji = '🐕',
+    },
   },
 
   cats = {
@@ -68,29 +68,29 @@ catalog.pets = {
       price = 5000,
       currency = 'money',
       description = 'Спокойная и с мягким характером, легко адаптируется к любому дому',
-      emoji = '🐈'
+      emoji = '🐈',
     },
     black = {
       name = 'Чёрная дворняжка',
       price = 5000,
       currency = 'money',
       description = 'Таинственная и независимая, любит уединённый отдых на солнечном подоконнике',
-      emoji = '🐈'
+      emoji = '🐈',
     },
     orange = {
       name = 'Оранжевая дворняжка',
       price = 15000,
       currency = 'money',
       description = 'Активная и любознательная кошка с ярким окрасом и добродушным поведением',
-      emoji = '🐈'
+      emoji = '🐈',
     },
     star = {
       name = 'Звёздный лорд',
       price = 3,
       currency = 'crystals',
       description = 'Уникальная космическая кошечка с синей шерстью, обладает врождённым чувством тайны и величия',
-      emoji = '🐈'
-    }
+      emoji = '🐈',
+    },
   },
 
   hamsters = {
@@ -99,8 +99,8 @@ catalog.pets = {
       price = 1,
       currency = 'crystals',
       description = 'Маленький герой аниме, активный и дружелюбный',
-      emoji = '🐹'
-    }
+      emoji = '🐹',
+    },
   },
 
   fantasy = {
@@ -109,21 +109,21 @@ catalog.pets = {
       price = 5,
       currency = 'crystals',
       description = 'Магический питомец, обладающий таинственными способностями и мудростью древних',
-      emoji = '💠'
+      emoji = '💠',
     },
     firefox = {
       name = 'Огнелис',
       price = 1000000,
       currency = 'money',
       description = 'Шкодный и свободолюбивый',
-      emoji = '🔥'
-    }
-  }
+      emoji = '🔥',
+    },
+  },
 }
 
 --- Данные породы или nil, если вид/цвет неизвестны.
--- @param breed (string) вид (dogs/cats/hamsters/fantasy)
--- @param color (string) порода (цвет)
+-- @tparam string breed вид (dogs/cats/hamsters/fantasy)
+-- @tparam string color порода (цвет)
 function catalog.get(breed, color)
   local byBreed = catalog.pets[breed]
   if not byBreed then

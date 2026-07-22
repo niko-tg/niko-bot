@@ -5,10 +5,10 @@ local hdec = require('bot.libs.hdec')
 local config = require('conf.config')
 local inlineKeyboard = require('bot.middlewares.inlineKeyboard')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/help', 'помощь' },
   flags = { Command.enum.PRIVATE },
-}
+})
 
 local HELP = ([[
 🤓 <b>Помощь по Нико</b>
@@ -28,6 +28,8 @@ local keyboard = inlineKeyboard({
   { { text = '👮 Команды модерации', url = config.links.mod_guide } },
 })
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   ctx:reply({
     text = HELP,

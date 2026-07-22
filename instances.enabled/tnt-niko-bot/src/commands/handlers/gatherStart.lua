@@ -8,13 +8,13 @@ local userActivityService = require('src.services.user_activity')
 local gatheringService = require('src.services.gathering')
 local render = require('src.render.gather')
 
---- @param ctx (table) контекст команды
--- @param command (table) объект команды (command.user уже загружен)
--- @param activityKey (string) 'fishing' | 'mining' | 'sawmill'
+-- @tparam table ctx контекст команды
+-- @tparam table command объект команды (command.user уже загружен)
+-- @tparam string activityKey 'fishing' | 'mining' | 'sawmill'
 return function(ctx, command, activityKey)
   local user = command.user
 
-  -- Ошибку VIP-проверки трактуем как «не VIP».
+  -- Ошибку VIP-проверки трактуем как 'не VIP'.
   local isVip = vipUsersService.isActive(user.id) or false
 
   local res, err = gatheringService.begin(user.id, activityKey, ctx:getChatId(), isVip)

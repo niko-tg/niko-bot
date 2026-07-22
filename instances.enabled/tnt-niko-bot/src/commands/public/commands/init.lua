@@ -4,14 +4,16 @@ local Command = require('bot.classes.Command')
 local auth = require('src.auth')
 local render = require('src.commands.public.commands.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/commands', 'команды' },
   flags = {
     Command.enum.PUBLIC,
     Command.enum.NO_REPLY,
   },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local view = render.menu(auth.isBotOwner(command.user))
 

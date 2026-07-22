@@ -9,10 +9,10 @@ local hdec = require('bot.libs.hdec')
 local Command = require('bot.classes.Command')
 local chatService = require('src.services.chats')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/delchat' },
-  flags = { Command.enum.MAINTENANCE }
-}
+  flags = { Command.enum.MAINTENANCE },
+})
 
 local USAGE = ([[
 ℹ️ <b>Использование</b>
@@ -30,6 +30,8 @@ local function parseTarget(text)
   return tokens[2]
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arg = parseTarget(ctx:getText())
 

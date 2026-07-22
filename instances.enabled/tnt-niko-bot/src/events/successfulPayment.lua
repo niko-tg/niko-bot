@@ -21,7 +21,7 @@ local VIP_DURATION = {
   [12] = parseUnit('1y', 'date'),
 }
 
--- Увеличить числовое поле пользователя на delta. true при успехе.
+--- Увеличить числовое поле пользователя на delta. true при успехе.
 local function incUserField(userId, field, delta)
   local user, err = usersService.read(userId)
   if err or not user then
@@ -38,7 +38,7 @@ local function incUserField(userId, field, delta)
   return true
 end
 
--- Начисление по типу доната. Возвращает текст-подтверждение в ЛС или nil.
+--- Начисление по типу доната. Возвращает текст-подтверждение в ЛС или nil.
 local function applyReward(userId, donatType, count)
   if donatType == donat_types.MONEY then
     local amount = config.donat.currency_per_min_stars * count
@@ -91,6 +91,8 @@ local function applyReward(userId, donatType, count)
   return nil
 end
 
+--- Обработчик успешного платежа: начисление купленного.
+-- @tparam table ctx контекст обновления
 local function successfulPayment(ctx)
   local payment = ctx:getSuccessfulPayment()
   local userId = ctx:getUserFromId()

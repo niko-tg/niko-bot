@@ -1,4 +1,4 @@
----
+--- Разбор строки с единицей измерения в число.
 -- Парсит строку с юнитами и возвращает числовое значение
 local parseUnit
 
@@ -7,7 +7,7 @@ local parseUnit
 -- @param unit_type Тип юнита -
 -- 'time', 'number', 'request', 'operation', 'data_size'.
 -- По умолчанию 'number'
--- @return Значение или nil
+-- @treturn table Значение или nil
 function parseUnit(str, unit_type)
   local value, unit = str:match('^(%d+)(.-)$')
   unit_type = unit_type or 'number'

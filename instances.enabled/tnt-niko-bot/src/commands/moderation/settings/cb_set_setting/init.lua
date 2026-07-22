@@ -1,4 +1,4 @@
---- Старница с настройками
+--- Старница с настройками.
 --
 local log = require('log')
 local bot = require('bot')
@@ -11,15 +11,18 @@ local showVipSettingsPage = require(bot.subdir(1, ...)..'.pages.showVipSettingsP
 local showHelloMessagePage = require(bot.subdir(1, ...)..'.pages.showHelloMessagePage')
 local arguments_dict = require(bot.subdir(1, ...)..'.arguments_dict')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_set_setting' },
   flags = {
     Command.enum.CALLBACK,
-    Command.enum.ADMINISTRATIVE
+    Command.enum.ADMINISTRATIVE,
   },
-  arguments_schema = { 'page', 'param', 'value' }
-}
+  arguments_schema = { 'page', 'param', 'value' },
+})
 
+--- Текст всплывающего ответа при переключении настройки.
+-- @tparam boolean flag новое значение настройки
+-- @treturn string
 local function mkAnswerText(flag)
   if flag then
     return '✅ Включили'
@@ -27,6 +30,8 @@ local function mkAnswerText(flag)
   return '❎ Выключили'
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Аргументы
   local arguments = command.arguments

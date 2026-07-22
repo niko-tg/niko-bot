@@ -43,17 +43,17 @@ local GONE = 'ℹ️ Этого питомца больше нет'
 
 local render = {}
 
--- Callback к cb_pet.
+--- Callback к cb_pet.
 local function petcb(action, id)
   return { command = 'cb_pet', arguments = { action = action, pet = id } }
 end
 
--- Кнопка возврата к списку.
+--- Кнопка возврата к списку.
 local function backToListRow()
   return { { text = '⬅️ К списку', callback = petcb('list', 0) } }
 end
 
--- Клавиатуры карточки по режиму.
+--- Клавиатуры карточки по режиму.
 local function careKeyboard(id)
   return inlineCallbackKeyboard({
     {
@@ -71,6 +71,9 @@ local function careKeyboard(id)
   })
 end
 
+--- Клавиатура управления питомцем.
+-- @tparam number id id питомца
+-- @treturn table разметка клавиатуры
 local function manageKeyboard(id)
   return inlineCallbackKeyboard({
     { { text = '✏️ Переименовать', callback = petcb('rename', id) } },
@@ -79,6 +82,9 @@ local function manageKeyboard(id)
   })
 end
 
+--- Клавиатура подтверждения удаления питомца.
+-- @tparam number id id питомца
+-- @treturn table разметка клавиатуры
 local function confirmKeyboard(id)
   return inlineCallbackKeyboard({
     { { text = '❌ ПОДТВЕРДИТЬ УДАЛЕНИЕ', callback = petcb('delyes', id) } },
@@ -87,9 +93,9 @@ local function confirmKeyboard(id)
 end
 
 --- Список питомцев игрока: кнопка на каждого. { empty = true } если их нет.
--- @param owner_id (number)
--- @return[1] { empty } | { image, caption, keyboard }
--- @return[2] err
+-- @tparam number owner_id
+-- @treturn[1] table { empty } | { image, caption, keyboard }
+-- @treturn[2] table err
 function render.list(owner_id)
   local pets, err = petsService.list(owner_id)
   if err then
@@ -101,12 +107,13 @@ function render.list(owner_id)
   end
 
   local rows = {}
-  for _, pet in ipairs(pets) do
+  for i = 1, #pets do
+    local pet = pets[i]
     local variant = catalog.get(pet.breed, pet.color)
     local emoji = variant and variant.emoji or '🐾'
 
     table.insert(rows, {
-      { text = emoji..' | '..pet.name, callback = petcb('show', pet.id) }
+      { text = emoji..' | '..pet.name, callback = petcb('show', pet.id) },
     })
   end
 
@@ -123,11 +130,11 @@ function render.missing()
 end
 
 --- Карточка питомца. mode: nil (уход) | 'manage' | 'confirm'.
--- @param id (number)
--- @param owner_id (number)
--- @param mode (string|nil)
--- @return[1] { gone = true } | { image, caption, keyboard }
--- @return[2] err
+-- @tparam number id
+-- @tparam number owner_id
+-- @tparam ?string mode
+-- @treturn[1] table { gone = true } | { image, caption, keyboard }
+-- @treturn[2] table err
 function render.card(id, owner_id, mode)
   local pet, err = petsService.read(id)
   if err then
@@ -227,7 +234,7 @@ local CARE_TEXT = {
 local SUPPLY_OF_ACTION = { feed = 'food', heal = 'medicine', bathe = 'shampoo' }
 
 --- Текст попапа по результату ухода.
--- @param result (table) из petsService.care
+-- @tparam table result из petsService.care
 function render.careMessage(result)
   local status = result.status
 

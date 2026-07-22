@@ -8,12 +8,14 @@ local usersService = require('src.services.users')
 local marriagesService = require('src.services.marriages')
 local userMention = require('src.render.userMention')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_marry' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'proposer', 'invited' },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arguments = command.arguments
   local action = arguments.action
@@ -55,7 +57,7 @@ function command.call(ctx)
     bot:editMessageText({
       chat_id = chatId,
       message_id = messageId,
-      text = render.failed()
+      text = render.failed(),
     })
     return
   end
@@ -64,7 +66,7 @@ function command.call(ctx)
     bot:editMessageText({
       chat_id = chatId,
       message_id = messageId,
-      text = render.alreadyProposer()
+      text = render.alreadyProposer(),
     })
     return
   end
@@ -76,7 +78,7 @@ function command.call(ctx)
     bot:editMessageText({
       chat_id = chatId,
       message_id = messageId,
-      text = render.failed()
+      text = render.failed(),
     })
     return
   end
@@ -85,7 +87,7 @@ function command.call(ctx)
     bot:editMessageText({
       chat_id = chatId,
       message_id = messageId,
-      text = render.alreadyInvited()
+      text = render.alreadyInvited(),
     })
     return
   end
@@ -97,7 +99,7 @@ function command.call(ctx)
     bot:editMessageText({
       chat_id = chatId,
       message_id = messageId,
-      text = render.failed()
+      text = render.failed(),
     })
     return
   end

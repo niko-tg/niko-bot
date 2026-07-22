@@ -80,7 +80,7 @@ local function banDuration(untilDate)
   return 'до '..os.date('%d.%m.%Y %H:%M', untilDate)
 end
 
--- Бот удалён из мод-чата (chat not found) - не ошибка, просто verbose.
+--- Бот удалён из мод-чата (chat not found) - не ошибка, просто verbose.
 local function onSendError(err)
   if tgErrors.isChatNotFound(err) then
     log.verbose(err)

@@ -7,10 +7,10 @@ local hdec = require('bot.libs.hdec')
 local Command = require('bot.classes.Command')
 local usersService = require('src.services.users')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/status', 'статус' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
 -- Максимальная длина статуса, символов
 local MAX_LEN = 75
@@ -35,13 +35,14 @@ ${sep}
 Максимум ${max} символов
 ]]):f({ sep = hdec.sep, max = MAX_LEN })
 
--- Есть ли среди сущностей сообщения ссылка (url или встроенная text_link).
+--- Есть ли среди сущностей сообщения ссылка (url или встроенная text_link).
 local function hasLink(entities)
   if not entities then
     return false
   end
 
-  for _, entity in ipairs(entities) do
+  for i = 1, #entities do
+    local entity = entities[i]
     if entity.type == 'url' or entity.type == 'text_link' then
       return true
     end
@@ -50,6 +51,8 @@ local function hasLink(entities)
   return false
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Всё после команды одним куском (статус может быть из нескольких слов).
   local raw = ctx.message.text:match('^%S+%s+(.+)$')

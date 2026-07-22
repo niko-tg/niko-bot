@@ -1,9 +1,9 @@
---- Событие получения обновление (сообщений) от телеграма
+--- Событие получения обновление (сообщений) от телеграма.
 --
 local bot = require('bot')
 
 --- Признаки сервисного сообщения. Если в message есть хоть одно из этих полей -
---- отдаём в onMessageService (там точная диспетчеризация по конкретному полю).
+-- отдаём в onMessageService (там точная диспетчеризация по конкретному полю).
 local service_fields = {
   'migrate_to_chat_id',
   'migrate_from_chat_id',
@@ -20,8 +20,12 @@ local service_fields = {
   'general_forum_topic_unhidden',
 }
 
+--- Является ли сообщение сервисным.
+-- @tparam table message сообщение Telegram
+-- @treturn boolean
 local function isServiceMessage(message)
-  for _, field in ipairs(service_fields) do
+  for i = 1, #service_fields do
+    local field = service_fields[i]
     if message[field] then
       return true
     end
@@ -29,6 +33,8 @@ local function isServiceMessage(message)
   return false
 end
 
+--- Корневой обработчик обновления: маршрутизация по типу апдейта.
+-- @tparam table ctx контекст обновления
 local function onGetUpdate(ctx)
   -- Any events
   --

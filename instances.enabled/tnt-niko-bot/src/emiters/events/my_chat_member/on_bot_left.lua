@@ -1,10 +1,12 @@
---- Бот сам вышел из чата
+--- Бот сам вышел из чата.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
 
 -- luacheck: ignore ctx
-local function on_bot_left(ctx)
+--- Бот сам вышел из чата.
+-- @tparam table ctx контекст обновления
+local function onBotLeft(ctx)
   log.verbose('[event] %s', 'on_bot_left')
 
   local chat = ctx:getChat()
@@ -24,4 +26,4 @@ local function on_bot_left(ctx)
   end
 end
 
-return on_bot_left
+return onBotLeft

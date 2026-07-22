@@ -1,7 +1,7 @@
---- Чаты
+--- Чаты.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- https://core.telegram.org/bots/api#chat
   {
@@ -70,15 +70,15 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'id',
     options = {
       parts = { 'id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 
   -- Топ касс: reverse-scan по casino_cashier -> ORDER BY ... DESC без SEQSCAN
@@ -87,8 +87,8 @@ local index = {
     options = {
       parts = { 'casino_cashier' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 
   -- Топ чатов: reverse-scan по total_messages
@@ -97,8 +97,8 @@ local index = {
     options = {
       parts = { 'total_messages' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 
   -- Поиск чата по username (maint /delchat @username). username nullable.
@@ -107,12 +107,12 @@ local index = {
     options = {
       parts = {{ field = 'username', is_nullable = true }},
       unique = false,
-      if_not_exists = true
-    }
-  }
+      if_not_exists = true,
+    },
+  },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

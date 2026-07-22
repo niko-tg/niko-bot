@@ -3,8 +3,10 @@
 local log = require('log')
 
 -- luacheck: ignore ctx
-local function on_forum_topic_edited(ctx)
+--- Отредактирован топик форума. Заглушка.
+-- @tparam table ctx контекст обновления
+local function onForumTopicEdited(ctx)
   log.verbose('[event] %s', 'on_forum_topic_edited')
 end
 
-return on_forum_topic_edited
+return onForumTopicEdited

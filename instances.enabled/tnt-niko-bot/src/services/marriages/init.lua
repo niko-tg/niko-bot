@@ -1,4 +1,4 @@
--- Сервис CRUD к бракам. Брак моногамен и двунаправлен: на пару - две записи,
+--- Сервис CRUD к бракам. Брак моногамен и двунаправлен: на пару - две записи,.
 -- каждая под своим user_id (первичный ключ). Брак глобальный, к чату не привязан.
 --
 local sql = require('bot.libs.sql')
@@ -11,9 +11,9 @@ local service = {}
 
 --- Чтение брака пользователя по первичному ключу (user_id).
 -- Отвечает на "женат ли я и кто партнёр" и наполняет карточку брака.
--- @param user_id (number) чей брак
--- @return[1] model marriage (или nil, если брака нет)
--- @return[2] err
+-- @tparam number user_id чей брак
+-- @treturn[1] ?table модель marriage (или nil, если брака нет)
+-- @treturn[2] table err
 function service.read(user_id)
   local item, err = sql(
     [[
@@ -45,11 +45,11 @@ end
 --- Заключение брака: две записи (в обе стороны) в одной транзакции.
 -- Моногамию гарантирует уникальность первичного ключа: если кто-то уже женат,
 -- вставка упрётся в неё и вся транзакция откатится.
--- @param user_id (number) первый
--- @param partner_id (number) второй
--- @param chat_id (number) чат, где поженились
--- @return[1] true
--- @return[2] err
+-- @tparam number user_id первый
+-- @tparam number partner_id второй
+-- @tparam number chat_id чат, где поженились
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.marry(user_id, partner_id, chat_id)
   local rowA, errsA = Marriage({
     user_id = user_id,
@@ -85,10 +85,10 @@ end
 
 --- Расторжение брака: обе записи в одной транзакции.
 -- Вызывать только когда брак точно есть (partner_id берётся из записи).
--- @param user_id (number) первый
--- @param partner_id (number) второй
--- @return[1] true
--- @return[2] err
+-- @tparam number user_id первый
+-- @tparam number partner_id второй
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.divorce(user_id, partner_id)
   local _, err = sql.atomic(function()
     sql.check(sql([[
@@ -112,11 +112,11 @@ end
 -- Ведущая таблица - user_in_chat (префикс chat_id по индексу), marriages цепляется
 -- по первичному ключу, второй супруг проверяется тем же индексом - без SEQSCAN.
 -- user_id < partner_id отсекает дубль второй записи пары.
--- @param chat_id (number)
--- @param limit (number)
--- @param offset (number)
--- @return[1] array { user_id, partner_id, created } (может быть пустым)
--- @return[2] err
+-- @tparam number chat_id
+-- @tparam number limit
+-- @tparam number offset
+-- @treturn[1] table массив { user_id, partner_id, created } (может быть пустым)
+-- @treturn[2] table err
 function service.topInChat(chat_id, limit, offset)
   local rows, err = sql(
     [[
@@ -152,9 +152,9 @@ function service.topInChat(chat_id, limit, offset)
 end
 
 --- Кол-во браков чата (оба супруга в чате) - для пагинации топа.
--- @param chat_id (number)
--- @return[1] number
--- @return[2] err
+-- @tparam number chat_id
+-- @treturn[1] number
+-- @treturn[2] table err
 function service.countInChat(chat_id)
   local rows, err = sql(
     [[

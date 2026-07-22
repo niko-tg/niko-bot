@@ -6,7 +6,7 @@
 --   'craft'    - скрафтить count штук предмета goal.item (растёт при крафте)
 --   'farm'     - собрать count любого урожая на ферме (растёт при сборе с грядки)
 --   'harvest'  - собрать count урожая goal.item (конкретная культура)
--- Награда выдаётся по нажатию «Забрать».
+-- Награда выдаётся по нажатию 'Забрать'.
 --
 
 return {
@@ -17,7 +17,7 @@ return {
     goal = {
       kind = 'item',
       item = 'fish',
-      count = 30
+      count = 30,
     },
     reward = { money = 20000 },
   },
@@ -28,7 +28,7 @@ return {
     goal = {
       kind = 'item',
       item = 'coal',
-      count = 50
+      count = 50,
     },
     reward = { money = 15000 },
   },
@@ -39,7 +39,7 @@ return {
     goal = {
       kind = 'activity',
       activity = 'sawmill',
-      count = 40
+      count = 40,
     },
     reward = { money = 15000 },
   },
@@ -52,7 +52,7 @@ return {
     goal = {
       kind = 'item',
       item = 'red_fish',
-      count = 5
+      count = 5,
     },
     reward = { money = 25000 },
   },
@@ -63,7 +63,7 @@ return {
     goal = {
       kind = 'item',
       item = 'gold',
-      count = 8
+      count = 8,
     },
     reward = { money = 20000 },
   },
@@ -74,7 +74,7 @@ return {
     goal = {
       kind = 'item',
       item = 'mushroom',
-      count = 10
+      count = 10,
     },
     reward = { money = 12000 },
   },
@@ -85,7 +85,7 @@ return {
     goal = {
       kind = 'item',
       item = 'scrap_metal',
-      count = 10
+      count = 10,
     },
     reward = { money = 12000 },
   },
@@ -96,7 +96,7 @@ return {
     goal = {
       kind = 'item',
       item = 'diamond',
-      count = 1000
+      count = 1000,
     },
     reward = { crystals = 1 },
   },
@@ -109,7 +109,7 @@ return {
     goal = {
       kind = 'craft',
       item = 'ingot',
-      count = 3
+      count = 3,
     },
     reward = { money = 18000 },
   },
@@ -120,7 +120,7 @@ return {
     goal = {
       kind = 'craft',
       item = 'soup',
-      count = 2
+      count = 2,
     },
     reward = { money = 15000 },
   },
@@ -132,7 +132,7 @@ return {
     emoji = '🧺',
     goal = {
       kind = 'farm',
-      count = 15
+      count = 15,
     },
     reward = { money = 18000 },
   },
@@ -143,7 +143,7 @@ return {
     goal = {
       kind = 'harvest',
       item = 'pumpkin',
-      count = 5
+      count = 5,
     },
     reward = { money = 22000 },
   },
@@ -154,7 +154,7 @@ return {
     goal = {
       kind = 'craft',
       item = 'bread',
-      count = 3
+      count = 3,
     },
     reward = { money = 16000 },
   },

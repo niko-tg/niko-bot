@@ -34,8 +34,8 @@ function render.usage()
 end
 
 --- Предложение дружбы: текст + кнопки принять/отказать.
--- @param proposer (table) кто предлагает (модель/telegram-юзер)
--- @param invited (table) кому предлагают (telegram-юзер)
+-- @tparam table proposer кто предлагает (модель/telegram-юзер)
+-- @tparam table invited кому предлагают (telegram-юзер)
 function render.proposal(proposer, invited)
   local keyboard = inlineCallbackKeyboard({
     {
@@ -46,8 +46,8 @@ function render.proposal(proposer, invited)
           arguments = {
             action = 'accept',
             proposer = proposer.id,
-            invited = invited.id
-          }
+            invited = invited.id,
+          },
         },
       },
       {
@@ -57,8 +57,8 @@ function render.proposal(proposer, invited)
           arguments = {
             action = 'reject',
             proposer = proposer.id,
-            invited = invited.id
-          }
+            invited = invited.id,
+          },
         },
       },
     },
@@ -73,8 +73,8 @@ function render.proposal(proposer, invited)
 end
 
 --- Дружба заключена.
--- @param proposerMention (string) готовое упоминание
--- @param invitedMention (string) готовое упоминание
+-- @tparam string proposerMention готовое упоминание
+-- @tparam string invitedMention готовое упоминание
 function render.accepted(proposerMention, invitedMention)
   return ACCEPTED:f({
     proposer = proposerMention,

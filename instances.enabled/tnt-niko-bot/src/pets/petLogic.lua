@@ -5,6 +5,11 @@ local states = require('src.pets.states')
 
 local state = states.state
 
+--- Ограничение значения диапазоном.
+-- @tparam number value значение
+-- @tparam number low нижняя граница
+-- @tparam number high верхняя граница
+-- @treturn number
 local function clamp(value, low, high)
   if value < low then
     return low
@@ -15,7 +20,7 @@ local function clamp(value, low, high)
   return value
 end
 
--- Русское склонение: 1 X / 2 Y / 5 Z.
+--- Русское склонение: 1 X / 2 Y / 5 Z.
 local function plural(n, one, few, many)
   local mod10 = n % 10
   local mod100 = n % 100
@@ -51,7 +56,7 @@ function petLogic.timeType()
 end
 
 --- Возраст питомца строкой: "X лет, Y дней" или "Y дней".
--- @param createdTs (number) unix-секунды рождения
+-- @tparam number createdTs unix-секунды рождения
 function petLogic.parseAge(createdTs)
   local timeSec = os.time() - createdTs
 

@@ -4,11 +4,13 @@
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.privacy.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/privacy', 'приватность' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local view = render.view(command.user)
 

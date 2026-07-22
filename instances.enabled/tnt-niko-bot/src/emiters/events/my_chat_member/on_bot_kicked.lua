@@ -1,10 +1,12 @@
---- Кикнули бота из чата
+--- Кикнули бота из чата.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
 
 -- luacheck: ignore ctx
-local function on_bot_kicked(ctx)
+--- Кикнули бота из чата.
+-- @tparam table ctx контекст обновления
+local function onBotKicked(ctx)
   log.verbose('[event] %s', 'on_bot_kicked')
 
   local chat = ctx:getChat()
@@ -24,4 +26,4 @@ local function on_bot_kicked(ctx)
   end
 end
 
-return on_bot_kicked
+return onBotKicked

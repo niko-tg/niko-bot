@@ -41,9 +41,9 @@ end
 
 --- Подтверждение развода вызвавшего: партнёр + кнопки да/нет.
 -- Если брака нет - сообщение об этом без кнопок.
--- @param ownerId (number)
--- @return[1] { text, keyboard }
--- @return[2] err
+-- @tparam number ownerId
+-- @treturn[1] table { text, keyboard }
+-- @treturn[2] table err
 function render.confirm(ownerId)
   local marriage, err = marriagesService.read(ownerId)
   if err then
@@ -65,15 +65,15 @@ function render.confirm(ownerId)
         text = '💔 Да, развестись',
         callback = {
           command = 'cb_divorce',
-          arguments = { action = 'yes' }
-        }
+          arguments = { action = 'yes' },
+        },
       },
       {
         text = '❤️ Нет',
         callback = {
           command = 'cb_divorce',
-          arguments = { action = 'no' }
-        }
+          arguments = { action = 'no' },
+        },
       },
     },
   })

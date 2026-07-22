@@ -10,14 +10,16 @@ local Command = require('bot.classes.Command')
 local helloMessageService = require('src.services.hello_message')
 local formatHelloMessage = require('src.utils.formatHelloMessage')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/gethello' },
   flags = {
     Command.enum.IN_CHAT,
     Command.enum.ADMINISTRATIVE,
-  }
-}
+  },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local chat = command.chat
   local user = command.user

@@ -1,4 +1,4 @@
--- Сервис CRUD к лайкам
+--- Сервис CRUD к лайкам.
 --
 local sql = require('bot.libs.sql')
 local Like = require('src.models.Like')
@@ -10,10 +10,10 @@ local service = {}
 
 --- Чтение лайка по паре (кто, кому) - первичный ключ.
 -- Используется для проверки "уже ставил": один лайк на пару.
--- @param liking_id (number) кто поставил
--- @param likee_id (number) кому поставлен
--- @return[1] model like (или nil, если лайка нет)
--- @return[2] err
+-- @tparam number liking_id кто поставил
+-- @tparam number likee_id кому поставлен
+-- @treturn[1] ?table модель like (или nil, если лайка нет)
+-- @treturn[2] table err
 function service.read(liking_id, likee_id)
   local item, err = sql(
     [[
@@ -45,10 +45,10 @@ end
 
 --- Создание лайка. Первичный ключ (liking_id, likee_id) гарантирует
 -- один лайк на пару: повторная вставка той же пары вернёт ошибку.
--- @param liking_id (number) кто поставил
--- @param likee_id (number) кому поставлен
--- @return[1] model like
--- @return[2] err
+-- @tparam number liking_id кто поставил
+-- @tparam number likee_id кому поставлен
+-- @treturn[1] table модель like
+-- @treturn[2] table err
 function service.add(liking_id, likee_id)
   local like, errs = Like({
     liking_id = liking_id,
@@ -69,11 +69,11 @@ end
 
 --- Список лайкнувших пользователя (свежие сверху). Фильтр по likee_id идёт
 -- через индекс likee, он же даёт порядок по created.
--- @param likee_id (number) чьи полученные лайки
--- @param limit (number)
--- @param offset (number)
--- @return[1] array { liking_id } (может быть пустым)
--- @return[2] err
+-- @tparam number likee_id чьи полученные лайки
+-- @tparam number limit
+-- @tparam number offset
+-- @treturn[1] table массив { liking_id } (может быть пустым)
+-- @treturn[2] table err
 function service.listLikers(likee_id, limit, offset)
   local rows, err = sql(
     [[
@@ -97,9 +97,9 @@ end
 
 --- Кол-во лайкнувших пользователя - для пагинации списка.
 -- Считается по диапазону индекса likee.
--- @param likee_id (number) чьи полученные лайки
--- @return[1] number
--- @return[2] err
+-- @tparam number likee_id чьи полученные лайки
+-- @treturn[1] number
+-- @treturn[2] table err
 function service.countLikers(likee_id)
   local rows, err = sql(
     [[

@@ -1,10 +1,16 @@
---- Простой рендер таблиц для быстрой диагностики
+--- Простой рендер таблиц для быстрой диагностики.
 --
 local datetime = require('datetime')
 
 local TAB_SYMBOL = '╰ '
 
 local tokinaze
+--- Разбор таблицы в плоский список пар ключ-значение.
+-- Циклические ссылки помечаются как <cycle>.
+-- @tparam table t исходная таблица
+-- @tparam[opt] table res аккумулятор
+-- @tparam[opt] table seen уже посещённые таблицы
+-- @treturn table список пар
 function tokinaze(t, res, seen)
   local res = res or {}
   local seen = seen or { [t] = true }
@@ -35,6 +41,10 @@ function tokinaze(t, res, seen)
 end
 
 local render
+--- Сборка строк отчёта из разобранных пар.
+-- @tparam table tokens результат tokinaze
+-- @tparam[opt=0] number deep текущий уровень вложенности
+-- @treturn table массив строк
 function render(tokens, deep)
   local res = {}
   local keys = {}

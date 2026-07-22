@@ -31,10 +31,10 @@ local function resolveName(userId)
 end
 
 --- Страница списка лайкнувших пользователя ownerId.
--- @param ownerId (number) чьи полученные лайки показываем
--- @param page (number) страница (с 1)
--- @return[1] { text, keyboard }
--- @return[2] err
+-- @tparam number ownerId чьи полученные лайки показываем
+-- @tparam number page страница (с 1)
+-- @treturn[1] table { text, keyboard }
+-- @treturn[2] table err
 function render.likers(ownerId, page)
   local total, countErr = likesService.countLikers(ownerId)
   if countErr then
@@ -47,7 +47,9 @@ function render.likers(ownerId, page)
   end
 
   local likerIds = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(likerIds, row.liking_id)
   end
 
@@ -66,7 +68,8 @@ function render.likers(ownerId, page)
   else
     local offset = (page - 1) * PER_PAGE
 
-    for index, likingId in ipairs(likerIds) do
+    for index = 1, #likerIds do
+      local likingId = likerIds[index]
       local rank = offset + index
 
       table.insert(lines, ROW:f({

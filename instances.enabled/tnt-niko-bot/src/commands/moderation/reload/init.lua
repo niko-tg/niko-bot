@@ -1,28 +1,34 @@
---- Принудительная синхронизация стафа чата
+--- Принудительная синхронизация стафа чата.
 --
 local log = require('log')
 local Command = require('bot.classes.Command')
 local hdec = require('bot.libs.hdec')
 local syncChatStaff = require('src.utils.syncChatStaff')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/reload' },
   flags = {
     Command.enum.IN_CHAT,
-    Command.enum.MODERATION
-  }
-}
+    Command.enum.MODERATION,
+  },
+})
 
+--- Список пользователей построчно, без ссылок.
+-- @tparam table users массив пользователей
+-- @treturn string готовый текст
 local function renderList(users)
   local lines = {}
 
-  for _, user in ipairs(users) do
+  for i = 1, #users do
+    local user = users[i]
     table.insert(lines, '   ╰ ' .. hdec.user(user, { no_link = true }))
   end
 
   return table.concat(lines, '\n')
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local chat = command.chat
 

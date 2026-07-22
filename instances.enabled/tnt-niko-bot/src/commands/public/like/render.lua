@@ -31,13 +31,13 @@ function render.usage()
 end
 
 --- Лайк поставлен.
--- @param recipient (table) получатель (telegram-юзер)
+-- @tparam table recipient получатель (telegram-юзер)
 function render.liked(recipient)
   return LIKED:f({ user = hdec.user(recipient) })
 end
 
 --- Лайк этому человеку уже стоял.
--- @param recipient (table) получатель (telegram-юзер)
+-- @tparam table recipient получатель (telegram-юзер)
 function render.alreadyLiked(recipient)
   return ALREADY:f({ user = hdec.user(recipient) })
 end

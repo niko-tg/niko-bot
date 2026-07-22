@@ -1,10 +1,12 @@
---- Пользователь перезапустил бота
+--- Пользователь перезапустил бота.
 --
 local log = require('log')
 local userService = require('src.services.users')
 
 -- luacheck: ignore ctx
-local function on_bot_restart(ctx)
+--- Пользователь перезапустил бота.
+-- @tparam table ctx контекст обновления
+local function onBotRestart(ctx)
   log.verbose('[event] %s', 'on_bot_restart')
 
   local userFrom = ctx:getUserFrom()
@@ -21,4 +23,4 @@ local function on_bot_restart(ctx)
   --
 end
 
-return on_bot_restart
+return onBotRestart

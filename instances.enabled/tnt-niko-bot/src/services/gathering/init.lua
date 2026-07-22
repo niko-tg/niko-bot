@@ -1,7 +1,7 @@
 --- Доменный сервис добычи: денежные потоки инвентаря (продажа и далее покупка/крафт).
 --
 -- Продажа меняет инвентарь и баланс атомарно (sql.atomic): читаем тюпл инвентаря
--- и правим баланс в одной транзакции - чинит race «проверка/обновление» старого бота.
+-- и правим баланс в одной транзакции - чинит race 'проверка/обновление' старого бота.
 --
 local log = require('log')
 local sql = require('bot.libs.sql')
@@ -34,8 +34,8 @@ end
 
 --- Прокачка навыка по накопленному xp. Меняет skill на месте.
 -- Порог следующего уровня = level_base * level.
--- @param skill (table) { xp, level }
--- @return boolean был ли подъём уровня
+-- @tparam table skill { xp, level }
+-- @treturn boolean был ли подъём уровня
 local function applyLevelUps(skill)
   local leveledUp = false
 
@@ -53,9 +53,9 @@ local function applyLevelUps(skill)
 end
 
 --- Все навыки добычи игрока: { fishing = { xp, level }, ... } с дефолтами.
--- @param user_id (number)
--- @return[1] table
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table
+-- @treturn[2] table err
 function service.skills(user_id)
   local stats, err = userGameStatsService.read(user_id)
   if err then
@@ -65,7 +65,8 @@ function service.skills(user_id)
   local stored = stats and stats.stats and stats.stats.gathering or {}
 
   local result = {}
-  for _, key in ipairs(activities.order) do
+  for i = 1, #activities.order do
+    local key = activities.order[i]
     local skill = stored[key]
     result[key] = {
       xp = (skill and skill.xp) or 0,
@@ -77,9 +78,9 @@ function service.skills(user_id)
 end
 
 --- Уровень навыка в активности (для гейта лута). Ошибку трактуем как базовый.
--- @param user_id (number)
--- @param activityKey (string)
--- @return number
+-- @tparam number user_id
+-- @tparam string activityKey
+-- @treturn number
 function service.skillLevel(user_id, activityKey)
   local stats, err = userGameStatsService.read(user_id)
   if err or stats == nil then
@@ -93,11 +94,11 @@ function service.skillLevel(user_id, activityKey)
 end
 
 --- Начисление XP навыка за сбор (с возможным подъёмом уровня).
--- @param user_id (number)
--- @param activityKey (string)
--- @param amount (number)
--- @return[1] table { level, leveledUp, gained }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string activityKey
+-- @tparam number amount
+-- @treturn[1] table { level, leveledUp, gained }
+-- @treturn[2] table err
 function service.addSkillXp(user_id, activityKey, amount)
   local stats, err = userGameStatsService.read(user_id)
   if err then
@@ -122,12 +123,12 @@ function service.addSkillXp(user_id, activityKey, amount)
 end
 
 --- Контракты хранятся в user_game_stats.stats.quests = { reset_at, progress, claimed }.
--- Сброс раз в сутки (как /bonus): прогресс и отметки «забрано» обнуляются.
+-- Сброс раз в сутки (как /bonus): прогресс и отметки 'забрано' обнуляются.
 
 --- Сброс контрактов, если прошёл кулдаун. Меняет qd на месте.
--- @param qd (table|nil) сохранённое состояние контрактов
--- @return[1] table qd с гарантированными полями
--- @return[2] boolean был ли сброс
+-- @tparam ?table qd сохранённое состояние контрактов
+-- @treturn[1] table qd с гарантированными полями
+-- @treturn[2] boolean был ли сброс
 local function freshQuests(qd)
   qd = qd or {}
   local now = os.time()
@@ -151,13 +152,15 @@ local function questIncrement(def, activityKey, loot)
   local inc = 0
 
   if def.goal.kind == 'item' then
-    for _, drop in ipairs(loot) do
+    for i = 1, #loot do
+      local drop = loot[i]
       if drop.id == def.goal.item then
         inc = inc + drop.count
       end
     end
   elseif def.goal.kind == 'activity' and def.goal.activity == activityKey then
-    for _, drop in ipairs(loot) do
+    for i = 1, #loot do
+      local drop = loot[i]
       inc = inc + drop.count
     end
   end
@@ -167,10 +170,10 @@ end
 
 --- Общий аккумулятор прогресса контрактов: для каждого спросить inc, прибавить
 -- положительные. Отдельная запись stats (best-effort, вне основной транзакции).
--- @param user_id (number)
--- @param incFor (function) def -> number прибавки к этому контракту
--- @return[1] true
--- @return[2] err
+-- @tparam number user_id
+-- @tparam function incFor def -> number прибавки к этому контракту
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 local function bumpQuests(user_id, incFor)
   local stats, err = userGameStatsService.read(user_id)
   if err then
@@ -180,7 +183,8 @@ local function bumpQuests(user_id, incFor)
   local data = (stats and stats.stats) or {}
   local qd = freshQuests(data.quests)
 
-  for _, def in ipairs(quests) do
+  for i = 1, #quests do
+    local def = quests[i]
     local inc = incFor(def)
     if inc > 0 then
       qd.progress[def.id] = (qd.progress[def.id] or 0) + inc
@@ -198,9 +202,9 @@ local function bumpQuests(user_id, incFor)
 end
 
 --- Учёт прогресса контрактов после сбора лута (best-effort).
--- @param user_id (number)
--- @param activityKey (string)
--- @param loot (array) { { id, count } }
+-- @tparam number user_id
+-- @tparam string activityKey
+-- @tparam table loot { { id, count } }
 function service.addQuestProgress(user_id, activityKey, loot)
   return bumpQuests(user_id, function(def)
     return questIncrement(def, activityKey, loot)
@@ -208,9 +212,9 @@ function service.addQuestProgress(user_id, activityKey, loot)
 end
 
 --- Учёт прогресса крафт-контрактов после успешного крафта (best-effort).
--- @param user_id (number)
--- @param outputId (string) id скрафченного предмета
--- @param count (number) сколько произведено
+-- @tparam number user_id
+-- @tparam string outputId id скрафченного предмета
+-- @tparam number count сколько произведено
 function service.addCraftProgress(user_id, outputId, count)
   return bumpQuests(user_id, function(def)
     if def.goal.kind == 'craft' and def.goal.item == outputId then
@@ -222,9 +226,9 @@ end
 
 --- Учёт прогресса фермерских контрактов после сбора урожая (best-effort).
 -- 'farm' - любой урожай, 'harvest' - конкретная культура goal.item.
--- @param user_id (number)
--- @param productId (string) id собранного продукта
--- @param count (number)
+-- @tparam number user_id
+-- @tparam string productId id собранного продукта
+-- @tparam number count
 function service.addFarmProgress(user_id, productId, count)
   return bumpQuests(user_id, function(def)
     if def.goal.kind == 'farm' then
@@ -237,9 +241,9 @@ function service.addFarmProgress(user_id, productId, count)
 end
 
 --- Состояние контрактов игрока (с ленивым суточным сбросом).
--- @param user_id (number)
--- @return[1] table { next_reset, list = { { def, progress, claimed, complete } } }
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table { next_reset, list = { { def, progress, claimed, complete } } }
+-- @treturn[2] table err
 function service.questState(user_id)
   local stats, err = userGameStatsService.read(user_id)
   if err then
@@ -259,7 +263,8 @@ function service.questState(user_id)
   end
 
   local list = {}
-  for _, def in ipairs(quests) do
+  for i = 1, #quests do
+    local def = quests[i]
     local progress = qd.progress[def.id] or 0
     table.insert(list, {
       def = def,
@@ -272,14 +277,15 @@ function service.questState(user_id)
   return { next_reset = qd.reset_at + config.gathering.quests.cooldown, list = list }, nil
 end
 
---- Забрать награду за выполненный контракт. Атомарно: отметка «забрано» + награда.
--- @param user_id (number)
--- @param questId (string)
--- @return[1] table { status = 'ok'|'incomplete'|'claimed'|'unavailable', reward }
--- @return[2] err
+--- Забрать награду за выполненный контракт. Атомарно: отметка 'забрано' + награда.
+-- @tparam number user_id
+-- @tparam string questId
+-- @treturn[1] table { status = 'ok'|'incomplete'|'claimed'|'unavailable', reward }
+-- @treturn[2] table err
 function service.claimQuest(user_id, questId)
   local def
-  for _, quest in ipairs(quests) do
+  for i = 1, #quests do
+    local quest = quests[i]
     if quest.id == questId then
       def = quest
       break
@@ -335,10 +341,10 @@ function service.claimQuest(user_id, questId)
 end
 
 --- Детерминированный ролл лута по сиду (одинаков для ручного и авто-сбора).
--- @param activityKey (string)
--- @param level (number) уровень навыка - открывает редкости (min_level)
--- @param seed (number)
--- @return table { list = { { id, count } }, jackpot = id|nil }
+-- @tparam string activityKey
+-- @tparam number level уровень навыка - открывает редкости (min_level)
+-- @tparam number seed
+-- @treturn table { list = { { id, count } }, jackpot = id|nil }
 local function rollLoot(activityKey, level, seed)
   local lootTable = loot[activityKey]
   local cfg = config.gathering[activityKey]
@@ -359,7 +365,8 @@ local function rollLoot(activityKey, level, seed)
   if rnd.range(1, cfg.rare_odds) == 1 then
     local eligible = {}
     local totalWeight = 0
-    for _, drop in ipairs(lootTable.rare) do
+    for i = 1, #lootTable.rare do
+      local drop = lootTable.rare[i]
       if drop.min_level <= level then
         totalWeight = totalWeight + drop.weight
         table.insert(eligible, drop)
@@ -369,7 +376,8 @@ local function rollLoot(activityKey, level, seed)
     if totalWeight > 0 then
       local pick = rnd.range(1, totalWeight)
       local acc = 0
-      for _, drop in ipairs(eligible) do
+      for i = 1, #eligible do
+        local drop = eligible[i]
         acc = acc + drop.weight
         if pick <= acc then
           aggregate[drop.id] = (aggregate[drop.id] or 0) + 1
@@ -391,9 +399,9 @@ local function rollLoot(activityKey, level, seed)
 end
 
 --- Продажа всех ресурсов из инвентаря (расходники/инструменты не трогаем).
--- @param user_id (number)
--- @return[1] table { total, lines = { { id, count, sum } } }
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table { total, lines = { { id, count, sum } } }
+-- @treturn[2] table err
 function service.sellAll(user_id)
   local result = { total = 0, lines = {} }
 
@@ -438,11 +446,11 @@ function service.sellAll(user_id)
 end
 
 --- Продажа одного ресурса. count = nil -> весь стак.
--- @param user_id (number)
--- @param id (string) предмет
--- @param count (number|nil) сколько продать (по умолчанию весь стак)
--- @return[1] table { id, sold, total }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string id предмет
+-- @tparam ?number count сколько продать (по умолчанию весь стак)
+-- @treturn[1] table { id, sold, total }
+-- @treturn[2] table err
 function service.sellItem(user_id, id, count)
   local result = { id = id, sold = 0, total = 0 }
 
@@ -496,10 +504,10 @@ end
 --- Покупка предмета (инструмент или расходник) за balance/crystals.
 -- Атомарно: списание валюты + выдача в инвентарь.
 -- Инструмент покупается по одному на тип - покупка обновляет прочность до полной.
--- @param user_id (number)
--- @param itemId (string)
--- @return[1] table { status = 'ok' | 'funds' | 'unavailable', currency, price, kind }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string itemId
+-- @treturn[1] table { status = 'ok' | 'funds' | 'unavailable', currency, price, kind }
+-- @treturn[2] table err
 function service.buy(user_id, itemId)
   local def = items.get(itemId)
   if def == nil or def.buy == nil or not (def.kind == 'tool' or def.kind == 'consumable') then
@@ -567,7 +575,8 @@ end
 
 --- Рецепт по id (или nil).
 local function findRecipe(recipeId)
-  for _, recipe in ipairs(recipes) do
+  for i = 1, #recipes do
+    local recipe = recipes[i]
     if recipe.id == recipeId then
       return recipe
     end
@@ -576,10 +585,10 @@ local function findRecipe(recipeId)
 end
 
 --- Крафт: списать входы, выдать выход. Атомарно (без частичных списаний).
--- @param user_id (number)
--- @param recipeId (string)
--- @return[1] table { status = 'ok'|'missing'|'unavailable', recipe }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string recipeId
+-- @treturn[1] table { status = 'ok'|'missing'|'unavailable', recipe }
+-- @treturn[2] table err
 function service.craft(user_id, recipeId)
   local recipe = findRecipe(recipeId)
   if recipe == nil then
@@ -593,7 +602,8 @@ function service.craft(user_id, recipeId)
     local itemsMap = inv and copyMap(inv.items) or {}
 
     -- Хватает ли всех входов.
-    for _, input in ipairs(recipe.inputs) do
+    for i = 1, #recipe.inputs do
+      local input = recipe.inputs[i]
       if (itemsMap[input.id] or 0) < input.count then
         result.status = 'missing'
         return
@@ -601,7 +611,8 @@ function service.craft(user_id, recipeId)
     end
 
     -- Списать входы.
-    for _, input in ipairs(recipe.inputs) do
+    for i = 1, #recipe.inputs do
+      local input = recipe.inputs[i]
       itemsMap[input.id] = itemsMap[input.id] - input.count
       if itemsMap[input.id] <= 0 then
         itemsMap[input.id] = nil
@@ -630,15 +641,15 @@ function service.craft(user_id, recipeId)
   return result, nil
 end
 
---- Старт задачи добычи. Атомарно: проверка «нет активной задачи», выбор лучшего
+--- Старт задачи добычи. Атомарно: проверка 'нет активной задачи', выбор лучшего.
 -- инструмента, трата прикормки (если есть), создание записи задачи.
 -- message_id ставится позже (после отправки сообщения) через user_activity.setMessage.
--- @param user_id (number)
--- @param activityKey (string)
--- @param chat_id (number)
--- @param isVip (boolean)
--- @return[1] table { status = 'ok'|'busy'|'no_tool', tool_id, until_date, bait_used }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string activityKey
+-- @tparam number chat_id
+-- @tparam boolean isVip
+-- @treturn[1] table { status = 'ok'|'busy'|'no_tool', tool_id, until_date, bait_used }
+-- @treturn[2] table err
 function service.begin(user_id, activityKey, chat_id, isVip)
   local activity = activities[activityKey]
   local cfg = config.gathering[activityKey]
@@ -656,7 +667,8 @@ function service.begin(user_id, activityKey, chat_id, isVip)
 
     -- Лучший инструмент из имеющихся (activity.tools идут по возрастанию класса).
     local toolId
-    for _, id in ipairs(activity.tools) do
+    for i = 1, #activity.tools do
+      local id = activity.tools[i]
       if (toolsMap[id] or 0) > 0 then
         toolId = id
       end
@@ -723,9 +735,9 @@ end
 --- Сбор задачи: выдать лут, износить инструмент, удалить задачу. Атомарно.
 -- Используется и ручным /collect, и TTL-джобой; благодаря сиду лут одинаков,
 -- а транзакция гарантирует, что начисление произойдёт ровно один раз.
--- @param user_id (number)
--- @return[1] table { status = 'done'|'none'|'not_ready', remaining, activity, loot, jackpot, tool_id, tool_broken, tool_left }
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table { status = 'done'|'none'|'not_ready', remaining, activity, loot, jackpot, tool_id, tool_broken, tool_left }
+-- @treturn[2] table err
 function service.collect(user_id)
   -- Предпросмотр вне транзакции: уровень навыка может читать БД (Фаза 4),
   -- держим возможный yield вне atomic.
@@ -763,7 +775,8 @@ function service.collect(user_id)
     local itemsMap = inv and copyMap(inv.items) or {}
     local toolsMap = inv and copyMap(inv.tools) or {}
 
-    for _, drop in ipairs(rolled.list) do
+    for i = 1, #rolled.list do
+      local drop = rolled.list[i]
       itemsMap[drop.id] = (itemsMap[drop.id] or 0) + drop.count
     end
 

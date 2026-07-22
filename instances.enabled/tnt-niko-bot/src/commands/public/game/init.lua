@@ -10,10 +10,10 @@ local gamingService = require('src.services.gaming_sessions')
 local gameTypes = require('src.enums.game_types')
 local render = require('src.commands.public.game.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/game', 'играть', 'игра' },
   flags = { Command.enum.IN_CHAT },
-}
+})
 
 local MIN_BID = 1000
 
@@ -24,13 +24,18 @@ ${sep}
 Минимальная ставка: <b>${min_bid}</b>р
 ]]):f({
   min_bid = MIN_BID,
-  sep = hdec.sep
+  sep = hdec.sep,
 })
 
+--- Занят ли игрок активной сессией.
+-- @tparam number user_id id игрока
+-- @treturn boolean
 local function isInGame(user_id)
   return gamingService.getByPlayer(user_id) ~= nil
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local message = ctx.message
   local reply = message.reply_to_message

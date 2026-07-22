@@ -10,10 +10,10 @@ local separateNumbers = require('src.utils.separateNumbers')
 local usersService = require('src.services.users')
 local gatheringService = require('src.services.gathering')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/sell', 'продать' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
 local USAGE = ([[
 💰 <b>Продажа</b>
@@ -24,7 +24,7 @@ ${sep}
 Без количества - продаётся весь стак.
 ]]):f({ sep = hdec.sep })
 
--- Слова, означающие «продать всё».
+-- Слова, означающие 'продать всё'.
 local ALL_WORDS = {
   ['всё'] = true,
   ['все'] = true,
@@ -118,6 +118,8 @@ local function sellCrystals(ctx, user_id, count)
   }))
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
 
@@ -169,11 +171,11 @@ function command.call(ctx)
     ctx:replyToMessage(SOLD_ITEM:f({
       label = items.label(id),
       count = result.sold,
-      total = separateNumbers(result.total)
+      total = separateNumbers(result.total),
     }))
   else
     ctx:replyToMessage(NOT_IN_INV:f({
-      label = items.label(id)
+      label = items.label(id),
     }))
   end
 end

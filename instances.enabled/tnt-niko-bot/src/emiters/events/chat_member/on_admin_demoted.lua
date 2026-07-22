@@ -1,4 +1,4 @@
----
+--- Событие chat_member: Администратор разжалован до участника.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
@@ -6,7 +6,9 @@ local chatService = require('src.services.chats')
 local Permissions = require('src.models.Permissions')
 local moderationLog = require('src.notifications.moderationLog')
 
-local function on_admin_demoted(ctx)
+--- Администратор разжалован: обновление записи участника и лог в мод-чат.
+-- @tparam table ctx контекст обновления
+local function onAdminDemoted(ctx)
   log.verbose('[event] %s', 'on_admin_demoted')
 
   local chat = ctx:getChat()
@@ -42,4 +44,4 @@ local function on_admin_demoted(ctx)
   end
 end
 
-return on_admin_demoted
+return onAdminDemoted

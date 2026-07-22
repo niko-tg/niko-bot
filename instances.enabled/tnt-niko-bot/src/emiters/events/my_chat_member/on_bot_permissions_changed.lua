@@ -1,4 +1,4 @@
---- Боту изменили права в чате
+--- Боту изменили права в чате.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
@@ -6,7 +6,9 @@ local Permissions = require('src.models.Permissions')
 local missingRightsWarner = require('src.utils.missingRightsWarner')
 
 -- luacheck: ignore ctx
-local function on_bot_permissions_changed(ctx)
+--- Боту изменили права в чате.
+-- @tparam table ctx контекст обновления
+local function onBotPermissionsChanged(ctx)
   log.verbose('[event] %s', 'on_bot_permissions_changed')
 
   local chat = ctx:getChat()
@@ -30,4 +32,4 @@ local function on_bot_permissions_changed(ctx)
   missingRightsWarner.reset(chat.id)
 end
 
-return on_bot_permissions_changed
+return onBotPermissionsChanged

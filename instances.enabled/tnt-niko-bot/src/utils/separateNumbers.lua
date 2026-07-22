@@ -1,8 +1,8 @@
---- Adding a separator to a number 1000000 -> 1.000.000
--- @param value (number | string)
--- @param[optchain] opts (table) options
--- @param[optchain] opts.separator (string) separator
--- @return string
+--- Adding a separator to a number 1000000 -> 1.000.000.
+-- @tparam number|string value
+-- @tparam[opt] table opts options
+-- @tparam[opt] string opts.separator separator
+-- @treturn string
 local function separateNumbers(value, opts)
   if value == nil then
     return 'nil'

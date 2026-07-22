@@ -83,43 +83,43 @@ local defs = {
   -- Инструменты
   rod = {
     name = 'Бамбуковая удочка', emoji = '🎣',
-    kind = 'tool', activity = 'fishing', durability = 10, buy = 7000,  currency = 'money'
+    kind = 'tool', activity = 'fishing', durability = 10, buy = 7000,  currency = 'money',
   },
   rod_pro = {
     name = 'Спиннинг', emoji = '🎣',
-    kind = 'tool', activity = 'fishing', durability = 1000, buy = 1, currency = 'crystals'
+    kind = 'tool', activity = 'fishing', durability = 1000, buy = 1, currency = 'crystals',
   },
 
   pick_wood  = {
     name = 'Деревянная кирка', emoji = '⛏️',
-    kind = 'tool', activity = 'mining', durability = 2, buy = 2500,  currency = 'money'
+    kind = 'tool', activity = 'mining', durability = 2, buy = 2500,  currency = 'money',
   },
   pick_metal = {
     name = 'Железная кирка', emoji = '⛏️',
-    kind = 'tool', activity = 'mining', durability = 10, buy = 10000, currency = 'money'
+    kind = 'tool', activity = 'mining', durability = 10, buy = 10000, currency = 'money',
   },
   pick_pro = {
     name = 'Алмазная кирка', emoji = '⛏️',
-    kind = 'tool', activity = 'mining', durability = 100, buy = 1, currency = 'crystals'
+    kind = 'tool', activity = 'mining', durability = 100, buy = 1, currency = 'crystals',
   },
 
   axe_wood = {
     name = 'Деревянный топор', emoji = '🪓',
-    kind = 'tool', activity = 'sawmill', durability = 2, buy = 1500, currency = 'money'
+    kind = 'tool', activity = 'sawmill', durability = 2, buy = 1500, currency = 'money',
   },
   saw_hand = {
     name = 'Ручная пила', emoji = '🪚',
-    kind = 'tool', activity = 'sawmill', durability = 10, buy = 6000, currency = 'money'
+    kind = 'tool', activity = 'sawmill', durability = 10, buy = 6000, currency = 'money',
   },
   saw_pro = {
     name = 'Цепная пила', emoji = '🪚',
-    kind = 'tool', activity = 'sawmill', durability = 100, buy = 1, currency = 'crystals'
+    kind = 'tool', activity = 'sawmill', durability = 100, buy = 1, currency = 'crystals',
   },
 
   -- Расходники
   bait = {
     name = 'Прикормка', emoji = '🪱',
-    kind = 'consumable', activity = 'fishing', buy = 15000, currency = 'money', buy_count = 10, sell = 250
+    kind = 'consumable', activity = 'fishing', buy = 15000, currency = 'money', buy_count = 10, sell = 250,
   },
 
   -- Ферма: семена (расходник, тратится при посадке; продаётся в /ферма, не в /shop)
@@ -178,7 +178,7 @@ local toolOrder = {
   'pick_pro',
   'axe_wood',
   'saw_hand',
-  'saw_pro'
+  'saw_pro',
 }
 local consumableOrder = { 'bait' }
 
@@ -228,8 +228,8 @@ function M.isResource(id)
 end
 
 --- Занятое место: сумма ресурсов в инвентаре (инструменты/расходники не в счёт).
--- @param itemsMap (table) id -> count
--- @return number
+-- @tparam table itemsMap id -> count
+-- @treturn number
 function M.resourceWeight(itemsMap)
   local weight = 0
   for id, count in pairs(itemsMap or {}) do
@@ -241,18 +241,20 @@ function M.resourceWeight(itemsMap)
 end
 
 --- Покупаемые предметы активности (инструменты + расходники) в порядке вывода.
--- @param activityKey (string) 'fishing' | 'mining' | 'sawmill'
--- @return array id
+-- @tparam string activityKey 'fishing' | 'mining' | 'sawmill'
+-- @treturn table массив id
 function M.shopItems(activityKey)
   local list = {}
 
-  for _, id in ipairs(toolOrder) do
+  for i = 1, #toolOrder do
+    local id = toolOrder[i]
     if defs[id].activity == activityKey then
       table.insert(list, id)
     end
   end
 
-  for _, id in ipairs(consumableOrder) do
+  for i = 1, #consumableOrder do
+    local id = consumableOrder[i]
     if defs[id].activity == activityKey then
       table.insert(list, id)
     end
@@ -261,7 +263,7 @@ function M.shopItems(activityKey)
   return list
 end
 
--- Правила «винительный -> именительный» для распознавания названий в /sell
+-- Правила 'винительный -> именительный' для распознавания названий в /sell
 -- (как в старом боте): рыбу->рыба, красную->красная, синюю->синяя, змею->змея.
 local DECLENSION_RULES = {
   { 'ую$', 'ая' },
@@ -275,7 +277,8 @@ local DECLENSION_RULES = {
 local function toNominative(word)
   word = utf8.lower(word)
 
-  for _, rule in ipairs(DECLENSION_RULES) do
+  for i = 1, #DECLENSION_RULES do
+    local rule = DECLENSION_RULES[i]
     if word:match(rule[1]) then
       return (word:gsub(rule[1], rule[2]))
     end
@@ -285,12 +288,13 @@ local function toNominative(word)
 end
 
 --- Найти продаваемый ресурс по словам запроса с учётом склонений.
--- @param words (array) слова названия без count, напр. { 'красную', 'рыбу' }
--- @return[1] string|nil id ресурса
--- @return[2] string фраза в именительном (для сообщения, если не найдено)
+-- @tparam table words слова названия без count, напр. { 'красную', 'рыбу' }
+-- @treturn[1] ?string id ресурса
+-- @treturn[2] string фраза в именительном (для сообщения, если не найдено)
 function M.resolveResource(words)
   local parts = {}
-  for _, word in ipairs(words) do
+  for i = 1, #words do
+    local word = words[i]
     table.insert(parts, toNominative(word))
   end
 

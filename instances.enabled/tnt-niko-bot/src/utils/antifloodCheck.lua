@@ -137,7 +137,7 @@ local function antifloodCheck(ctx, chatItem)
   -- правилам он считается простым участником, телеграм всё равно
   -- не даст ограничить админа.
   if uic and (uic.status == chat_member_status.CREATOR
-           or uic.status == chat_member_status.ADMINISTRATOR) then
+    or uic.status == chat_member_status.ADMINISTRATOR) then
     return false
   end
 

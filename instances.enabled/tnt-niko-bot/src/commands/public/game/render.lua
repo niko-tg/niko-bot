@@ -125,6 +125,13 @@ end
 
 local render = {}
 
+--- Аргументы callback-кнопки игрового меню.
+-- @tparam string action действие кнопки
+-- @tparam string gameKey ключ игры
+-- @tparam number initiatorId id инициатора
+-- @tparam number opponentId id оппонента
+-- @tparam number bid размер ставки
+-- @treturn table аргументы кнопки
 local function buttonArgs(action, gameKey, initiatorId, opponentId, bid)
   return {
     action = action,
@@ -140,7 +147,8 @@ function render.gameMenu(initiator, opponent, bid)
   local rows = {}
   local row = {}
 
-  for _, game in ipairs(gameTypes.list) do
+  for i = 1, #gameTypes.list do
+    local game = gameTypes.list[i]
     table.insert(row, {
       text = game.emoji .. ' ' .. game.name,
       callback = {
@@ -187,14 +195,14 @@ function render.invite(initiator, opponent, gameKey, bid)
         text = '✅ Принять',
         callback = {
           command = 'cb_game',
-          arguments = buttonArgs('accept', gameKey, initiator.id, opponent.id, bid)
+          arguments = buttonArgs('accept', gameKey, initiator.id, opponent.id, bid),
         },
       },
       {
         text = '❌ Отклонить',
         callback = {
           command = 'cb_game',
-          arguments = buttonArgs('decline', gameKey, initiator.id, opponent.id, bid)
+          arguments = buttonArgs('decline', gameKey, initiator.id, opponent.id, bid),
         },
       },
     },
@@ -221,10 +229,10 @@ function render.gameStart(initiator, opponent, gameKey, bid)
 end
 
 --- Промежуточный ход: текущий бросок и накопленный счёт игрока.
--- @param gameKey (string) ключ игры
--- @param step (number) номер хода (1..MAX_STEPS)
--- @param rollScore (number) очков за текущий бросок
--- @param totalScore (number) накопленных очков
+-- @tparam string gameKey ключ игры
+-- @tparam number step номер хода (1..MAX_STEPS)
+-- @tparam number rollScore очков за текущий бросок
+-- @tparam number totalScore накопленных очков
 function render.gameStep(gameKey, step, rollScore, totalScore)
   local game = gameTypes.byKey[gameKey]
 
@@ -241,10 +249,10 @@ function render.gameStep(gameKey, step, rollScore, totalScore)
 end
 
 --- Итог партии: счёт обоих игроков, победитель/ничья, банк.
--- @param session (table) сессия игры
--- @param data (table) состояние { [user_id] = { score, steps } }
--- @param player1 (table) объект игрока player1 (для упоминания)
--- @param player2 (table) объект игрока player2 (для упоминания)
+-- @tparam table session сессия игры
+-- @tparam table data состояние { [user_id] = { score, steps } }
+-- @tparam table player1 объект игрока player1 (для упоминания)
+-- @tparam table player2 объект игрока player2 (для упоминания)
 function render.gameResult(session, data, player1, player2)
   local game = gameTypes.byKey[session.game_type]
 
@@ -267,10 +275,10 @@ function render.gameResult(session, data, player1, player2)
 end
 
 --- Завершение сессии по таймауту: табло + исход по очкам.
--- @param session (table) сессия игры
--- @param data (table) состояние { [user_id] = { score, steps } }
--- @param player1 (table) объект игрока player1
--- @param player2 (table) объект игрока player2
+-- @tparam table session сессия игры
+-- @tparam table data состояние { [user_id] = { score, steps } }
+-- @tparam table player1 объект игрока player1
+-- @tparam table player2 объект игрока player2
 function render.gameExpired(session, data, player1, player2)
   local game = gameTypes.byKey[session.game_type]
 
@@ -293,11 +301,11 @@ function render.gameExpired(session, data, player1, player2)
 end
 
 --- Принудительная отмена сессии (мут/бан игрока).
--- @param session (table) сессия игры
--- @param player1 (table) объект игрока player1
--- @param player2 (table) объект игрока player2
--- @param actor (table) игрок, из-за которого отмена (для упоминания)
--- @param verb (string) причина: 'замучен' | 'забанен'
+-- @tparam table session сессия игры
+-- @tparam table player1 объект игрока player1
+-- @tparam table player2 объект игрока player2
+-- @tparam table actor игрок, из-за которого отмена (для упоминания)
+-- @tparam string verb причина: 'замучен' | 'забанен'
 function render.gameCancelled(session, player1, player2, actor, verb)
   local game = gameTypes.byKey[session.game_type]
 
@@ -315,10 +323,10 @@ function render.gameCancelled(session, player1, player2, actor, verb)
 end
 
 --- Статус активной сессии игрока (/game без реплея, когда он уже в игре).
--- @param session (table) сессия игры
--- @param me (table) объект игрока, запросившего статус
--- @param opponent (table) объект оппонента
--- @param remainingSec (number) сколько секунд сессии осталось жить
+-- @tparam table session сессия игры
+-- @tparam table me объект игрока, запросившего статус
+-- @tparam table opponent объект оппонента
+-- @tparam number remainingSec сколько секунд сессии осталось жить
 function render.gameStatus(session, me, opponent, remainingSec)
   local game = gameTypes.byKey[session.game_type]
 

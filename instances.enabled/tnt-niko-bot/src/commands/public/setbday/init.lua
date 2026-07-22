@@ -6,10 +6,10 @@ local datetime = require('datetime')
 local Command = require('bot.classes.Command')
 local usersService = require('src.services.users')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/setbday', 'др' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
 local USAGE = ([[
 🎂 <b>День рождения</b>
@@ -29,7 +29,7 @@ ${sep}
 Формат: <code>ДД.ММ.ГГГГ</code> (напр. 25.05.2005)
 ]]):f({ sep = hdec.sep })
 
--- Парсит "ДД.ММ.ГГГГ" (разделитель . - /) в datetime или nil.
+--- Парсит "ДД.ММ.ГГГГ" (разделитель . - /) в datetime или nil.
 local function parseBirthday(str)
   local d, m, y = str:match('^(%d%d?)[%.%-/](%d%d?)[%.%-/](%d%d%d%d)$')
   if not d then
@@ -61,6 +61,8 @@ local function parseBirthday(str)
   return dt
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arg = ctx.message.text:match('^%S+%s+(%S+)')
   if not arg then
@@ -76,7 +78,7 @@ function command.call(ctx)
 
   local _, err = usersService.upsert({
     id = command.user.id,
-    birthday_date = birthday
+    birthday_date = birthday,
   })
 
   if err then
@@ -86,7 +88,7 @@ function command.call(ctx)
   end
 
   ctx:replyToMessage(BDAY_SET:f({
-    birthday = os.date('%d.%m.%Y', birthday.timestamp)
+    birthday = os.date('%d.%m.%Y', birthday.timestamp),
   }))
 end
 

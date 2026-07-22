@@ -5,6 +5,8 @@ local bot = require('bot')
 local log = require('log')
 local donatPayload = require('src.donat.payload')
 
+--- Подтверждение платежа перед списанием звёзд.
+-- @tparam table ctx контекст обновления
 local function preCheckoutQuery(ctx)
   local donatType = donatPayload.parse(ctx:getInvoicePayload())
 
@@ -22,7 +24,7 @@ local function preCheckoutQuery(ctx)
     return
   end
 
-  -- Цифровой товар всегда «в наличии» - подтверждаем.
+  -- Цифровой товар всегда 'в наличии' - подтверждаем.
   bot:answerPreCheckoutQuery({
     pre_checkout_query_id = ctx:getId(),
     ok = true,

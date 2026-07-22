@@ -1,7 +1,7 @@
---- Активные одиночные партии «Мины» (PVE).
+--- Активные одиночные партии 'Мины' (PVE).
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- Игрок (PK - одна партия на игрока).
   {
@@ -38,19 +38,19 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'primary',
     options = {
       parts = { 'user_id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

@@ -1,7 +1,7 @@
---- Пользователь в чате
+--- Пользователь в чате.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   {
     name = 'user_id',
@@ -17,7 +17,7 @@ local formatSpace = {
   },
   {
     name = 'permissions',
-    type = 'map'
+    type = 'map',
   },
 
   -- Параметры для статистики
@@ -54,7 +54,7 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   -- Композитный первичный ключ (предотвращает дубли user<->chat).
   -- Поиск по префиксу chat_id даёт всех участников чата
@@ -63,8 +63,8 @@ local index = {
     options = {
       parts = { 'chat_id', 'user_id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   -- Поиск всех чатов пользователя
   {
@@ -72,12 +72,12 @@ local index = {
     options = {
       parts = { 'user_id' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

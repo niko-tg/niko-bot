@@ -1,4 +1,4 @@
----
+--- Энам событий chat_member (изменения статуса участников чата).
 --
 local event_chat_member = {
   CHANNEL = 'channel',
@@ -11,7 +11,7 @@ local event_chat_member = {
   MEMBER_UNBANNED = 'member_unbanned',
   MEMBER_RESTRICTED = 'member_restricted',
   ADMIN_LEFT = 'admin_left',
-  OWNER_LEFT = 'owner_left'
+  OWNER_LEFT = 'owner_left',
 }
 
 return event_chat_member

@@ -1,4 +1,4 @@
---- Рендер «Пазла»: меню сложности, запомни, повтори, итоги, кулдаун.
+--- Рендер 'Пазла': меню сложности, запомни, повтори, итоги, кулдаун.
 --
 local hdec = require('bot.libs.hdec')
 local config = require('conf.config')
@@ -74,7 +74,8 @@ end
 --- Последовательность как строка эмодзи в исходном порядке.
 local function seqString(seq)
   local parts = {}
-  for _, index in ipairs(seq) do
+  for i = 1, #seq do
+    local index = seq[i]
     table.insert(parts, emoji(index))
   end
   return table.concat(parts, ' ')
@@ -88,13 +89,14 @@ end
 local render = {}
 
 --- Меню выбора сложности. Для VIP награды и подсказка увеличены.
--- @param isVip (boolean)
+-- @tparam boolean isVip
 function render.menu(isVip)
   local multiplier = isVip and config.puzzle.vip_multiplier or 1
 
   local row = {}
 
-  for _, len in ipairs(config.puzzle.lengths) do
+  for i = 1, #config.puzzle.lengths do
+    local len = config.puzzle.lengths[i]
     table.insert(row, {
       text = ('%d | До %sр'):format(len, separateNumbers(approxWin(len) * multiplier)),
       callback = {
@@ -115,7 +117,7 @@ function render.menu(isVip)
   }
 end
 
---- Фаза «запомни»: показываем порядок + кнопка «Запомнил».
+--- Фаза 'запомни': показываем порядок + кнопка 'Запомнил'.
 function render.memorize(active)
   local keyboard = inlineCallbackKeyboard({
     {
@@ -126,7 +128,7 @@ function render.memorize(active)
           arguments = {
             action = 'memorized',
             len = 0,
-            idx = 0
+            idx = 0,
           },
         },
       },
@@ -143,7 +145,7 @@ function render.memorize(active)
   }
 end
 
---- Фаза «повтори»: порядок скрыт, кнопки эмодзи (по индексу), вскрытые -> ✅.
+--- Фаза 'повтори': порядок скрыт, кнопки эмодзи (по индексу), вскрытые -> ✅.
 function render.recall(active)
   -- Вскрытые = seq[1..pos-1].
   local consumed = {}
@@ -153,7 +155,8 @@ function render.recall(active)
 
   -- Кнопки = индексы последовательности, отсортированы (порядок не выдаём).
   local indices = {}
-  for _, index in ipairs(active.seq) do
+  for i = 1, #active.seq do
+    local index = active.seq[i]
     table.insert(indices, index)
   end
   table.sort(indices)
@@ -161,7 +164,8 @@ function render.recall(active)
   local rows = {}
   local row = {}
 
-  for _, index in ipairs(indices) do
+  for i = 1, #indices do
+    local index = indices[i]
     if consumed[index] then
       table.insert(row, {
         text = DONE,
@@ -170,7 +174,7 @@ function render.recall(active)
           arguments = {
             action = 'none',
             len = 0,
-            idx = index
+            idx = index,
           },
         },
       })
@@ -182,7 +186,7 @@ function render.recall(active)
           arguments = {
             action = 'tap',
             len = 0,
-            idx = index
+            idx = index,
           },
         },
       })

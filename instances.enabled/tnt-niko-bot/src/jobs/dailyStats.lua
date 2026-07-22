@@ -21,6 +21,7 @@ local function startOfDay(ts)
   return os.time(d)
 end
 
+--- Один проход: снятие суточного среза статистики бота.
 local function tick()
   local todayStart = startOfDay(os.time())
 
@@ -60,6 +61,7 @@ local function tick()
   end
 end
 
+--- Запуск фонового файбера суточной статистики.
 local function start()
   fiber.create(function()
     fiber.self():name('daily-stats')

@@ -49,10 +49,11 @@ local TIERS = {
 local bites = {}
 
 --- Случайный укус: сначала тир по весу, затем вариант внутри тира.
--- @return table { tier, label, power, crit, description, animation }
+-- @treturn table { tier, label, power, crit, description, animation }
 function bites.roll()
   local total = 0
-  for _, tier in ipairs(TIERS) do
+  for i = 1, #TIERS do
+    local tier = TIERS[i]
     total = total + tier.weight
   end
 
@@ -60,7 +61,8 @@ function bites.roll()
   local acc = 0
   local chosen = TIERS[1]
 
-  for _, tier in ipairs(TIERS) do
+  for i = 1, #TIERS do
+    local tier = TIERS[i]
     acc = acc + tier.weight
     if pick <= acc then
       chosen = tier

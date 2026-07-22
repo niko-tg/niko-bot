@@ -1,4 +1,4 @@
----
+--- Событие chat_member: Участник исключён (бан) из чата.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
@@ -6,7 +6,9 @@ local chatService = require('src.services.chats')
 local moderationLog = require('src.notifications.moderationLog')
 local cancelGame = require('src.commands.public.game.cancel')
 
-local function on_member_kicked(ctx)
+--- Участник исключён из чата: обновление статуса и счётчика участников.
+-- @tparam table ctx контекст обновления
+local function onMemberKicked(ctx)
   log.verbose('[event] %s', 'on_member_kicked')
 
   local chat = ctx:getChat()
@@ -44,4 +46,4 @@ local function on_member_kicked(ctx)
   cancelGame(chat.id, newChatMember.user, 'забанен')
 end
 
-return on_member_kicked
+return onMemberKicked

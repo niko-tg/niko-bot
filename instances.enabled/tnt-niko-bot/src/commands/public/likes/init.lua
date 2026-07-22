@@ -4,11 +4,13 @@ local log = require('log')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.likes.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/likes', 'лайки' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Ответом на сообщение смотрим лайки того человека, иначе свои.
   local reply = ctx.message.reply_to_message

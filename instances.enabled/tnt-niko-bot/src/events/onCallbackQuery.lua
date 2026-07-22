@@ -1,4 +1,4 @@
---- Событие обработки кнопок с колбэком
+--- Событие обработки кнопок с колбэком.
 --
 local log = require('log')
 local bot = require('bot')
@@ -14,12 +14,12 @@ local TOO_FAST_TEXT = '⏳ Часто жмёшь! Подожди ${sec} сек'
 -- Текст когда сам Telegram не дал изменить сообщение (flood). ${sec} - его retry_after.
 local TG_FLOOD_TEXT = '⏳ Телеграм просит подождать ${sec} сек'
 
--- Ответ на слишком частые нажатия кнопки
+--- Ответ на слишком частые нажатия кнопки
 -- cache_time просит клиент Telegram какое-то время отдавать -
 -- этот ответ из своего кэша и не слать новый запрос на повторные нажатия той же кнопки -
--- так бот не заваливает Telegram запросами и кнопка перестаёт «зависать»
+-- так бот не заваливает Telegram запросами и кнопка перестаёт 'зависать'
 -- wait приходит сверху: примерно столько секунд до следующего разрешённого нажатия.
-local function antiflood_answer(ctx, wait)
+local function antifloodAnswer(ctx, wait)
   local seconds = math.max(1, math.ceil(wait or 1))
 
   ctx:answer({
@@ -29,8 +29,8 @@ local function antiflood_answer(ctx, wait)
   })
 end
 
--- Есть ли в ответе осмысленный текст попапа («БУМ», «Забрал»...), а не пустой
--- ack, который просто гасит «часики» на кнопке.
+--- Есть ли в ответе осмысленный текст попапа ('БУМ', 'Забрал'...), а не пустой
+-- ack, который просто гасит 'часики' на кнопке.
 local function hasText(fields)
   if type(fields) == 'string' then
     return fields ~= ''
@@ -43,7 +43,7 @@ local function hasText(fields)
   return false
 end
 
--- Подменяем ctx:answer на время обработки одного колбэка:
+--- Подменяем ctx:answer на время обработки одного колбэка:
 --   * осмысленный попап - отправляем сразу;
 --   * пустой ack - откладываем. Вдруг правка сообщения упрётся во flood и нам
 --     нужно будет показать таймер вместо пустого ответа (ответить можно один раз).
@@ -66,8 +66,8 @@ local function instrumentAnswer(ctx)
   end
 end
 
--- После обработки: если никто так и не ответил, но хендлер просил погасить
--- «часики» - досылаем отложенный пустой ack.
+--- После обработки: если никто так и не ответил, но хендлер просил погасить
+-- 'часики' - досылаем отложенный пустой ack.
 local function flushAnswer(ctx)
   local state = ctx._floodState
 
@@ -76,8 +76,8 @@ local function flushAnswer(ctx)
   end
 end
 
--- Когда Telegram ответил 429 на правку сообщения (частое при быстрых нажатиях),
--- сама правка не прошла. Чтобы кнопка не «зависала», отвечаем активному колбэку
+--- Когда Telegram ответил 429 на правку сообщения (частое при быстрых нажатиях),
+-- сама правка не прошла. Чтобы кнопка не 'зависала', отвечаем активному колбэку
 -- этого fiber'а таймером с реальным retry_after от Telegram. cache_time просит
 -- клиент не слать повторные нажатия той же кнопки на это время.
 local function answerFlood(ctx, err)
@@ -96,6 +96,8 @@ end
 -- Не-колбэчные правки (рассылка) идут в чужих fiber'ах, где storage пуст - там обёртка ничего не делает.
 local guardInstalled = false
 
+--- Однократная установка обёрток над методами правки сообщений.
+-- Нужна, чтобы ловить flood-wait централизованно, без правок в хендлерах.
 local function installFloodGuard()
   if guardInstalled then
     return
@@ -103,6 +105,8 @@ local function installFloodGuard()
 
   guardInstalled = true
 
+  --- Подмена метода бота обёрткой, ловящей flood-wait.
+  -- @tparam string method имя метода bot
   local function wrap(method)
     local raw = bot[method]
 
@@ -129,7 +133,7 @@ local function installFloodGuard()
   wrap('editMessageMedia')
 end
 
--- Колбэк, чью кнопку может жать НЕ автор исходного сообщения (PVP-игры: оппонент
+--- Колбэк, чью кнопку может жать НЕ автор исходного сообщения (PVP-игры: оппонент
 -- принимает инвайт). Такая команда помечает себя флагом MULTI_USER, а ownership
 -- проверяет внутри хендлера - поэтому общий isSameUser-гейт для неё пропускаем.
 local function isMultiUserCallback(ctx)
@@ -139,6 +143,8 @@ local function isMultiUserCallback(ctx)
   return command ~= nil and command:hasFlag(command_flags.MULTI_USER)
 end
 
+--- Диспетчеризация нажатия: проверки владельца кнопки и запуск команды.
+-- @tparam table ctx контекст обновления
 local function dispatch(ctx)
   -- Попытка выолнить команду от лица чата
   --
@@ -153,7 +159,7 @@ local function dispatch(ctx)
   -- В приватном чате безусловно обрабытываем нажатия
   --
   if chatType == chat_type.PRIVATE then
-    processCommand(ctx, { antiflood_answer = antiflood_answer })
+    processCommand(ctx, { antifloodAnswer = antifloodAnswer })
     return
   end
 
@@ -164,9 +170,11 @@ local function dispatch(ctx)
     return
   end
 
-  processCommand(ctx, { antiflood_answer = antiflood_answer })
+  processCommand(ctx, { antifloodAnswer = antifloodAnswer })
 end
 
+--- Обработчик callback_query.
+-- @tparam table ctx контекст обновления
 local function onCallbackQuery(ctx)
   installFloodGuard()
   instrumentAnswer(ctx)

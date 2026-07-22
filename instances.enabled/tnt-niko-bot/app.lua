@@ -1,15 +1,26 @@
--- ----------------------------
--- Точка входа
--- ----------------------------
-package.cpath = package.cpath .. ";.rocks/lib/tarantool/?.so;.rocks/lib/lua/5.1/?.so"
-package.path = package.path .. ";.rocks/share/lua/5.1/?.lua"
-package.path = package.path .. ";.rocks/share/lua/5.1/?/init.lua"
+--- Точка входа инстанса бота.
+--
+-- Порядок инициализации: пути -> конфиг -> схема хранилища -> события ->
+-- команды -> фоновые задачи -> запуск (long polling в dev, webhook в prod).
+--
 
--- luacheck: ignore 
--- Глоабальная установка fstring
+-- ----------------------------
+-- Пути поиска модулей
+-- ----------------------------
+package.cpath = package.cpath .. ';.rocks/lib/tarantool/?.so;.rocks/lib/lua/5.1/?.so'
+package.path = package.path .. ';.rocks/share/lua/5.1/?.lua'
+package.path = package.path .. ';.rocks/share/lua/5.1/?/init.lua'
+
+-- luacheck: ignore
+-- Глобальная установка fstring
 string.f = require('src.utils.fstring')
 
 local log = require('log')
+local datetime = require('datetime')
+local config = require('conf.config')
+local bot = require('bot')
+local commandLoader = require('bot.utils.commandLoader')
+local routes = require('src.routes')
 
 -- Сид рандома один раз на старте (дальше math.random без переинициализации)
 math.randomseed(os.time())
@@ -17,14 +28,11 @@ math.randomseed(os.time())
 -- ----------------------------
 -- Конфигурирование бота
 -- ----------------------------
-local config = require('conf.config')
-local bot = require('bot')
-
 do
-  bot:cfg {
+  bot:cfg({
     token = os.getenv('BOT_TOKEN'),
-    username = config.bot.username
-  }
+    username = config.bot.username,
+  })
 end
 
 -- ----------------------------
@@ -39,7 +47,7 @@ do
     -- Создание схемы
     local schema = box.schema.create_space(spaceName, {
       format = formatSpace,
-      if_not_exists = true
+      if_not_exists = true,
     })
 
     -- Создание индексов
@@ -85,8 +93,6 @@ bot.events.successfulPayment = require('src.events.successfulPayment')
 -- ----------------------------
 -- Команды
 -- ----------------------------
-local commandLoader = require('bot.utils.commandLoader')
-
 commandLoader.setPath('src.commands')
 
 commandLoader({
@@ -124,6 +130,7 @@ commandLoader({
     rp = {},
     game = { callback_commands = { 'cb_game' } },
     mines = { callback_commands = { 'cb_mines' } },
+    boss = { callback_commands = { 'cb_boss' } },
     puzzle = { callback_commands = { 'cb_puzzle' } },
     spin = {},
     cashbox = {},
@@ -172,15 +179,13 @@ commandLoader({
 require('src.jobs.vipReminder').start()
 require('src.jobs.gameTimeout').start()
 require('src.jobs.mineTimeout').start()
+require('src.jobs.bossTimeout').start()
 require('src.jobs.dailyStats').start()
 require('src.jobs.petsDecay').start()
 
 -- ----------------------------
 -- Запуск
 -- ----------------------------
-local datetime = require('datetime')
-local routes = require('src.routes')
-
 local BOT_MODE = os.getenv('BOT_MODE')
 local ALLOWED_UPDATES = {
   bot.enums.allowed_updates.MESSAGE,
@@ -199,9 +204,9 @@ if BOT_MODE == 'dev' then
     port = config.server.port,
   })
 
-  bot:startLongPolling {
+  bot:startLongPolling({
     allowed_updates = ALLOWED_UPDATES,
-  }
+  })
 
   return
 end
@@ -210,7 +215,7 @@ log.info('[WebHook] Bot running in PROD mode')
 
 bot:sendMessage({
   chat_id = config.admin_id,
-  text = 'Started at: ' .. tostring(datetime.now())
+  text = 'Started at: ' .. tostring(datetime.now()),
 })
 
 local _, err = bot:startWebHook({

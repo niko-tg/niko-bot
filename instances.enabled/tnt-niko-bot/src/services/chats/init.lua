@@ -1,4 +1,4 @@
--- Сервис CRUD к чатам
+--- Сервис CRUD к чатам.
 --
 local sql = require('bot.libs.sql')
 local bot = require('bot')
@@ -6,13 +6,14 @@ local Chat = require('src.models.Chat')
 
 local services_error_type = require('src.enums.services.services_error_type')
 local setErrType = require('src.utils.services.setErrType')
+local retryTxnConflict = require('src.utils.services.retryTxnConflict')
 
 local service = {}
 
---- Создание записи
--- @param data (table) record(s)
--- @return[1] model chat
--- @return[2] err
+--- Создание записи.
+-- @tparam table data record(s)
+-- @treturn[1] table модель chat
+-- @treturn[2] table err
 function service.create(data)
   local chat, errs = Chat(data, { init = true })
   if errs then
@@ -27,10 +28,10 @@ function service.create(data)
   return chat, nil
 end
 
---- Чтение записи
--- @param chat_id (number) chat id
--- @return[1] model chat
--- @return[2] err
+--- Чтение записи.
+-- @tparam number chat_id chat id
+-- @treturn[1] table модель chat
+-- @treturn[2] table err
 function service.read(chat_id)
   local item, err = sql(
     [[
@@ -40,7 +41,7 @@ function service.read(chat_id)
       WHERE
         id = ${id}
     ]], {
-      id = chat_id
+      id = chat_id,
     })
 
   if err then
@@ -61,9 +62,9 @@ end
 
 --- Чтение записи по username (для maint-команд). username хранится в нижнем
 -- регистре (Chat-модель), поэтому ищем по lower. Требует индекс username.
--- @param username (string) без префикса @, в любом регистре
--- @return[1] model chat | nil
--- @return[2] err
+-- @tparam string username без префикса @, в любом регистре
+-- @treturn[1] ?table модель chat
+-- @treturn[2] table err
 function service.readByUsername(username)
   local item, err = sql(
     [[
@@ -73,7 +74,7 @@ function service.readByUsername(username)
       WHERE
         username = ${username}
     ]], {
-      username = tostring(username):lower()
+      username = tostring(username):lower(),
     })
 
   if err then
@@ -92,11 +93,11 @@ function service.readByUsername(username)
   return chat, nil
 end
 
---- Обновление записи
--- @param fields (table) fields
--- @param where (table) where condition
--- @return[1] res
--- @return[2] err
+--- Обновление записи.
+-- @tparam table fields fields
+-- @tparam table where where condition
+-- @treturn[1] table res
+-- @treturn[2] table err
 function service.update(fields, where)
   -- NoSQL вариант: settings - map, SQL UPDATE для map-полей в Tarantool 3
   -- не работает. where должен быть полным первичным ключом ({ id }).
@@ -108,10 +109,10 @@ function service.update(fields, where)
   return res, nil
 end
 
---- Удаление записи
--- @param chat_id (number) chat id
--- @return[1] res
--- @return[2] err
+--- Удаление записи.
+-- @tparam number chat_id chat id
+-- @treturn[1] table res
+-- @treturn[2] table err
 function service.delete(chat_id)
   local res, err = sql(
     [[
@@ -120,7 +121,7 @@ function service.delete(chat_id)
       WHERE
         id = ${id}
     ]], {
-      id = chat_id
+      id = chat_id,
     })
 
   if err then
@@ -130,10 +131,10 @@ function service.delete(chat_id)
   return res, nil
 end
 
---- Гарантированное создание записи (если записи не существует)
--- @param data (table) chat object
--- @return[1] chat model
--- @return[2] err
+--- Гарантированное создание записи (если записи не существует).
+-- @tparam table data chat object
+-- @treturn[1] table модель chat
+-- @treturn[2] table err
 function service.ensure(data)
   if data.id == nil then
     error('Field id is empty', 1)
@@ -151,13 +152,13 @@ function service.ensure(data)
   return service.create(data)
 end
 
---- Добавление или обновление записи
+--- Добавление или обновление записи.
 -- При вставке создаёт полную запись с дефолтами
 -- При обновлении меняет только переданные поля
 -- data обязан содержать id и type - обязательные поля модели Chat
--- @param data (table) fields
--- @return[1] model chat
--- @return[2] err
+-- @tparam table data fields
+-- @treturn[1] table модель chat
+-- @treturn[2] table err
 function service.upsert(data)
   -- Полная модель с дефолтами для случая вставки
   local defaultChat, errs = Chat(data, { init = true })
@@ -178,10 +179,10 @@ end
 --- Инкремент кассы чата (пополнение из проигрышей слота).
 -- Одиночный SQL UPDATE атомарен сам по себе, лишней транзакции не нужно.
 -- casino_cashier - unsigned, прибавление в минус не уходит.
--- @param chat_id (number)
--- @param amount (number)
--- @return[1] true
--- @return[2] err
+-- @tparam number chat_id
+-- @tparam number amount
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.addCashbox(chat_id, amount)
   local _, err = sql([[
     UPDATE chats
@@ -202,9 +203,9 @@ function service.addCashbox(chat_id, amount)
 end
 
 --- Атомарно забрать кассу: вернуть текущее значение и обнулить (джекпот).
--- @param chat_id (number)
--- @return[1] number сколько было в кассе
--- @return[2] err
+-- @tparam number chat_id
+-- @treturn[1] number сколько было в кассе
+-- @treturn[2] table err
 function service.takeCashbox(chat_id)
   local taken = 0
 
@@ -248,19 +249,23 @@ function service.takeCashbox(chat_id)
 end
 
 --- Атомарный инкремент счётчика активности чата (+1 на сообщение).
--- @param chat_id (number)
--- @return[1] true
--- @return[2] err
+-- Самый контендящийся кортеж: все сообщения чата бьют в одну запись,
+-- под MVCC параллельные файберы конфликтуют - ретраим.
+-- @tparam number chat_id
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.incTotalMessages(chat_id)
-  local _, err = sql([[
-    UPDATE chats
-    SET
-      total_messages = total_messages + 1
-    WHERE
-      id = ${chat_id}
-  ]], {
-    chat_id = chat_id,
-  })
+  local _, err = retryTxnConflict(function()
+    return sql([[
+      UPDATE chats
+      SET
+        total_messages = total_messages + 1
+      WHERE
+        id = ${chat_id}
+    ]], {
+      chat_id = chat_id,
+    })
+  end)
 
   if err then
     return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)
@@ -270,9 +275,9 @@ function service.incTotalMessages(chat_id)
 end
 
 --- Атомарный +1 к числу участников чата (вход/возврат участника).
--- @param chat_id (number)
--- @return[1] true
--- @return[2] err
+-- @tparam number chat_id
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.incMembers(chat_id)
   local _, err = sql([[
     UPDATE chats
@@ -293,9 +298,9 @@ end
 
 --- Атомарный -1 к числу участников чата (выход/бан участника).
 -- Проверка members > 0: поле unsigned, ниже нуля уходить нельзя (бросит ошибку).
--- @param chat_id (number)
--- @return[1] true
--- @return[2] err
+-- @tparam number chat_id
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.decMembers(chat_id)
   local _, err = sql([[
     UPDATE chats
@@ -317,10 +322,10 @@ end
 --- Топ чатов по кассе. casino_cashier > 0 идёт по индексу, reverse-scan -> ORDER BY DESC.
 -- Исключаем чаты, где бота кикнули/забанили или он вышел (статус бота в user_in_chat
 -- kicked/left) - такие в топ не попадают.
--- @param limit (number)
--- @param offset (number)
--- @return[1] array { id, title, username, casino_cashier }
--- @return[2] err
+-- @tparam number limit
+-- @tparam number offset
+-- @treturn[1] table массив { id, title, username, casino_cashier }
+-- @treturn[2] table err
 function service.topByCashbox(limit, offset)
   local botId = bot:getBotId()
 
@@ -355,8 +360,8 @@ end
 --- Кол-во чатов с кассой (casino_cashier > 0) - для пагинации.
 -- Тот же фильтр, что и topByCashbox (исключаем чаты с кикнутым/вышедшим ботом), иначе число страниц
 -- разойдётся со списком.
--- @return[1] number
--- @return[2] err
+-- @treturn[1] number
+-- @treturn[2] table err
 function service.countByCashbox()
   local botId = bot:getBotId()
 
@@ -384,10 +389,10 @@ function service.countByCashbox()
 end
 
 --- Топ чатов по активности (total_messages). Диапазон > 0 по индексу, reverse-scan.
--- @param limit (number)
--- @param offset (number)
--- @return[1] array { id, title, username, total_messages }
--- @return[2] err
+-- @tparam number limit
+-- @tparam number offset
+-- @treturn[1] table массив { id, title, username, total_messages }
+-- @treturn[2] table err
 function service.topByMessages(limit, offset)
   local rows, err = sql([[
     SELECT id, title, username, total_messages
@@ -408,8 +413,8 @@ function service.topByMessages(limit, offset)
 end
 
 --- Кол-во чатов с активностью (total_messages > 0) - для пагинации.
--- @return[1] number
--- @return[2] err
+-- @treturn[1] number
+-- @treturn[2] table err
 function service.countByMessages()
   local rows, err = sql([[
     SELECT COUNT(*) AS "cnt"
@@ -429,8 +434,8 @@ function service.countByMessages()
 end
 
 --- ID всех известных чатов - для рассылки. Полный перебор -> SEQSCAN.
--- @return[1] array<number> (может быть пустым)
--- @return[2] err
+-- @treturn[1] table массив (может быть пустым)
+-- @treturn[2] table err
 function service.allIds()
   local rows, err = sql([[
     SELECT id
@@ -442,7 +447,9 @@ function service.allIds()
   end
 
   local ids = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     ids[#ids + 1] = row.id
   end
 

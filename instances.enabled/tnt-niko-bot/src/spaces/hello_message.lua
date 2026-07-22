@@ -1,7 +1,7 @@
---- Приветственное сообщение
+--- Приветственное сообщение.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   {
     name = 'chat_id',
@@ -17,23 +17,23 @@ local formatSpace = {
   },
   {
     name = 'file',
-    type = 'map'
-  }
+    type = 'map',
+  },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'chat_id',
     options = {
       parts = {'chat_id'},
       unique = true,
-      if_not_exists = true
-    }
-  }
+      if_not_exists = true,
+    },
+  },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

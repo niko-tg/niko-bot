@@ -4,50 +4,50 @@
 -- Завершается ручным сбором (/collect) или TTL-джобой по истечении until_date.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- PK
   {
     name = 'user_id',
-    type = 'number'
+    type = 'number',
   },
 
   -- Активность: 'fishing' | 'mining' | 'sawmill'
   {
     name = 'activity',
-    type = 'string'
+    type = 'string',
   },
 
   -- Инструмент в работе (изнашивается на финише)
   {
     name = 'tool_id',
-    type = 'string'
+    type = 'string',
   },
 
   -- Время готовности (unix-секунды)
   {
     name = 'until_date',
-    type = 'unsigned'
+    type = 'unsigned',
   },
 
   -- Где висит сообщение задачи (для редактирования на финише)
   {
     name = 'chat_id',
-    type = 'number'
+    type = 'number',
   },
   {
     name = 'message_id',
-    type = 'number'
+    type = 'number',
   },
 
   -- Сид детерминированного ролла лута: ручной сбор и авто-сбор дают один лут
   {
     name = 'seed',
-    type = 'unsigned'
+    type = 'unsigned',
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'user_id',
@@ -59,7 +59,7 @@ local index = {
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,
