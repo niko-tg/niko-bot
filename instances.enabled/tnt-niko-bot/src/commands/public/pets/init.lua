@@ -5,11 +5,13 @@ local bot = require('bot')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.pets.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/pets', 'питомцы' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local view, err = render.list(command.user.id)
   if err then

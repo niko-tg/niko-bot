@@ -1,7 +1,7 @@
---- Друзья (двунаправленно: на каждую дружбу две записи A->B и B->A)
+--- Друзья (двунаправленно: на каждую дружбу две записи A->B и B->A).
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- Чьи друзья.
   {
@@ -25,27 +25,27 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'primary',
     options = {
       parts = { 'user_id', 'friend_id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   {
     name = 'by_user',
     options = {
       parts = { 'user_id', 'created' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

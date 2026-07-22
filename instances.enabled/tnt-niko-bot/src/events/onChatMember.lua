@@ -1,4 +1,4 @@
----
+--- Обработчик chat_member: классификация смены статуса участника и эмит события.
 --
 local log = require('log')
 local chat_member_status = require('bot.enums.chat_member_status')
@@ -16,6 +16,8 @@ local function incMembers(chat_id)
   end
 end
 
+--- Уменьшение счётчика участников чата.
+-- @tparam number chat_id id чата
 local function decMembers(chat_id)
   local _, err = chatService.decMembers(chat_id)
   if err then
@@ -23,6 +25,8 @@ local function decMembers(chat_id)
   end
 end
 
+--- Обработчик chat_member: классификация смены статуса и эмит события.
+-- @tparam table ctx контекст обновления
 local function onChatMember(ctx)
   local chatType = ctx:getChatType()
 
@@ -136,7 +140,7 @@ local function onChatMember(ctx)
         old_status = tostring(oldStatus),
         new_status = tostring(newStatus),
         user_id = newChatM.user.id,
-        chat_id = chat.id
+        chat_id = chat.id,
       })
     end
   end

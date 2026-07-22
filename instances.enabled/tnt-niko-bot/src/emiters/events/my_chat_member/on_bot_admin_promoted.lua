@@ -1,4 +1,4 @@
---- Бота повысили до админа или добавили в чат как админа
+--- Бота повысили до админа или добавили в чат как админа.
 --
 local log = require('log')
 local fiber = require('fiber')
@@ -8,7 +8,9 @@ local syncChatStaff = require('src.utils.syncChatStaff')
 local notifyBotAddedToChat = require('src.notifications.botAddedToChat')
 
 -- luacheck: ignore ctx
-local function on_bot_admin_promoted(ctx)
+--- Бота повысили до админа или добавили в чат как админа.
+-- @tparam table ctx контекст обновления
+local function onBotAdminPromoted(ctx)
   log.verbose('[event] %s', 'on_bot_admin_promoted')
 
   local chat = ctx:getChat()
@@ -35,4 +37,4 @@ local function on_bot_admin_promoted(ctx)
   notifyBotAddedToChat(ctx)
 end
 
-return on_bot_admin_promoted
+return onBotAdminPromoted

@@ -9,11 +9,11 @@ local rp = require('src.rp.actions')
 local usersService = require('src.services.users')
 local userMention = require('src.render.userMention')
 
-local command = Command:new {
+local command = Command:new({
   commands = rp.names,
   flags = { Command.enum.IN_CHAT },
   info = 'РП-действия над собеседником реплаем: обнять, поцеловать, погладить, ударить и др.',
-}
+})
 
 local UNKNOWN_USER = ([[
 🤷‍♀️ Не знаю такого пользователя
@@ -21,7 +21,7 @@ ${sep}
 Проверь, правильно ли написан @юзернейм
 ]]):f({ sep = hdec.sep })
 
--- Суффикс рода глагола: обнял / обняла / обнял(а).
+--- Суффикс рода глагола: обнял / обняла / обнял(а).
 local function genderSuffix(user)
   if user.gender == 'woman' then
     return 'а'
@@ -32,6 +32,8 @@ local function genderSuffix(user)
   return '(а)'
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- [1] - имя вызванной команды (первый токен), [2] - аргумент (@username).
   -- processCommand резолвит команду так же: bot.commands[text:split(' ',1)[1]].

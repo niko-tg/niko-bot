@@ -1,4 +1,4 @@
----
+--- Страница VIP-настроек чата.
 --
 local bot = require('bot')
 local hdec = require('bot.libs.hdec')
@@ -17,6 +17,9 @@ ${sep}
 Запрет писать от лица чатов: ${has_ban_sender_chat}
 ]]):f({ sep = hdec.sep })
 
+--- Подпись переключателя настройки.
+-- @tparam boolean flag значение настройки
+-- @treturn string 'ON' либо 'OFF'
 local function flagToText(flag)
   if flag then
     return 'ON'
@@ -25,6 +28,10 @@ local function flagToText(flag)
   return 'OFF'
 end
 
+--- Показ страницы настроек.
+-- @tparam table ctx контекст обновления
+-- @tparam table arguments аргументы callback-кнопки
+-- @tparam table pchat модель чата с настройками
 local function showVipSettingsPage(ctx, arguments, pchat)
   if arguments.action ~= 'show' then
     return
@@ -44,44 +51,44 @@ local function showVipSettingsPage(ctx, arguments, pchat)
   local keyboard = inlineCallbackKeyboard({
     {
       text = ('Удаление ссылок: ${has_delete_links}'):f({
-        has_delete_links = flagToText(hasDeleteLinks)
+        has_delete_links = flagToText(hasDeleteLinks),
       }),
       callback = {
         command = 'cb_set_setting',
         arguments = {
           page = arguments_dict.page.vip_settings,
           param = arguments_dict.param.has_delete_links,
-          value = tostring(not hasDeleteLinks)
-        }
-      }
+          value = tostring(not hasDeleteLinks),
+        },
+      },
     },
 
     {
       text = ('Запрет пересылать в чат: ${has_delete_forward_message}'):f({
-        has_delete_forward_message = flagToText(hasDeleteForwardMessage)
+        has_delete_forward_message = flagToText(hasDeleteForwardMessage),
       }),
       callback = {
         command = 'cb_set_setting',
         arguments = {
           page = arguments_dict.page.vip_settings,
           param = arguments_dict.param.has_delete_forward_message,
-          value = tostring(not hasDeleteForwardMessage)
-        }
-      }
+          value = tostring(not hasDeleteForwardMessage),
+        },
+      },
     },
 
     {
       text = ('Запрет писать от лица чатов: ${has_ban_sender_chat}'):f({
-        has_ban_sender_chat = flagToText(hasBanSenderChat)
+        has_ban_sender_chat = flagToText(hasBanSenderChat),
       }),
       callback = {
         command = 'cb_set_setting',
         arguments = {
           page = arguments_dict.page.vip_settings,
           param = arguments_dict.param.has_ban_sender_chat,
-          value = tostring(not hasBanSenderChat)
-        }
-      }
+          value = tostring(not hasBanSenderChat),
+        },
+      },
     },
 
     {
@@ -90,9 +97,9 @@ local function showVipSettingsPage(ctx, arguments, pchat)
         command = 'cb_settings',
         arguments = {
           page = 'main',
-          action = 'edit'
-        }
-      }
+          action = 'edit',
+        },
+      },
     },
   })
 

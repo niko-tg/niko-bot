@@ -76,15 +76,15 @@ local SUPPLY_BOUGHT = [[
 
 local render = {}
 
--- Callback к cb_zoo. Неиспользуемые аргументы - плейсхолдер '_'.
+--- Callback к cb_zoo. Неиспользуемые аргументы - плейсхолдер '_'.
 local function cb(action, a, b)
   return {
     command = 'cb_zoo',
-    arguments = { action = action, a = a or '_', b = b or '_' }
+    arguments = { action = action, a = a or '_', b = b or '_' },
   }
 end
 
--- Цена с эмодзи валюты.
+--- Цена с эмодзи валюты.
 local function priceLabel(price, currency)
   return separateNumbers(price)..' '..(currency == 'crystals' and '💎' or '💵')
 end
@@ -105,9 +105,10 @@ end
 function render.petCategories()
   local rows = {}
 
-  for _, breed in ipairs(catalog.typeOrder) do
+  for i = 1, #catalog.typeOrder do
+    local breed = catalog.typeOrder[i]
     table.insert(rows, {
-      { text = catalog.types[breed].button, callback = cb('breed', breed) }
+      { text = catalog.types[breed].button, callback = cb('breed', breed) },
     })
   end
 
@@ -129,10 +130,11 @@ function render.petColors(breed)
 
   local rows = {}
 
-  for _, color in ipairs(colors) do
+  for i = 1, #colors do
+    local color = colors[i]
     local variant = catalog.get(breed, color)
     table.insert(rows, {
-      { text = variant.emoji..' '..variant.name, callback = cb('view', breed, color) }
+      { text = variant.emoji..' '..variant.name, callback = cb('view', breed, color) },
     })
   end
 
@@ -187,9 +189,10 @@ end
 function render.supplyCategories()
   local rows = {}
 
-  for _, kind in ipairs(supplies.categoryOrder) do
+  for i = 1, #supplies.categoryOrder do
+    local kind = supplies.categoryOrder[i]
     table.insert(rows, {
-      { text = supplies.categories[kind].button, callback = cb('cat', kind) }
+      { text = supplies.categories[kind].button, callback = cb('cat', kind) },
     })
   end
 
@@ -211,10 +214,11 @@ function render.supplyList(kind)
 
   local rows = {}
 
-  for _, breed in ipairs(supplies.breedOrder) do
+  for i = 1, #supplies.breedOrder do
+    local breed = supplies.breedOrder[i]
     local item = supplies.get(supplies.id(breed, kind))
     table.insert(rows, {
-      { text = item.emoji..' '..item.name, callback = cb('sview', item.id) }
+      { text = item.emoji..' '..item.name, callback = cb('sview', item.id) },
     })
   end
 

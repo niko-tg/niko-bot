@@ -49,6 +49,7 @@ local function expire(session)
   end
 end
 
+--- Один проход: отмена игровых сессий, у которых вышел TTL.
 local function tick()
   local sessions, err = gamingService.listExpired(gameTypes.SESSION_TTL)
 
@@ -61,12 +62,14 @@ local function tick()
     return
   end
 
-  for _, session in ipairs(sessions) do
+  for i = 1, #sessions do
+    local session = sessions[i]
     expire(session)
     fiber.sleep(SEND_DELAY)
   end
 end
 
+--- Запуск фонового файбера контроля TTL игровых сессий.
 local function start()
   fiber.create(function()
     fiber.self():name('game-timeout')

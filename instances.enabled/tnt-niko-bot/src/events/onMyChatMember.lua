@@ -1,10 +1,12 @@
----
+--- Обработчик my_chat_member: классификация смены статуса бота и эмит события.
 --
 local chat_member_status = require('bot.enums.chat_member_status')
 local chat_type = require('bot.enums.chat_type')
 local emitter = require('src.emiters.events.my_chat_member')
 local event_my_chat_member = require('src.enums.events.event_my_chat_member')
 
+--- Обработчик my_chat_member: классификация смены статуса бота и эмит события.
+-- @tparam table ctx контекст обновления
 local function onMyChatMember(ctx)
   local chatType = ctx:getChatType()
 

@@ -2,7 +2,7 @@
 -- в callback_data). Параметры состояния - числа 0..100.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   {
     name = 'id',
@@ -54,7 +54,7 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   -- Первичный ключ - id питомца.
   {
@@ -62,8 +62,8 @@ local index = {
     options = {
       parts = { 'id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   -- Питомцы владельца: список и счёт.
   {
@@ -71,12 +71,12 @@ local index = {
     options = {
       parts = { 'owner_id' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

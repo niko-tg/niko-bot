@@ -4,28 +4,28 @@
 -- без переупаковки/стакинга (источник багов старого src/classes/inventory.lua).
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- PK
   {
     name = 'user_id',
-    type = 'number'
+    type = 'number',
   },
 
   -- Ресурсы и расходники: id -> количество
   {
     name = 'items',
-    type = 'map'
+    type = 'map',
   },
 
   -- Инструменты: id -> остаток прочности (по одному инструменту на тип)
   {
     name = 'tools',
-    type = 'map'
+    type = 'map',
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'user_id',
@@ -37,7 +37,7 @@ local index = {
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

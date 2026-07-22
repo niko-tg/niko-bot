@@ -1,11 +1,13 @@
----
+--- Событие chat_member: Владелец покинул чат.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
 local chatService = require('src.services.chats')
 
 -- luacheck: ignore ctx
-local function on_owner_left(ctx)
+--- Владелец покинул чат.
+-- @tparam table ctx контекст обновления
+local function onOwnerLeft(ctx)
   log.verbose('[event] %s', 'on_owner_left')
 
   local chat = ctx:getChat()
@@ -34,4 +36,4 @@ local function on_owner_left(ctx)
   --
 end
 
-return on_owner_left
+return onOwnerLeft

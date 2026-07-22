@@ -1,4 +1,4 @@
---- Lua format string
+--- Lua format string.
 -- @param text text
 -- @param args table
 local function fstring(text, args)

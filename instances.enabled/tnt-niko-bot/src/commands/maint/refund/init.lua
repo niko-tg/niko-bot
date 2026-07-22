@@ -1,4 +1,4 @@
---- Возврат платежа (рефанд Telegram Stars)
+--- Возврат платежа (рефанд Telegram Stars).
 --
 -- /refund charge_id=<telegram_payment_charge_id>
 --
@@ -11,10 +11,10 @@ local hdec = require('bot.libs.hdec')
 local separateNumbers = require('src.utils.separateNumbers')
 local transactionsService = require('src.services.transactions')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/refund' },
   flags = { Command.enum.MAINTENANCE },
-}
+})
 
 local USAGE = ([[
 ℹ️ <b>Использование</b>
@@ -33,6 +33,9 @@ ${sep}
 📦 <code>${payload}</code>
 ]]
 
+--- Разбор аргументов вида key=value из текста команды.
+-- @tparam string text текст сообщения
+-- @treturn table пары ключ-значение
 local function parseArgs(text)
   local args = {}
 
@@ -43,6 +46,8 @@ local function parseArgs(text)
   return args
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local args = parseArgs(ctx.message.text)
 

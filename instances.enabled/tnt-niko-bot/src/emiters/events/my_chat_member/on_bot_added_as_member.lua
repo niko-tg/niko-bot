@@ -1,4 +1,4 @@
---- Добавили в качестве участника
+--- Добавили в качестве участника.
 --
 local log = require('log')
 local fiber = require('fiber')
@@ -8,7 +8,9 @@ local syncChatStaff = require('src.utils.syncChatStaff')
 local notifyBotAddedToChat = require('src.notifications.botAddedToChat')
 
 -- luacheck: ignore ctx
-local function on_bot_added_as_member(ctx)
+--- Добавили в качестве участника.
+-- @tparam table ctx контекст обновления
+local function onBotAddedAsMember(ctx)
   log.verbose('[event] %s', 'on_bot_added_as_member')
 
   local chat = ctx:getChat()
@@ -21,7 +23,7 @@ local function on_bot_added_as_member(ctx)
     user_id = newChatMember.user.id,
     status = newChatMember.status,
     permissions = {},
-    joined_date = datetime.now()
+    joined_date = datetime.now(),
   })
 
   if err then
@@ -35,4 +37,4 @@ local function on_bot_added_as_member(ctx)
   notifyBotAddedToChat(ctx)
 end
 
-return on_bot_added_as_member
+return onBotAddedAsMember

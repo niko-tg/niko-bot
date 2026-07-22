@@ -1,4 +1,4 @@
----
+--- Событие chat_member: Участник вернулся из ограничения в обычный статус.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
@@ -6,7 +6,9 @@ local chatService = require('src.services.chats')
 local Permissions = require('src.models.Permissions')
 
 -- luacheck: ignore ctx
-local function on_restricted_return(ctx)
+--- Участник вернулся из ограничения в обычный статус.
+-- @tparam table ctx контекст обновления
+local function onRestrictedReturn(ctx)
   log.verbose('[event] %s', 'on_restricted_return')
 
   local chat = ctx:getChat()
@@ -18,7 +20,7 @@ local function on_restricted_return(ctx)
     chat_id = chat.id,
     user_id = newChatMember.user.id,
     status = newChatMember.status,
-    permissions = Permissions(newChatMember)
+    permissions = Permissions(newChatMember),
   })
 
   if err then
@@ -36,4 +38,4 @@ local function on_restricted_return(ctx)
   --
 end
 
-return on_restricted_return
+return onRestrictedReturn

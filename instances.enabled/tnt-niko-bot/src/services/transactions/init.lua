@@ -1,4 +1,4 @@
--- Сервис CRUD к успешным транзакциям (донатам)
+--- Сервис CRUD к успешным транзакциям (донатам).
 --
 local sql = require('bot.libs.sql')
 local Transaction = require('src.models.Transaction')
@@ -8,10 +8,10 @@ local setErrType = require('src.utils.services.setErrType')
 
 local service = {}
 
---- Создание записи
--- @param data (table) record
--- @return[1] model transaction
--- @return[2] err
+--- Создание записи.
+-- @tparam table data record
+-- @treturn[1] table модель transaction
+-- @treturn[2] table err
 function service.create(data)
   local transaction, errs = Transaction(data, { init = true })
   if errs then
@@ -28,9 +28,9 @@ end
 
 --- Чтение записи по id платежа Telegram (первичный ключ).
 -- Используется для идемпотентности: проверить, не обработан ли платёж ранее.
--- @param telegram_payment_charge_id (string)
--- @return[1] model transaction (или nil, если записи нет)
--- @return[2] err
+-- @tparam string telegram_payment_charge_id
+-- @treturn[1] ?table модель transaction (или nil, если записи нет)
+-- @treturn[2] table err
 function service.read(telegram_payment_charge_id)
   local item, err = sql(
     [[
@@ -59,11 +59,11 @@ function service.read(telegram_payment_charge_id)
   return transaction, nil
 end
 
---- Обновление записи
--- @param fields (table) поля
--- @param where (table) условие, напр. { telegram_payment_charge_id = .. }
--- @return[1] res
--- @return[2] err
+--- Обновление записи.
+-- @tparam table fields поля
+-- @tparam table where условие, напр. { telegram_payment_charge_id = .. }
+-- @treturn[1] table res
+-- @treturn[2] table err
 function service.update(fields, where)
   local res, err = sql.update('transactions', fields, where)
   if err then
@@ -75,10 +75,10 @@ end
 
 --- Топ донатеров по сумме (глобально, без рефандов).
 -- Агрегат по всей таблице -> SEQSCAN (Tarantool 3.x требует явно).
--- @param limit (number)
--- @param offset (number)
--- @return[1] array { user_id, total } (может быть пустым)
--- @return[2] err
+-- @tparam number limit
+-- @tparam number offset
+-- @treturn[1] table массив { user_id, total } (может быть пустым)
+-- @treturn[2] table err
 function service.topByAmount(limit, offset)
   local rows, err = sql(
     [[
@@ -101,8 +101,8 @@ function service.topByAmount(limit, offset)
 end
 
 --- Кол-во уникальных донатеров (без рефандов) - для пагинации топа.
--- @return[1] number
--- @return[2] err
+-- @treturn[1] number
+-- @treturn[2] table err
 function service.countDonors()
   local rows, err = sql(
     [[

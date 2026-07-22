@@ -23,6 +23,10 @@ local NOT_ENOUGH_RIGHTS_PATTERNS = {
   "message can't be deleted",
 }
 
+--- Проверка вхождения подстроки в description ошибки.
+-- @tparam ?table err ошибка Telegram Bot API
+-- @tparam string needle искомая подстрока
+-- @treturn boolean
 local function descriptionContains(err, needle)
   local d = err and err.description
 
@@ -42,7 +46,8 @@ function M.isIgnorable(err)
     return false
   end
 
-  for _, pattern in ipairs(IGNORABLE_PATTERNS) do
+  for i = 1, #IGNORABLE_PATTERNS do
+    local pattern = IGNORABLE_PATTERNS[i]
     if err.description:find(pattern, 1, true) then
       return true
     end
@@ -57,7 +62,8 @@ function M.isNotEnoughRights(err)
     return false
   end
 
-  for _, pattern in ipairs(NOT_ENOUGH_RIGHTS_PATTERNS) do
+  for i = 1, #NOT_ENOUGH_RIGHTS_PATTERNS do
+    local pattern = NOT_ENOUGH_RIGHTS_PATTERNS[i]
     if err.description:find(pattern, 1, true) then
       return true
     end

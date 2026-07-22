@@ -14,8 +14,8 @@ ${sep}
 ⏳ Активен до: <code>${untilDate}</code>
 ]]):f({ sep = hdec.sep })
 
---- @param user (table) кому выдали VIP (нужен user.id)
---- @param untilDate (number) unix-timestamp окончания VIP
+--- @tparam table user кому выдали VIP (нужен user.id)
+-- @tparam number untilDate unix-timestamp окончания VIP
 local function vipActivated(user, untilDate)
   local _, err = bot:sendMessage({
     chat_id = user.id,

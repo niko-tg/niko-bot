@@ -6,12 +6,14 @@ local Command = require('bot.classes.Command')
 local usersService = require('src.services.users')
 local render = require('src.commands.public.privacy.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_privacy' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'owner' },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local owner = tonumber(command.arguments.owner)
 
@@ -19,7 +21,7 @@ function command.call(ctx)
   if command.user.id ~= owner then
     ctx:answer({
       text = 'Это не твоя кнопка 🙃',
-      show_alert = true
+      show_alert = true,
     })
     return
   end
@@ -33,7 +35,7 @@ function command.call(ctx)
 
     ctx:answer({
       text = 'Не удалось изменить',
-      show_alert = true
+      show_alert = true,
     })
 
     return

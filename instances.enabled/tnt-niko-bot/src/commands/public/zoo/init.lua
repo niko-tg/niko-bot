@@ -4,14 +4,16 @@ local bot = require('bot')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.zoo.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/zoo_shop', 'зоомагазин', 'зоотовары' },
   flags = {
     Command.enum.PUBLIC,
-    Command.enum.NO_REPLY
-  }
-}
+    Command.enum.NO_REPLY,
+  },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local view = render.menu()
 

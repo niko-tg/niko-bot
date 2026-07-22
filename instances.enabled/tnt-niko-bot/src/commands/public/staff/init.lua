@@ -1,4 +1,4 @@
---- Команда отображения администрации чата
+--- Команда отображения администрации чата.
 --
 local log = require('log')
 local Command = require('bot.classes.Command')
@@ -8,10 +8,10 @@ local userInChatService = require('src.services.user_in_chat')
 local usersService = require('src.services.users')
 local chat_member_status = require('bot.enums.chat_member_status')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/staff', 'стаф' },
-  flags = { Command.enum.IN_CHAT }
-}
+  flags = { Command.enum.IN_CHAT },
+})
 
 local HEADER = '👮🏻 Главные по чатику'
 local FOOTER = '╭ Обновления стафа\n┊\n╰ Команда /reload'
@@ -54,7 +54,9 @@ local function collect(chatId)
     return groups, adminErr
   end
 
-  for _, uic in ipairs(owners or {}) do
+  owners = owners or {}
+  for i = 1, #owners do
+    local uic = owners[i]
     local perms = uic.permissions or {}
 
     if not perms.is_anonymous then
@@ -66,7 +68,9 @@ local function collect(chatId)
     end
   end
 
-  for _, uic in ipairs(admins or {}) do
+  admins = admins or {}
+  for i = 1, #admins do
+    local uic = admins[i]
     local perms = uic.permissions or {}
 
     if not perms.is_anonymous then
@@ -99,7 +103,8 @@ local function renderSection(emoji, title, names)
 
   local lines = { emoji .. ' ' .. title }
 
-  for _, name in ipairs(names) do
+  for i = 1, #names do
+    local name = names[i]
     table.insert(lines, '   ╰ ' .. name)
   end
 
@@ -108,6 +113,8 @@ end
 
 local SECTION_SEPARATOR = '\n'..hdec.sep..'\n'
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local chat = command.chat
 
@@ -148,7 +155,7 @@ function command.call(ctx)
   local body = table.concat(sections, SECTION_SEPARATOR)
 
   ctx:replyToMessage(
-       HEADER
+    HEADER
     .. SECTION_SEPARATOR
     .. body
     .. SECTION_SEPARATOR

@@ -18,7 +18,7 @@ local PER_PAGE = 20
 local MEDALS = { '🥇', '🥈', '🥉' }
 local IS_GROUP = {
   [chat_type.GROUP] = true,
-  [chat_type.SUPERGROUP] = true
+  [chat_type.SUPERGROUP] = true,
 }
 
 -- Кнопка возврата в меню топов.
@@ -29,10 +29,10 @@ local BACK_ROW = {
       command = 'cb_top',
       arguments = {
         which = 'menu',
-        page = 1
-      }
-    }
-  }
+        page = 1,
+      },
+    },
+  },
 }
 
 local render = {}
@@ -64,7 +64,7 @@ local function resolveChatName(entry)
   return hdec.escape(title)
 end
 
---- Меню выбора топа. «Активные» - только в группе.
+--- Меню выбора топа. 'Активные' - только в группе.
 function render.menu(chatType)
   local rows = {
     {
@@ -74,10 +74,10 @@ function render.menu(chatType)
           command = 'cb_top',
           arguments = {
             which = 'players',
-            page = 1
-          }
-        }
-      }
+            page = 1,
+          },
+        },
+      },
     },
     {
       {
@@ -86,10 +86,10 @@ function render.menu(chatType)
           command = 'cb_top',
           arguments = {
             which = 'cashbox',
-            page = 1
-          }
-        }
-      }
+            page = 1,
+          },
+        },
+      },
     },
     {
       {
@@ -98,10 +98,10 @@ function render.menu(chatType)
           command = 'cb_top',
           arguments = {
             which = 'chats',
-            page = 1
-          }
-        }
-      }
+            page = 1,
+          },
+        },
+      },
     },
     {
       {
@@ -110,10 +110,10 @@ function render.menu(chatType)
           command = 'cb_top',
           arguments = {
             which = 'donat',
-            page = 1
-          }
-        }
-      }
+            page = 1,
+          },
+        },
+      },
     },
     {
       {
@@ -122,10 +122,10 @@ function render.menu(chatType)
           command = 'cb_top',
           arguments = {
             which = 'kus',
-            page = 1
-          }
-        }
-      }
+            page = 1,
+          },
+        },
+      },
     },
     {
       {
@@ -134,10 +134,10 @@ function render.menu(chatType)
           command = 'cb_top',
           arguments = {
             which = 'rich',
-            page = 1
-          }
-        }
-      }
+            page = 1,
+          },
+        },
+      },
     },
   }
 
@@ -149,10 +149,10 @@ function render.menu(chatType)
           command = 'cb_top',
           arguments = {
             which = 'active',
-            page = 1
-          }
-        }
-      }
+            page = 1,
+          },
+        },
+      },
     })
 
     table.insert(rows, {
@@ -162,10 +162,10 @@ function render.menu(chatType)
           command = 'cb_top',
           arguments = {
             which = 'marriages',
-            page = 1
-          }
-        }
-      }
+            page = 1,
+          },
+        },
+      },
     })
   end
 
@@ -176,7 +176,7 @@ function render.menu(chatType)
 end
 
 --- Общий рендер страницы лидерборда.
--- @param which (string) для навигации; title; entries (строки топа); total; page; formatEntry
+-- @tparam string which для навигации; title; entries (строки топа); total; page; formatEntry
 local function renderPage(which, title, entries, total, page, formatEntry, formatName)
   formatName = formatName or function(entry)
     return resolveName(entry.user_id)
@@ -189,7 +189,8 @@ local function renderPage(which, title, entries, total, page, formatEntry, forma
   else
     local offset = (page - 1) * PER_PAGE
 
-    for index, entry in ipairs(entries) do
+    for index = 1, #entries do
+      local entry = entries[index]
       local rank = offset + index
       local prefix = MEDALS[rank] or (rank..'.')
 
@@ -222,10 +223,12 @@ local function donat(page)
   end
 
   local entries = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(entries, {
       user_id = row.user_id,
-      value = row.total
+      value = row.total,
     })
   end
 
@@ -247,10 +250,12 @@ local function active(page, chatId)
   end
 
   local entries = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(entries, {
       user_id = row.user_id,
-      value = row.count_messages
+      value = row.count_messages,
     })
   end
 
@@ -273,7 +278,9 @@ local function marriages(page, chatId)
   end
 
   local entries = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(entries, {
       user_id = row.user_id,
       partner_id = row.partner_id,
@@ -301,7 +308,9 @@ local function players(page)
   end
 
   local entries = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(entries, {
       user_id = row.id,
       level = row.level,
@@ -328,7 +337,9 @@ local function kus(page)
   end
 
   local entries = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(entries, {
       user_id = row.id,
       value = row.kuses,
@@ -353,7 +364,9 @@ local function rich(page)
   end
 
   local entries = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(entries, {
       user_id = row.id,
       value = row.balance,
@@ -378,7 +391,9 @@ local function cashbox(page)
   end
 
   local entries = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(entries, {
       chat_id = row.id,
       title = row.title,
@@ -405,7 +420,9 @@ local function chats(page)
   end
 
   local entries = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     table.insert(entries, {
       chat_id = row.id,
       title = row.title,
@@ -420,8 +437,8 @@ local function chats(page)
 end
 
 --- Диспетчер топа по which. Неизвестный/недоступный -> меню.
--- @return[1] { text, keyboard }
--- @return[2] err
+-- @treturn[1] table { text, keyboard }
+-- @treturn[2] table err
 function render.top(which, page, chatType, chatId)
   if which == 'donat' then
     return donat(page)

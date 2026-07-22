@@ -18,8 +18,9 @@ local userInChatService = require('src.services.user_in_chat')
 local chatService = require('src.services.chats')
 
 --- Запускает sync. Result всегда non-nil (с пустыми массивами при ошибке).
--- @return result (table) { synced = {user, ...}, demoted = {user, ...} }
--- @return err    (table|nil)
+-- @tparam number chatId id чата
+-- @treturn[1] table result { synced = { user, ... }, demoted = { user, ... } }
+-- @treturn[2] table err
 local function syncChatStaff(chatId)
   local result = {
     synced  = {},  -- user-объекты из Telegram-ответа (свежие данные)
@@ -48,18 +49,23 @@ local function syncChatStaff(chatId)
     return result, adminErr
   end
 
-  for _, uic in ipairs(owners or {}) do
+  owners = owners or {}
+  for i = 1, #owners do
+    local uic = owners[i]
     existing[uic.user_id] = true
   end
 
-  for _, uic in ipairs(admins or {}) do
+  admins = admins or {}
+  for i = 1, #admins do
+    local uic = admins[i]
     existing[uic.user_id] = true
   end
 
   -- 2. Upsert актуальных
   local seen = {}
 
-  for _, member in ipairs(members) do
+  for i = 1, #members do
+    local member = members[i]
     local user = member.user
 
     if user then
@@ -100,11 +106,11 @@ local function syncChatStaff(chatId)
       local _, demoteErr = userInChatService.update(
         {
           status = chat_member_status.UNKNOWN,
-          permissions = emptyPerms
+          permissions = emptyPerms,
         },
         {
           chat_id = chatId,
-          user_id = userId
+          user_id = userId,
         }
       )
 

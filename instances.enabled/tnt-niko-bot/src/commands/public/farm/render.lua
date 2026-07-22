@@ -63,12 +63,13 @@ local function cropLabel(cropId)
 end
 
 --- Главный экран фермы.
--- @param state (table) из farmService.state
+-- @tparam table state из farmService.state
 function render.menu(state)
   local lines = {}
   local rows = {}
 
-  for _, slot in ipairs(state.slots) do
+  for i = 1, #state.slots do
+    local slot = state.slots[i]
     if slot.empty then
       table.insert(lines, SLOT_EMPTY:f({ n = slot.index }))
     elseif slot.ready then
@@ -80,8 +81,8 @@ function render.menu(state)
             command = 'cb_farm',
             arguments = {
               action = 'collect',
-              target = tostring(slot.index)
-            }
+              target = tostring(slot.index),
+            },
           },
         },
       })
@@ -89,7 +90,7 @@ function render.menu(state)
       table.insert(lines, SLOT_GROWING:f({
         n = slot.index,
         crop = cropLabel(slot.crop),
-        left = remaining(slot.ready_at)
+        left = remaining(slot.ready_at),
       }))
     end
   end
@@ -102,8 +103,8 @@ function render.menu(state)
         command = 'cb_farm',
         arguments = {
           action = 'plant_menu',
-          target = '0'
-        }
+          target = '0',
+        },
       },
     })
   end
@@ -113,8 +114,8 @@ function render.menu(state)
       command = 'cb_farm',
       arguments = {
         action = 'shop',
-        target = '0'
-      }
+        target = '0',
+      },
     },
   })
   table.insert(actionRow, {
@@ -123,8 +124,8 @@ function render.menu(state)
       command = 'cb_farm',
       arguments = {
         action = 'zoo',
-        target = '0'
-      }
+        target = '0',
+      },
     },
   })
   table.insert(rows, actionRow)
@@ -136,8 +137,8 @@ function render.menu(state)
         command = 'cb_farm',
         arguments = {
           action = 'refresh',
-          target = '0'
-        }
+          target = '0',
+        },
       },
     },
   })
@@ -157,7 +158,8 @@ end
 function render.plantMenu(level)
   local rows = {}
 
-  for _, key in ipairs(crops.order) do
+  for i = 1, #crops.order do
+    local key = crops.order[i]
     local crop = crops[key]
     if level >= (crop.min_level or 1) then
       table.insert(rows, {
@@ -167,8 +169,8 @@ function render.plantMenu(level)
             command = 'cb_farm',
             arguments = {
               action = 'plant',
-              target = crop.id
-            }
+              target = crop.id,
+            },
           },
         },
       })
@@ -180,8 +182,8 @@ function render.plantMenu(level)
             command = 'cb_farm',
             arguments = {
               action = 'locked',
-              target = crop.id
-            }
+              target = crop.id,
+            },
           },
         },
       })
@@ -195,8 +197,8 @@ function render.plantMenu(level)
         command = 'cb_farm',
         arguments = {
           action = 'refresh',
-          target = '0'
-        }
+          target = '0',
+        },
       },
     },
   })
@@ -208,11 +210,12 @@ function render.plantMenu(level)
 end
 
 --- Магазин семян: кнопки-семена с ценой, покупка по клику.
--- @param user (table) для показа баланса
+-- @tparam table user для показа баланса
 function render.seedShop(user, level)
   local rows = {}
 
-  for _, key in ipairs(crops.order) do
+  for i = 1, #crops.order do
+    local key = crops.order[i]
     local crop = crops[key]
     local seed = items.get(crop.seed)
     if level >= (crop.min_level or 1) then
@@ -223,8 +226,8 @@ function render.seedShop(user, level)
             command = 'cb_farm',
             arguments = {
               action = 'buy',
-              target = crop.seed
-            }
+              target = crop.seed,
+            },
           },
         },
       })
@@ -236,8 +239,8 @@ function render.seedShop(user, level)
             command = 'cb_farm',
             arguments = {
               action = 'locked',
-              target = crop.id
-            }
+              target = crop.id,
+            },
           },
         },
       })
@@ -251,8 +254,8 @@ function render.seedShop(user, level)
         command = 'cb_farm',
         arguments = {
           action = 'refresh',
-          target = '0'
-        }
+          target = '0',
+        },
       },
     },
   })
@@ -267,12 +270,13 @@ function render.seedShop(user, level)
 end
 
 --- Подэкран загона: купленные животные с готовностью продукта.
--- @param state (table) из farmService.animalState
+-- @tparam table state из farmService.animalState
 function render.zoo(state)
   local lines = {}
   local rows = {}
 
-  for _, entry in ipairs(state.list) do
+  for i = 1, #state.list do
+    local entry = state.list[i]
     if entry.owned then
       local def = entry.def
       local product = items.label(def.product)
@@ -285,8 +289,8 @@ function render.zoo(state)
               command = 'cb_farm',
               arguments = {
                 action = 'collect_animal',
-                target = def.id
-              }
+                target = def.id,
+              },
             },
           },
         })
@@ -307,8 +311,8 @@ function render.zoo(state)
         command = 'cb_farm',
         arguments = {
           action = 'animal_shop',
-          target = '0'
-        }
+          target = '0',
+        },
       },
     },
   })
@@ -319,8 +323,8 @@ function render.zoo(state)
         command = 'cb_farm',
         arguments = {
           action = 'refresh',
-          target = '0'
-        }
+          target = '0',
+        },
       },
     },
   })
@@ -332,12 +336,13 @@ function render.zoo(state)
 end
 
 --- Магазин животных: доступные по уровню фермы, покупка по клику.
--- @param user (table) для показа баланса
--- @param level (number) уровень фермы (гейт)
+-- @tparam table user для показа баланса
+-- @tparam number level уровень фермы (гейт)
 function render.animalShop(user, level)
   local rows = {}
 
-  for _, key in ipairs(animals.order) do
+  for i = 1, #animals.order do
+    local key = animals.order[i]
     local def = animals[key]
     if level >= (def.min_level or 1) then
       table.insert(rows, {
@@ -347,8 +352,8 @@ function render.animalShop(user, level)
             command = 'cb_farm',
             arguments = {
               action = 'buy_animal',
-              target = def.id
-            }
+              target = def.id,
+            },
           },
         },
       })
@@ -360,8 +365,8 @@ function render.animalShop(user, level)
             command = 'cb_farm',
             arguments = {
               action = 'locked',
-              target = def.id
-            }
+              target = def.id,
+            },
           },
         },
       })
@@ -375,8 +380,8 @@ function render.animalShop(user, level)
         command = 'cb_farm',
         arguments = {
           action = 'zoo',
-          target = '0'
-        }
+          target = '0',
+        },
       },
     },
   })

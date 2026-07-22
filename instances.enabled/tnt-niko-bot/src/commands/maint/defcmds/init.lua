@@ -9,10 +9,10 @@ local bot_command_scope = require('bot.enums.bot_command_scope')
 local BotCommand = require('bot.types.BotCommand')
 local BotCommandScope = require('bot.types.BotCommandScope')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/defcmds' },
   flags = { Command.enum.MAINTENANCE },
-}
+})
 
 -- Имена БЕЗ слеша - Telegram требует [a-z0-9_], слеш невалиден.
 local PRIVATE_COMMANDS = {
@@ -68,28 +68,30 @@ local GROUP_COMMANDS = {
   BotCommand({ 'commands',  '📜 Команды' }),
 }
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   ctx:reply('Устанавливаю стандартные команды...')
 
   -- Чистим админ-скоп (его не используем).
-  bot:deleteMyCommands {
+  bot:deleteMyCommands({
     scope = BotCommandScope(bot_command_scope.ALL_CHAT_ADMINISTRATORS),
-  }
+  })
 
-  local _, errPrivate = bot:setMyCommands {
+  local _, errPrivate = bot:setMyCommands({
     commands = PRIVATE_COMMANDS,
     scope = BotCommandScope(bot_command_scope.ALL_PRIVATE_CHATS),
-  }
+  })
   if errPrivate then
     log.error(errPrivate)
     ctx:reply('⚠️ Ошибка установки команд для ЛС')
     return
   end
 
-  local _, errGroup = bot:setMyCommands {
+  local _, errGroup = bot:setMyCommands({
     commands = GROUP_COMMANDS,
     scope = BotCommandScope(bot_command_scope.ALL_GROUP_CHATS),
-  }
+  })
   if errGroup then
     log.error(errGroup)
     ctx:reply('⚠️ Ошибка установки команд для групп')

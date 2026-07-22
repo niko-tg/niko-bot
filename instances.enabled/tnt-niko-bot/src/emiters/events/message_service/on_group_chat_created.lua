@@ -3,8 +3,10 @@
 local log = require('log')
 
 -- luacheck: ignore ctx
-local function on_group_chat_created(ctx)
+--- Создана группа. Заглушка.
+-- @tparam table ctx контекст обновления
+local function onGroupChatCreated(ctx)
   log.verbose('[event] %s', 'on_group_chat_created')
 end
 
-return on_group_chat_created
+return onGroupChatCreated

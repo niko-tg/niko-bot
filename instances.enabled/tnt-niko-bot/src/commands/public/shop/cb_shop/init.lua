@@ -11,12 +11,15 @@ local inventoryService = require('src.services.inventory')
 local gatheringService = require('src.services.gathering')
 local render = require('src.commands.public.shop.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_shop' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'item' },
-}
+})
 
+--- Перерисовка карточки на месте (правка исходного сообщения).
+-- @tparam table ctx контекст обновления
+-- @tparam table view { text, keyboard }
 local function edit(ctx, view)
   bot:editMessageText({
     chat_id = ctx:getChatId(),
@@ -26,7 +29,7 @@ local function edit(ctx, view)
   })
 end
 
---- Карточка товара актуальным инвентарём (для строки «у тебя»).
+--- Карточка товара актуальным инвентарём (для строки 'у тебя').
 local function showItem(ctx, user_id, itemId)
   local inv, err = inventoryService.read(user_id)
   if err then
@@ -37,6 +40,8 @@ local function showItem(ctx, user_id, itemId)
   edit(ctx, render.item(itemId, inv))
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Читаем до первого yield: command - общий объект (см. cb_mines).
   local user = command.user
@@ -86,7 +91,7 @@ function command.call(ctx)
 
       ctx:answer({
         text = 'Ошибка покупки, попробуй ещё',
-        show_alert = true
+        show_alert = true,
       })
 
       return
@@ -97,7 +102,7 @@ function command.call(ctx)
 
       ctx:answer({
         text = 'Недостаточно ' .. what,
-        show_alert = true
+        show_alert = true,
       })
 
       return
@@ -106,7 +111,7 @@ function command.call(ctx)
     if result.status ~= 'ok' then
       ctx:answer({
         text = 'Товар недоступен',
-        show_alert = true
+        show_alert = true,
       })
       return
     end

@@ -40,9 +40,9 @@ local function resolveName(userId)
 end
 
 --- Карточка брака вызвавшего: партнёр, сколько дней вместе + кнопка развода.
--- @param ownerId (number)
--- @return[1] { text, keyboard }
--- @return[2] err
+-- @tparam number ownerId
+-- @treturn[1] table { text, keyboard }
+-- @treturn[2] table err
 function render.card(ownerId)
   local marriage, err = marriagesService.read(ownerId)
   if err then
@@ -65,10 +65,10 @@ function render.card(ownerId)
         text = '💔 Развестись',
         callback = {
           command = 'cb_divorce',
-          arguments = { action = 'ask' }
-        }
-      }
-    }
+          arguments = { action = 'ask' },
+        },
+      },
+    },
   })
 
   return { text = text, keyboard = keyboard }, nil

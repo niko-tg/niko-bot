@@ -11,19 +11,29 @@ local function lcg(seed)
 
   local rnd = {}
 
+  --- Текущий сид генератора.
+  -- @treturn number
   function rnd.getSeed()
     return seed
   end
 
+  --- Установка нового сида.
+  -- @tparam number newSeed сид
   function rnd.seed(newSeed)
     seed = newSeed
   end
 
+  --- Следующее число последовательности в [0, 1).
+  -- @treturn number
   function rnd.random()
     seed = (a * seed + c) % m
     return seed / m
   end
 
+  --- Целое число из диапазона [min, max].
+  -- @tparam number min нижняя граница
+  -- @tparam number max верхняя граница
+  -- @treturn number
   function rnd.range(min, max)
     seed = (a * seed + c) % m
     return math.floor((seed / m) * (max - min + 1)) + min

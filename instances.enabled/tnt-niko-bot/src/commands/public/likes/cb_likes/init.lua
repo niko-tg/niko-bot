@@ -5,12 +5,14 @@ local bot = require('bot')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.likes.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_likes' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'owner', 'page' },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arguments = command.arguments
   local owner = tonumber(arguments.owner)

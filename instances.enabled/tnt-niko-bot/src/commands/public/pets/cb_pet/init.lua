@@ -7,15 +7,15 @@ local Command = require('bot.classes.Command')
 local render = require('src.commands.public.pets.render')
 local petsService = require('src.services.pets')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_pet' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'pet' },
-}
+})
 
 local CARE_ACTIONS = { feed = true, heal = true, bathe = true, play = true }
 
--- Показать экран (всегда фото) через editMessageMedia.
+--- Показать экран (всегда фото) через editMessageMedia.
 local function showView(ctx, view)
   if not view then
     return
@@ -38,7 +38,7 @@ local function showView(ctx, view)
   end
 end
 
--- Показать карточку (или экран "питомца нет"). mode: nil|'manage'|'confirm'.
+--- Показать карточку (или экран "питомца нет"). mode: nil|'manage'|'confirm'.
 local function showCard(ctx, id, owner, mode)
   local view, err = render.card(id, owner, mode)
   if err then
@@ -53,6 +53,8 @@ local function showCard(ctx, id, owner, mode)
   end
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local args = command.arguments
   local action = args.action

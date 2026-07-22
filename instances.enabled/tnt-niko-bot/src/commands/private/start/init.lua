@@ -1,5 +1,5 @@
 --- Стартовая команда: приветствие при первом запуске + экран с приглашением
---- добавить бота в чат и кнопкой короткого гайда.
+-- добавить бота в чат и кнопкой короткого гайда.
 --
 local log = require('log')
 local bot = require('bot')
@@ -9,10 +9,10 @@ local Command = require('bot.classes.Command')
 local inlineKeyboard = require('bot.middlewares.inlineKeyboard')
 local usersService = require('src.services.users')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/start' },
   flags = { Command.enum.PRIVATE },
-}
+})
 
 local START = ([[
 🐲 <b>Нико — игровой бот для чатов</b>
@@ -24,14 +24,14 @@ ${sep}
 <b> Добавь меня в свой чат и назначь админом — кнопка ниже 👇</b>
 ]]):f({ sep = hdec.sep })
 
--- Клавиатура старта: добавить в группу, короткий гайд, ссылки.
+--- Клавиатура старта: добавить в группу, короткий гайд, ссылки.
 local function startKeyboard()
   return inlineKeyboard({
     {
       {
         text = '👉 Добавить в группу 👈',
         url = ('https://t.me/${u}?startgroup=true'):f({ u = bot.username }),
-      }
+      },
     },
     { { text = '📜 Короткий гайд', callback = 'cb_start_guide' } },
     {
@@ -41,7 +41,7 @@ local function startKeyboard()
   })
 end
 
--- Экран старта (фото + приглашение + кнопки).
+--- Экран старта (фото + приглашение + кнопки).
 local function sendStart(chatId)
   bot:sendPhoto({
     chat_id = chatId,
@@ -52,6 +52,8 @@ local function sendStart(chatId)
   })
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
   local chatId = ctx:getChatId()

@@ -66,7 +66,8 @@ end
 
 --- Культура по id семени (или nil).
 function crops.bySeed(seedId)
-  for _, key in ipairs(crops.order) do
+  for i = 1, #crops.order do
+    local key = crops.order[i]
     if crops[key].seed == seedId then
       return crops[key]
     end

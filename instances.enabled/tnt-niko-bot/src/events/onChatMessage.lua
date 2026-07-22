@@ -27,6 +27,8 @@ local IS_GROUP = {
 local SYNC_RETRY_COOLDOWN = 300
 local staffSyncRetryAt = {}  -- chat_id -> os.time(), после которого можно повторить
 
+--- Обработчик не-командных сообщений чата: фильтры и антифлуд.
+-- @tparam table ctx контекст обновления
 local function onChatMessage(ctx)
   local chat = ctx:getChat()
 

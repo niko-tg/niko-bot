@@ -9,10 +9,10 @@ local Command = require('bot.classes.Command')
 local hdec = require('bot.libs.hdec')
 local resolveTargetUser = require('src.utils.resolveTargetUser')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/uid' },
   flags = { Command.enum.MAINTENANCE },
-}
+})
 
 local USAGE = ([[
 ℹ️ <b>Использование</b>
@@ -25,7 +25,7 @@ local RESULT_TEMPLATE = [[
 🆔 [${user}] <code>${userId}</code>
 ]]
 
---- Берёт первый токен после "/uid"
+--- Берёт первый токен после "/uid".
 --  Если это @username - возвращает нормализованный.
 local function parseUsername(text)
   local tokens = {}
@@ -41,6 +41,8 @@ local function parseUsername(text)
   return nil
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local message = ctx.message
   local reply = message.reply_to_message

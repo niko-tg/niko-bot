@@ -1,4 +1,4 @@
---- Обработка доната
+--- Обработка доната.
 --
 local hdec = require('bot.libs.hdec')
 local config = require('conf.config')
@@ -7,10 +7,10 @@ local separateNumbers = require('src.utils.separateNumbers')
 local inlineCallbackKeyboard = require('bot.middlewares.inlineCallbackKeyboard')
 local donat_types = require('src.enums.donat_types')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/donat', 'донат' },
-  flags = { Command.enum.PRIVATE }
-}
+  flags = { Command.enum.PRIVATE },
+})
 
 local TEMPLATE = [[
 ⭐️ <b>Донат за звезды!</b> ⭐️
@@ -29,6 +29,8 @@ ${sep}
 За покупку кофе вы получите +1 к карме, а так же сможете поддержать проект, даже если у вас всего 1 звезда
 ]]
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
 
   local strVals = {
@@ -58,8 +60,8 @@ function command.call(ctx)
           command = 'cb_donat',
           arguments = {
             type = donat_types.MONEY, count = 10,
-          }
-        }
+          },
+        },
       },
       {
         text = '💵 ' .. strVals.x10m_currency,
@@ -67,8 +69,8 @@ function command.call(ctx)
           command = 'cb_donat',
           arguments = {
             type = donat_types.MONEY, count = 1,
-          }
-        }
+          },
+        },
       },
     },
     -- Section crystals
@@ -79,8 +81,8 @@ function command.call(ctx)
           command = 'cb_donat',
           arguments = {
             type = donat_types.CRYSTAL, count = 5,
-          }
-        }
+          },
+        },
       },
       {
         text = '💎 1 кристалл',
@@ -88,8 +90,8 @@ function command.call(ctx)
           command = 'cb_donat',
           arguments = {
             type = donat_types.CRYSTAL, count = 1,
-          }
-        }
+          },
+        },
       },
     },
     -- Section VIP
@@ -100,8 +102,8 @@ function command.call(ctx)
           command = 'cb_donat',
           arguments = {
             type = donat_types.VIP, count = 12,
-          }
-        }
+          },
+        },
       },
       {
         text = '👑 VIP на месяц',
@@ -109,8 +111,8 @@ function command.call(ctx)
           command = 'cb_donat',
           arguments = {
             type = donat_types.VIP, count = 1,
-          }
-        }
+          },
+        },
       },
     },
     -- Other section
@@ -120,21 +122,21 @@ function command.call(ctx)
         command = 'cb_donat',
         arguments = {
           type = donat_types.COFFEE, count = 1,
-        }
-      }
+        },
+      },
     },
   })
 
   table.insert(keyboard.inline_keyboard, {
     {
       text = '🧑‍💻 Служба поддержки',
-      url = 'tg://user?id=1268212938'
-    }
+      url = 'tg://user?id=1268212938',
+    },
   })
 
   ctx:replyToMessage({
     text = TEMPLATE:f(strVals),
-    reply_markup = keyboard
+    reply_markup = keyboard,
   })
 end
 

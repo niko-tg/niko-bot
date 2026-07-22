@@ -2,7 +2,7 @@
 --[[
 Получателей перебираем по очереди с небольшой паузой, чтобы не упереться в общий лимит Telegram.
 Сообщение копируем (copyMessage) из исходного чата - получатель видит его -
-как обычное сообщение от бота, без пометки «переслано».
+как обычное сообщение от бота, без пометки 'переслано'.
 Ход рассылки показываем отдельным сообщением и время от времени обновляем.
 --]]
 local log = require('log')
@@ -27,16 +27,20 @@ ${sep}
 ⚠️ Ошибок: <b>${errors}</b>
 ]]
 
--- opts.ctx        - Кнтекст команды (куда слать сообщение с ходом)
--- opts.label      - Подпись: «по чатам» / «по юзерам»
--- opts.fromChatId - Исходный чат, откуда берём сообщение
--- opts.messageId  - id сообщения, которое рассылаем
--- opts.targets    - Список id получателей
+--- Рассылка сообщения по списку получателей с отчётом о ходе.
+-- @tparam table opts опции рассылки
+-- @tparam table opts.ctx контекст команды (куда слать сообщение с ходом)
+-- @tparam string opts.label подпись: 'по чатам' / 'по юзерам'
+-- @tparam number opts.fromChatId исходный чат, откуда берём сообщение
+-- @tparam number opts.messageId id сообщения, которое рассылаем
+-- @tparam table opts.targets список id получателей
 local function runBroadcast(opts)
   local total = #opts.targets
   local sent = 0
   local errors = 0
 
+  --- Текст сообщения о ходе рассылки.
+  -- @treturn string
   local function progressText()
     return PROGRESS_TEMPLATE:f({
       sep = hdec.sep,
@@ -53,6 +57,8 @@ local function runBroadcast(opts)
   local progressChatId = opts.ctx:getChatId()
   local progressMessageId = progress and progress.message_id
 
+  --- Обновление сообщения с ходом рассылки.
+  -- Молча пропускает ошибки правки, кроме 429.
   local function updateProgress()
     if not progressMessageId then
       return
@@ -64,13 +70,13 @@ local function runBroadcast(opts)
       text = progressText(),
     })
 
-    -- «Message is not modified» и подобное не важны - молча пропускаем.
+    -- 'Message is not modified' и подобное не важны - молча пропускаем.
     if err and err.error_code ~= 429 then
       log.verbose(err)
     end
   end
 
-  -- Отправляет одному получателю. На 429 ждёт столько, сколько просит
+  --- Отправляет одному получателю. На 429 ждёт столько, сколько просит
   -- Telegram, и пробует снова. true - доставлено.
   local function sendOne(targetId)
     for _ = 1, MAX_RETRIES do
@@ -85,7 +91,7 @@ local function runBroadcast(opts)
       end
 
       if err.error_code ~= 429 then
-        -- Обычно «бот заблокирован» или «чат не найден» - это ожидаемо.
+        -- Обычно 'бот заблокирован' или 'чат не найден' - это ожидаемо.
         log.verbose(err)
         return false
       end

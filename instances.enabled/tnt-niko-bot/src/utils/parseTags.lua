@@ -1,3 +1,5 @@
+--- Разбор HTML-разметки Telegram: валидация и вырезание тегов.
+--
 local utf8 = require('utf8')
 
 local html_tags = {
@@ -12,9 +14,14 @@ local html_tags = {
   ['pre'] = true,
   ['strike'] = true,
   ['strong'] = true,
-  ['tg-spoiler'] = true
+  ['tg-spoiler'] = true,
 }
 
+--- Валидация HTML-разметки Telegram в тексте.
+-- @tparam string text проверяемый текст
+-- @tparam[opt=5000] number max_text_size максимальная длина текста
+-- @tparam[opt=100] number tags_limit максимальное число тегов
+-- @treturn table массив найденных ошибок разметки
 local function parseTags(text, max_text_size, tags_limit)
   local errs = {}
   local tagStack = {}
@@ -70,7 +77,8 @@ local function parseTags(text, max_text_size, tags_limit)
   end
 
   if #tagStack > 0 then
-    for _, unclosed in ipairs(tagStack) do
+    for i = 1, #tagStack do
+      local unclosed = tagStack[i]
       table.insert(errs, 'Отсутствует закрывающий тег для <'..unclosed..'>')
     end
 

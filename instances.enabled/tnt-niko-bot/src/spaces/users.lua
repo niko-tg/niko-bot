@@ -1,7 +1,7 @@
---- Пользователи
+--- Пользователи.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- https://core.telegram.org/bots/api#user
   --
@@ -54,7 +54,7 @@ local formatSpace = {
   },
   {
     name = 'reserved_balance',
-    type = 'unsigned'
+    type = 'unsigned',
   },
   {
     name = 'crystals',
@@ -127,31 +127,31 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'id',
     options = {
       parts = { 'id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   {
     name = 'username',
     options = {
       parts = { 'username' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   {
     name = 'is_started_bot',
     options = {
       parts = { 'is_started_bot' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 
   -- Топ игроков: ведущая часть level даёт диапазон без SEQSCAN,
@@ -161,8 +161,8 @@ local index = {
     options = {
       parts = { 'level', 'xp' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 
   -- Активные за период: диапазон last_activity >= since по индексу (без SEQSCAN)
@@ -171,8 +171,8 @@ local index = {
     options = {
       parts = { { field = 'last_activity', is_nullable = true } },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 
   -- Топ кусак: диапазон kuses > 0 по индексу + реверс-скан под ORDER BY kuses DESC
@@ -181,8 +181,8 @@ local index = {
     options = {
       parts = { 'kuses' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 
   -- Топ богатых: диапазон balance > 0 по индексу + реверс-скан под ORDER BY balance DESC
@@ -191,12 +191,12 @@ local index = {
     options = {
       parts = { 'balance' },
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

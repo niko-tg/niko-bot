@@ -12,9 +12,9 @@ local setErrType = require('src.utils.services.setErrType')
 local service = {}
 
 --- Чтение инвентаря игрока.
--- @param user_id (number)
--- @return[1] model inventory | nil
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] ?table модель inventory
+-- @treturn[2] table err
 function service.read(user_id)
   local item, err = sql(
     [[
@@ -44,9 +44,9 @@ function service.read(user_id)
 end
 
 --- Вставка/обновление (меняет только переданные поля).
--- @param data (table) { user_id, items?, tools? }
--- @return[1] model inventory
--- @return[2] err
+-- @tparam table data { user_id, items?, tools? }
+-- @treturn[1] table модель inventory
+-- @treturn[2] table err
 function service.upsert(data)
   local defaultInv, errs = Inventory(data, { init = true })
   if errs then
@@ -67,10 +67,10 @@ function service.upsert(data)
 end
 
 --- Начисление ресурсов в инвентарь.
--- @param user_id (number)
--- @param additions (array) [ { id, count }, ... ] (id могут повторяться)
--- @return[1] model inventory
--- @return[2] err
+-- @tparam number user_id
+-- @tparam table additions [ { id, count }, ... ] (id могут повторяться)
+-- @treturn[1] table модель inventory
+-- @treturn[2] table err
 function service.addItems(user_id, additions)
   local existing, err = service.read(user_id)
   if err then
@@ -79,7 +79,8 @@ function service.addItems(user_id, additions)
 
   local items = (existing and existing.items) or {}
 
-  for _, add in ipairs(additions) do
+  for i = 1, #additions do
+    local add = additions[i]
     items[add.id] = (items[add.id] or 0) + add.count
   end
 
@@ -87,11 +88,11 @@ function service.addItems(user_id, additions)
 end
 
 --- Установка инструмента (покупка/замена/починка): tools[toolId] = durability.
--- @param user_id (number)
--- @param toolId (string)
--- @param durability (number)
--- @return[1] model inventory
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string toolId
+-- @tparam number durability
+-- @treturn[1] table модель inventory
+-- @treturn[2] table err
 function service.setTool(user_id, toolId, durability)
   local existing, err = service.read(user_id)
   if err then
@@ -105,11 +106,11 @@ function service.setTool(user_id, toolId, durability)
 end
 
 --- Износ инструмента на amount. Прочность <= 0 -> инструмент исчезает.
--- @param user_id (number)
--- @param toolId (string)
--- @param amount (number)
--- @return[1] number остаток прочности (0 = сломался)
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string toolId
+-- @tparam number amount
+-- @treturn[1] number остаток прочности (0 = сломался)
+-- @treturn[2] table err
 function service.useTool(user_id, toolId, amount)
   local existing, err = service.read(user_id)
   if err then

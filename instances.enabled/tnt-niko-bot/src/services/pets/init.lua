@@ -1,4 +1,4 @@
--- Сервис питомцев и зоотоваров. Объединён в один: уход атомарно тратит товар
+--- Сервис питомцев и зоотоваров. Объединён в один: уход атомарно тратит товар.
 -- (map в pet_supplies) и меняет параметры питомца (числа в pets) - одна транзакция.
 --
 local sql = require('bot.libs.sql')
@@ -18,7 +18,7 @@ local state = states.state
 
 local service = {}
 
--- Поверхностная копия map (для правки tuple-полей перед записью).
+--- Поверхностная копия map (для правки tuple-полей перед записью).
 local function copyMap(source)
   local out = {}
   if source then
@@ -29,19 +29,19 @@ local function copyMap(source)
   return out
 end
 
--- Колонка валюты по строковому типу цены.
+--- Колонка валюты по строковому типу цены.
 local function currencyColumn(currency)
   return currency == 'crystals' and 'crystals' or 'balance'
 end
 
---------------------------------------------------------------------------------
+-- ----------------------------
 -- Питомцы
---------------------------------------------------------------------------------
+-- ----------------------------
 
 --- Список питомцев владельца (в порядке появления).
--- @param owner_id (number)
--- @return[1] array Pet
--- @return[2] err
+-- @tparam number owner_id
+-- @treturn[1] table массив Pet
+-- @treturn[2] table err
 function service.list(owner_id)
   local rows, err = sql(
     [[
@@ -58,7 +58,9 @@ function service.list(owner_id)
   end
 
   local list = {}
-  for _, row in ipairs(rows or {}) do
+  rows = rows or {}
+  for i = 1, #rows do
+    local row = rows[i]
     local pet, errs = Pet(row, { init = true })
     if errs then
       return nil, setErrType(errs, services_error_type.INTERNAL_VALIDATION_ERROR)
@@ -70,9 +72,9 @@ function service.list(owner_id)
 end
 
 --- Чтение питомца по id.
--- @param id (number)
--- @return[1] Pet | nil
--- @return[2] err
+-- @tparam number id
+-- @treturn[1] ?table Pet
+-- @treturn[2] table err
 function service.read(id)
   local item, err = sql(
     [[
@@ -98,9 +100,9 @@ function service.read(id)
 end
 
 --- Кол-во питомцев владельца (для проверки лимита).
--- @param owner_id (number)
--- @return[1] number
--- @return[2] err
+-- @tparam number owner_id
+-- @treturn[1] number
+-- @treturn[2] table err
 function service.count(owner_id)
   local rows, err = sql(
     [[
@@ -121,12 +123,12 @@ function service.count(owner_id)
 end
 
 --- Покупка питомца: проверка лимита и средств, атомарное списание + создание.
--- @param owner_id (number)
--- @param breed (string)
--- @param color (string)
--- @param maxPets (number) лимит питомцев игрока (зависит от VIP)
--- @return[1] table { status = 'ok'|'unavailable'|'limit'|'funds', pet?, currency?, max? }
--- @return[2] err
+-- @tparam number owner_id
+-- @tparam string breed
+-- @tparam string color
+-- @tparam number maxPets лимит питомцев игрока (зависит от VIP)
+-- @treturn[1] table { status = 'ok'|'unavailable'|'limit'|'funds', pet?, currency?, max? }
+-- @treturn[2] table err
 function service.buy(owner_id, breed, color, maxPets)
   local variant = catalog.get(breed, color)
   if variant == nil then
@@ -185,10 +187,10 @@ function service.buy(owner_id, breed, color, maxPets)
 end
 
 --- Удаление питомца (только своего).
--- @param id (number)
--- @param owner_id (number)
--- @return[1] true
--- @return[2] err
+-- @tparam number id
+-- @tparam number owner_id
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.delete(id, owner_id)
   local _, err = sql(
     [[
@@ -206,11 +208,11 @@ function service.delete(id, owner_id)
 end
 
 --- Смена клички питомца (только своего). Имя должно быть уже провалидировано.
--- @param id (number)
--- @param owner_id (number)
--- @param name (string)
--- @return[1] table { status = 'ok'|'gone'|'not_owner' }
--- @return[2] err
+-- @tparam number id
+-- @tparam number owner_id
+-- @tparam string name
+-- @treturn[1] table { status = 'ok'|'gone'|'not_owner' }
+-- @treturn[2] table err
 function service.rename(id, owner_id, name)
   local pet, readErr = service.read(id)
   if readErr then
@@ -240,7 +242,7 @@ function service.rename(id, owner_id, name)
   return { status = 'ok', name = name }, nil
 end
 
--- Запись новых параметров питомца (числа), в т.ч. в составе транзакции ухода.
+--- Запись новых параметров питомца (числа), в т.ч. в составе транзакции ухода.
 local function writePetStats(id, fields)
   local setParts = {}
   local params = { id = id }
@@ -255,7 +257,7 @@ local function writePetStats(id, fields)
   )
 end
 
--- Списание одного зоотовара из pet_supplies (box: поле-map).
+--- Списание одного зоотовара из pet_supplies (box: поле-map).
 local function consumeSupply(user_id, supplyId)
   local row = box.space.pet_supplies:get(user_id)
   local items = row and copyMap(row.items) or {}
@@ -271,12 +273,12 @@ end
 
 --- Уход за питомцем: покормить/полечить/искупать/поиграть.
 -- Возвращает статус для ответа. На 'ok' параметры уже обновлены (и товар списан).
--- @param id (number)
--- @param owner_id (number)
--- @param action (string) 'feed'|'heal'|'bathe'|'play'
--- @return[1] table { status = 'ok'|'gone'|'not_owner'|'sleeping'|'not_needed'
+-- @tparam number id
+-- @tparam number owner_id
+-- @tparam string action 'feed'|'heal'|'bathe'|'play'
+-- @treturn[1] table { status = 'ok'|'gone'|'not_owner'|'sleeping'|'not_needed'
 --                    |'too_tired'|'too_hungry'|'no_supply', action?, supplyId? }
--- @return[2] err
+-- @treturn[2] table err
 function service.care(id, owner_id, action)
   local pet, readErr = service.read(id)
   if readErr then
@@ -375,14 +377,14 @@ function service.care(id, owner_id, action)
   return { status = 'ok', action = action }, nil
 end
 
---------------------------------------------------------------------------------
+-- ----------------------------
 -- Зоотовары
---------------------------------------------------------------------------------
+-- ----------------------------
 
 --- Карта зоотоваров игрока (id -> количество).
--- @param user_id (number)
--- @return[1] table (может быть пустой)
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table (может быть пустой)
+-- @treturn[2] table err
 function service.supplies(user_id)
   local item, err = sql(
     [[
@@ -403,9 +405,9 @@ function service.supplies(user_id)
 end
 
 --- Количество конкретного зоотовара у игрока.
--- @param user_id (number)
--- @param supplyId (string)
--- @return number
+-- @tparam number user_id
+-- @tparam string supplyId
+-- @treturn number
 function service.supplyCount(user_id, supplyId)
   local row = box.space.pet_supplies:get(user_id)
   if row == nil or row.items == nil then
@@ -416,10 +418,10 @@ function service.supplyCount(user_id, supplyId)
 end
 
 --- Покупка зоотовара: проверка средств, атомарное списание + начисление в map.
--- @param user_id (number)
--- @param supplyId (string)
--- @return[1] table { status = 'ok'|'unavailable'|'funds', currency?, count? }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string supplyId
+-- @treturn[1] table { status = 'ok'|'unavailable'|'funds', currency?, count? }
+-- @treturn[2] table err
 function service.buySupply(user_id, supplyId)
   local item = supplies.get(supplyId)
   if item == nil then

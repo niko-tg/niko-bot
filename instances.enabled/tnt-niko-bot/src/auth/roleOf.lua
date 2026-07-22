@@ -10,6 +10,10 @@
 local chat_member_status = require('bot.enums.chat_member_status')
 local roles = require('src.auth.roles').roles
 
+--- Классификация участника в роль по статусу и правам.
+-- @tparam string status статус участника чата
+-- @tparam[opt] table perms admin-права участника
+-- @treturn number роль из src.auth.roles
 local function roleOf(status, perms)
   if status == chat_member_status.CREATOR then
     return roles.OWNER

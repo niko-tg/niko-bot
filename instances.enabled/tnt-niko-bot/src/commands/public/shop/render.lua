@@ -38,10 +38,11 @@ local function priceLabel(def)
 end
 
 --- Меню разделов.
--- @param user (table) для показа баланса
+-- @tparam table user для показа баланса
 function render.menu(user)
   local row = {}
-  for _, key in ipairs(activities.order) do
+  for i = 1, #activities.order do
+    local key = activities.order[i]
     local activity = activities[key]
     table.insert(row, {
       text = activity.emoji .. ' ' .. activity.name,
@@ -49,8 +50,8 @@ function render.menu(user)
         command = 'cb_shop',
         arguments = {
           action = 'cat',
-          item = key
-        }
+          item = key,
+        },
       },
     })
   end
@@ -66,12 +67,14 @@ function render.menu(user)
 end
 
 --- Список товаров раздела: кнопки с названиями (детали - по клику).
--- @param activityKey (string)
+-- @tparam string activityKey
 function render.category(activityKey)
   local activity = activities[activityKey]
 
   local rows = {}
-  for _, id in ipairs(items.shopItems(activityKey)) do
+  local shopIds = items.shopItems(activityKey)
+  for i = 1, #shopIds do
+    local id = shopIds[i]
     table.insert(rows, {
       {
         text = items.label(id),
@@ -79,8 +82,8 @@ function render.category(activityKey)
           command = 'cb_shop',
           arguments = {
             action = 'item',
-            item = id
-          }
+            item = id,
+          },
         },
       },
     })
@@ -93,8 +96,8 @@ function render.category(activityKey)
         command = 'cb_shop',
         arguments = {
           action = 'menu',
-          item = '0'
-        }
+          item = '0',
+        },
       },
     },
   })
@@ -102,7 +105,7 @@ function render.category(activityKey)
   local text = CATEGORY_TEXT:f({
     emoji = activity.emoji,
     name = activity.name,
-    sep = hdec.sep
+    sep = hdec.sep,
   })
 
   return {
@@ -111,9 +114,9 @@ function render.category(activityKey)
   }
 end
 
---- Карточка товара: характеристики + кнопки «Купить» и «Назад».
--- @param itemId (string)
--- @param inv (table|nil) инвентарь игрока (для строки «у тебя»)
+--- Карточка товара: характеристики + кнопки 'Купить' и 'Назад'.
+-- @tparam string itemId
+-- @tparam ?table inv инвентарь игрока (для строки 'у тебя')
 function render.item(itemId, inv)
   local def = items.get(itemId)
   local activity = activities[def.activity]
@@ -127,7 +130,7 @@ function render.item(itemId, inv)
     spec = 'В пачке: <b>' .. def.buy_count .. '</b> шт\n'
   end
 
-  -- Опциональная строка «у тебя» (после цены).
+  -- Опциональная строка 'у тебя' (после цены).
   local owned = ''
   if inv then
     if def.kind == 'tool' and inv.tools and inv.tools[itemId] then
@@ -155,8 +158,8 @@ function render.item(itemId, inv)
           command = 'cb_shop',
           arguments = {
             action = 'buy',
-            item = itemId
-          }
+            item = itemId,
+          },
         },
       },
     },
@@ -167,8 +170,8 @@ function render.item(itemId, inv)
           command = 'cb_shop',
           arguments = {
             action = 'cat',
-            item = def.activity
-          }
+            item = def.activity,
+          },
         },
       },
     },

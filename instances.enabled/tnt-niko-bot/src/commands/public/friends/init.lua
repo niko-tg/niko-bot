@@ -4,11 +4,13 @@ local log = require('log')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.friends.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/friends', 'друзья' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Друзья личные - всегда показываем список вызвавшего.
   local view, err = render.list(command.user.id, 1)

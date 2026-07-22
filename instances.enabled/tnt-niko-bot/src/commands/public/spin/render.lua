@@ -1,4 +1,4 @@
---- Рендер «Спина»: барабаны, касса, итоги. Веса/выплаты - из config.spin.
+--- Рендер 'Спина': барабаны, касса, итоги. Веса/выплаты - из config.spin.
 --
 local hdec = require('bot.libs.hdec')
 local config = require('conf.config')
@@ -48,8 +48,8 @@ ${sep}
 local render = {}
 
 --- Инфо со ставкой/кассой/комбинациями (/spin без ставки).
--- @param cashbox (number)
--- @param isGroup (boolean) в группе ли (касса только в группах)
+-- @tparam number cashbox
+-- @tparam boolean isGroup в группе ли (касса только в группах)
 function render.info(cashbox, isGroup)
   local spin = config.spin
 
@@ -69,7 +69,7 @@ function render.info(cashbox, isGroup)
 end
 
 --- Итог спина.
--- @param result (table) { category, reels, amount, balance, cashboxWon, gotCrystal }
+-- @tparam table result { category, reels, amount, balance, cashboxWon, gotCrystal }
 function render.result(result)
   local cashboxFrag = ''
   if result.cashboxWon and result.cashboxWon > 0 then

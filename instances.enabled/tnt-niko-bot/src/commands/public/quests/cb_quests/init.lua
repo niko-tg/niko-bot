@@ -7,11 +7,11 @@ local separateNumbers = require('src.utils.separateNumbers')
 local gatheringService = require('src.services.gathering')
 local render = require('src.commands.public.quests.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_quests' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'quest' },
-}
+})
 
 --- Перерисовка списка контрактов актуальным состоянием.
 local function refresh(ctx, user_id)
@@ -39,6 +39,8 @@ local function rewardToast(reward)
   return ('🎁 Награда: +%sр'):format(separateNumbers(reward.money))
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
   local action = command.arguments.action

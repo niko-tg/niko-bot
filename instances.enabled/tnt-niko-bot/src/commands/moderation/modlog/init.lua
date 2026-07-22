@@ -9,14 +9,16 @@ local userInChatService = require('src.services.user_in_chat')
 
 local showChatList = require(bot.subdir(0, ...)..'.pages.showChatList')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/modlog' },
   flags = {
     Command.enum.IN_CHAT,
-    Command.enum.ADMINISTRATIVE
-  }
-}
+    Command.enum.ADMINISTRATIVE,
+  },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Назначать приёмник логов может только владелец этого чата.
   -- Флаг ADMINISTRATIVE пропускает всех админов, поэтому здесь сужаем до owner.

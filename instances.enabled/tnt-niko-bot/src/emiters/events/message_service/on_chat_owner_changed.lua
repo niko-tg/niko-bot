@@ -1,11 +1,13 @@
 --- Сменился владелец чата.
---- В payload по доке только new_owner (User), старого id в событии нет.
+-- В payload по доке только new_owner (User), старого id в событии нет.
 --
 local log = require('log')
 local chat_member_status = require('bot.enums.chat_member_status')
 local uicService = require('src.services.user_in_chat')
 
-local function on_chat_owner_changed(ctx)
+--- Сменился владелец чата: обновление записи владельца.
+-- @tparam table ctx контекст обновления
+local function onChatOwnerChanged(ctx)
   log.verbose('[event] %s', 'on_chat_owner_changed')
 
   local chat = ctx:getChat()
@@ -30,4 +32,4 @@ local function on_chat_owner_changed(ctx)
   end
 end
 
-return on_chat_owner_changed
+return onChatOwnerChanged

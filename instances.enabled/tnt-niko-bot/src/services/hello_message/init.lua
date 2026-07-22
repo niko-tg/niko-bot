@@ -1,4 +1,4 @@
---- Сервис CRUD к приветственным сообщениям чатов
+--- Сервис CRUD к приветственным сообщениям чатов.
 --
 local sql = require('bot.libs.sql')
 local HelloMessage = require('src.models.HelloMessage')
@@ -8,10 +8,10 @@ local setErrType = require('src.utils.services.setErrType')
 
 local service = {}
 
---- Чтение записи по chat_id (PK)
--- @param chat_id (number)
--- @return[1] model hello_message
--- @return[2] err
+--- Чтение записи по chat_id (PK).
+-- @tparam number chat_id
+-- @treturn[1] table модель hello_message
+-- @treturn[2] table err
 function service.read(chat_id)
   local item, err = sql(
     [[
@@ -21,7 +21,7 @@ function service.read(chat_id)
       WHERE
         chat_id = ${chat_id}
     ]], {
-      chat_id = chat_id
+      chat_id = chat_id,
     })
 
   if err then
@@ -40,7 +40,7 @@ function service.read(chat_id)
   return helloMessage, nil
 end
 
---- Удаление записи по chat_id
+--- Удаление записи по chat_id.
 function service.delete(chat_id)
   local res, err = sql(
     [[
@@ -49,7 +49,7 @@ function service.delete(chat_id)
       WHERE
         chat_id = ${chat_id}
     ]], {
-      chat_id = chat_id
+      chat_id = chat_id,
     })
 
   if err then
@@ -59,7 +59,7 @@ function service.delete(chat_id)
   return res, nil
 end
 
---- Добавление или обновление по chat_id (один приветственный месседж на чат)
+--- Добавление или обновление по chat_id (один приветственный месседж на чат).
 function service.upsert(data)
   local defaultHello, errs = HelloMessage(data, { init = true })
   if errs then

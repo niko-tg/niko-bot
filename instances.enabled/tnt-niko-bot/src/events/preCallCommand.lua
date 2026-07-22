@@ -1,4 +1,4 @@
---- Обработчик до выполнения команды
+--- Обработчик до выполнения команды.
 --
 local log = require('log')
 local auth = require('src.auth')
@@ -16,8 +16,10 @@ local IS_GROUP = {
   [chat_type.SUPERGROUP] = true,
 }
 
---- Возвращает true  - Команда выполняется дальше
---             false - Команда не должна выполнится
+--- Пред-обработчик команды: решает, выполнять ли её дальше.
+-- @tparam table ctx контекст обновления
+-- @tparam table command описание вызываемой команды
+-- @treturn boolean true - команда выполняется дальше, false - отменена
 local function preCallCommand(ctx, command)
   local user = ctx:getUserFrom()
   local chat = ctx:getChat()

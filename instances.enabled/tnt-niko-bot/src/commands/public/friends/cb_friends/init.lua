@@ -7,12 +7,14 @@ local Command = require('bot.classes.Command')
 local render = require('src.commands.public.friends.render')
 local friendsService = require('src.services.friends')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_friends' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'friend', 'page' },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arguments = command.arguments
   local action = arguments.action

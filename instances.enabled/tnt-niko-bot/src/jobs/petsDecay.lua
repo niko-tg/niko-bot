@@ -14,6 +14,7 @@ local petLogic = require('src.pets.petLogic')
 
 local YIELD_EVERY = 500
 
+--- Один проход: деградация показателей всех питомцев.
 local function decayAll()
   local count = 0
 
@@ -52,6 +53,7 @@ local function decayAll()
   end
 end
 
+--- Запуск фонового файбера деградации питомцев.
 local function start()
   fiber.create(function()
     fiber.self():name('pets-decay')

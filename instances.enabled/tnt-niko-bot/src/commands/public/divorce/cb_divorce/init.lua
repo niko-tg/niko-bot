@@ -7,12 +7,14 @@ local Command = require('bot.classes.Command')
 local render = require('src.commands.public.divorce.render')
 local marriagesService = require('src.services.marriages')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_divorce' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action' },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local action = command.arguments.action
   local ownerId = command.user.id
@@ -22,7 +24,7 @@ function command.call(ctx)
   local chatId = ctx:getChatId()
   local messageId = ctx:getMessageId()
 
-  -- Запрос подтверждения (кнопка «Развестись» из карточки брака).
+  -- Запрос подтверждения (кнопка 'Развестись' из карточки брака).
   if action == 'ask' then
     local view, err = render.confirm(ownerId)
     if err then

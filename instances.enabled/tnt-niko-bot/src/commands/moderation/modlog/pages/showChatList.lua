@@ -1,4 +1,4 @@
---- Страница со списком чатов пользователя для привязки логов модерации
+--- Страница со списком чатов пользователя для привязки логов модерации.
 --
 local log = require('log')
 local bot = require('bot')
@@ -62,6 +62,10 @@ local function appendFooter(text, footer)
   return text
 end
 
+--- Показ списка чатов, доступных модератору.
+-- @tparam table ctx контекст обновления
+-- @tparam table arguments аргументы callback-кнопки
+-- @tparam table command описание команды
 local function showChatList(ctx, arguments, command)
   local action = arguments and arguments.action
   local footer = arguments and arguments.footer
@@ -75,7 +79,9 @@ local function showChatList(ctx, arguments, command)
 
   local buttons = {}
 
-  for _, uic in ipairs(ownedChats or {}) do
+  ownedChats = ownedChats or {}
+  for i = 1, #ownedChats do
+    local uic = ownedChats[i]
     -- Сам модераторский чат в список не добавляем - привязка к себе бессмысленна
     if uic.chat_id ~= command.chat.id then
       local chat, chatErr = chatService.read(uic.chat_id)

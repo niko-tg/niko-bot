@@ -1,4 +1,4 @@
---- Зоотовары: корма, шампуни, лекарства. По одному товару на (вид × категорию).
+--- Зоотовары: корма, шампуни, лекарства. По одному товару на (вид x категорию).
 -- id товара = "<breed>_<kind>" (напр. cats_food) - совпадает с потребностью ухода.
 --
 local supplies = {}
@@ -45,8 +45,10 @@ end
 -- Сборка таблицы товаров: { id -> { id, name, emoji, breed, kind, price, currency, count } }.
 supplies.items = {}
 
-for _, breed in ipairs(supplies.breedOrder) do
-  for _, kind in ipairs(supplies.categoryOrder) do
+for i = 1, #supplies.breedOrder do
+  local breed = supplies.breedOrder[i]
+  for j = 1, #supplies.categoryOrder do
+    local kind = supplies.categoryOrder[j]
     local id = supplies.id(breed, kind)
 
     supplies.items[id] = {

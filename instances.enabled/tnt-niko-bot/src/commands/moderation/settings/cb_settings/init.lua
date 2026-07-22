@@ -1,4 +1,4 @@
---- Старница с настройками
+--- Старница с настройками.
 --
 local bot = require('bot')
 local Command = require('bot.classes.Command')
@@ -10,15 +10,17 @@ local showHelloMessagePage = require(bot.subdir(1, ...)..'.pages.showHelloMessag
 
 local arguments_dict = require(bot.subdir(1, ...)..'.arguments_dict')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_settings' },
   flags = {
     Command.enum.CALLBACK,
-    Command.enum.ADMINISTRATIVE
+    Command.enum.ADMINISTRATIVE,
   },
-  arguments_schema = { 'page', 'action' }
-}
+  arguments_schema = { 'page', 'action' },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Ответ на нажатие кнопки
   ctx:answer()

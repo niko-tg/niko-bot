@@ -1,10 +1,12 @@
----
+--- Обработчик текстовых сообщений: запуск текстовой команды либо передача в onChatMessage.
 --
 local utf8 = require('utf8')
 local bot = require('bot')
 local processCommand = require('bot.processes.processCommand')
 local isForward = require('src.utils.isForward')
 
+--- Обработчик текстовых сообщений: запуск текстовой команды либо передача в onChatMessage.
+-- @tparam table ctx контекст обновления
 local function onGetMessageText(ctx)
   -- Форварды команд не запускаем, но фильтры/антифлуд должны их видеть.
   if isForward(ctx.message) then
@@ -22,7 +24,7 @@ local function onGetMessageText(ctx)
   if bot.commands[commandName] then
     return processCommand(ctx, {
       is_text_command = true,
-      command = bot.commands[commandName]
+      command = bot.commands[commandName],
     })
   end
 

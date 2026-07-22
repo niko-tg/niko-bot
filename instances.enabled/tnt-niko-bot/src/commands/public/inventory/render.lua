@@ -32,7 +32,8 @@ local function resourceBlock(itemsMap)
   local total = 0
   local weight = 0
 
-  for _, id in ipairs(items.resourceOrder) do
+  for i = 1, #items.resourceOrder do
+    local id = items.resourceOrder[i]
     local count = itemsMap[id]
 
     if count and count > 0 then
@@ -43,7 +44,7 @@ local function resourceBlock(itemsMap)
       table.insert(lines, RES_LINE:f({
         label = items.label(id),
         count = count,
-        sum = separateNumbers(sum)
+        sum = separateNumbers(sum),
       }))
     end
   end
@@ -55,22 +56,24 @@ end
 local function gearBlock(itemsMap, toolsMap)
   local lines = {}
 
-  for _, id in ipairs(items.toolOrder) do
+  for i = 1, #items.toolOrder do
+    local id = items.toolOrder[i]
     local left = toolsMap[id]
     if left then
       table.insert(lines, TOOL_LINE:f({
         label = items.label(id),
-        left = left
+        left = left,
       }))
     end
   end
 
-  for _, id in ipairs(items.consumableOrder) do
+  for i = 1, #items.consumableOrder do
+    local id = items.consumableOrder[i]
     local count = itemsMap[id]
     if count and count > 0 then
       table.insert(lines, CONS_LINE:f({
         label = items.label(id),
-        count = count
+        count = count,
       }))
     end
   end
@@ -78,7 +81,7 @@ local function gearBlock(itemsMap, toolsMap)
   return lines
 end
 
---- Клавиатура: «продать всё» и «обновить». По одному ресурсу - через /sell.
+--- Клавиатура: 'продать всё' и 'обновить'. По одному ресурсу - через /sell.
 local function buildKeyboard(hasSellable)
   if not hasSellable then
     return nil
@@ -92,8 +95,8 @@ local function buildKeyboard(hasSellable)
           command = 'cb_inv',
           arguments = {
             action = 'sellall',
-            item = '0'
-          }
+            item = '0',
+          },
         },
       },
     },
@@ -101,8 +104,8 @@ local function buildKeyboard(hasSellable)
 end
 
 --- Экран инвентаря.
--- @param inv (table|nil) модель инвентаря
--- @return table { text, keyboard }
+-- @tparam ?table inv модель инвентаря
+-- @treturn table { text, keyboard }
 function render.inventory(inv)
   local itemsMap = (inv and inv.items) or {}
   local toolsMap = (inv and inv.tools) or {}
@@ -113,9 +116,9 @@ function render.inventory(inv)
   if #resLines == 0 and #gearLines == 0 then
     return {
       text = EMPTY_TEXT:f({
-        sep = hdec.sep
+        sep = hdec.sep,
       }),
-      keyboard = nil
+      keyboard = nil,
     }
   end
 

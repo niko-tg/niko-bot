@@ -1,7 +1,12 @@
---- Модель активной задачи добычи
+--- Модель активной задачи добычи.
 --
 local Errors = require('src.models.Errors')
 
+--- Конструктор модели UserActivity.
+-- @tparam table data сырые поля (из запроса или из БД)
+-- @tparam[opt] table opts опции { init = true } - инициализация всех полей
+-- @treturn[1] table model
+-- @treturn[2] table errs
 local function UserActivity(data, opts)
   local init = opts and opts.init
 

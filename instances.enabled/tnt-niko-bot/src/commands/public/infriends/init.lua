@@ -3,14 +3,16 @@
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.infriends.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/infriends', 'вдрузья' },
   flags = {
     Command.enum.IN_CHAT,
-    Command.enum.REPLY
-  }
-}
+    Command.enum.REPLY,
+  },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local reply = ctx.message.reply_to_message
 

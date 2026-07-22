@@ -40,9 +40,9 @@ local cooldownUntil = {}
 local M = {}
 
 --- Регистрирует сообщение. Возвращает true если это срабатывание (флуд).
--- @param key (string) - chat_id..':'..user_id
--- @param eventTime (number) - ctx.message.date (unix-секунды)
--- @param signature (string|nil) - подпись содержимого (для признака "одинаково")
+-- @tparam string key - chat_id..':'..user_id
+-- @tparam number eventTime - ctx.message.date (unix-секунды)
+-- @tparam ?string signature - подпись содержимого (для признака "одинаково")
 function M.hit(key, eventTime, signature)
   local until_ts = cooldownUntil[key]
 
@@ -61,7 +61,8 @@ function M.hit(key, eventTime, signature)
   local cleaned = {}
 
   if prev then
-    for _, e in ipairs(prev) do
+    for i = 1, #prev do
+      local e = prev[i]
       if eventTime - e.time < SAME_WINDOW_SECONDS then
         table.insert(cleaned, e)
       end
@@ -73,7 +74,8 @@ function M.hit(key, eventTime, signature)
 
   -- Признак #1: сколько всего сообщений за последнюю 1 секунду
   local countInShort = 0
-  for _, e in ipairs(cleaned) do
+  for i = 1, #cleaned do
+    local e = cleaned[i]
     if eventTime - e.time < COUNT_WINDOW_SECONDS then
       countInShort = countInShort + 1
     end
@@ -83,7 +85,8 @@ function M.hit(key, eventTime, signature)
   -- (только если подпись передали - например текст или стикер)
   local sameCount = 0
   if signature then
-    for _, e in ipairs(cleaned) do
+    for i = 1, #cleaned do
+      local e = cleaned[i]
       if e.sig == signature then
         sameCount = sameCount + 1
       end
@@ -118,7 +121,8 @@ local function cleanup()
   for key, list in pairs(windows) do
     local hasFresh = false
 
-    for _, e in ipairs(list) do
+    for i = 1, #list do
+      local e = list[i]
       if now - e.time < SAME_WINDOW_SECONDS then
         hasFresh = true
         break

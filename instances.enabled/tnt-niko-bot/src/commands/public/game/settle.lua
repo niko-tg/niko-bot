@@ -5,10 +5,10 @@
 local usersService = require('src.services.users')
 local userGameStatsService = require('src.services.user_game_stats')
 
---- @param session (table) сессия игры
--- @param data (table) состояние { [user_id] = { score, steps } }
--- @return[1] outcome { draw=bool, winnerId, loserId } | nil
--- @return[2] err (если деньги не перевелись -> сессию НЕ трогаем)
+--- @tparam table session сессия игры
+-- @tparam table data состояние { [user_id] = { score, steps } }
+-- @treturn[1] ?table outcome { draw=bool, winnerId, loserId }
+-- @treturn[2] table err (если деньги не перевелись -> сессию НЕ трогаем)
 local function settle(session, data)
   local player1Id = session.player1_id
   local player2Id = session.player2_id

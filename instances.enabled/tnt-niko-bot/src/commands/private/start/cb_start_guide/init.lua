@@ -7,10 +7,10 @@ local config = require('conf.config')
 local Command = require('bot.classes.Command')
 local inlineKeyboard = require('bot.middlewares.inlineKeyboard')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_start_guide' },
   flags = { Command.enum.CALLBACK },
-}
+})
 
 local GUIDE = ([[
 🐲 <b>Что умеет Нико</b>
@@ -32,17 +32,21 @@ ${sep}
 🏠 <a href="${chat}">Чат</a> · 🗞 <a href="${news}">Новости</a>
 ]]):f({ sep = hdec.sep, chat = config.links.chat, news = config.links.news })
 
+--- Клавиатура гайда: кнопка добавления бота в группу.
+-- @treturn table разметка клавиатуры
 local function guideKeyboard()
   return inlineKeyboard({
     {
       {
         text = '👉 Добавить в группу 👈',
         url = ('https://t.me/${u}?startgroup=true'):f({ u = bot.username }),
-      }
+      },
     },
   })
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   ctx:answer()
 

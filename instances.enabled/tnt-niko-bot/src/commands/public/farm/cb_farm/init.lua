@@ -11,12 +11,15 @@ local farmService = require('src.services.farm')
 local gatheringService = require('src.services.gathering')
 local render = require('src.commands.public.farm.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_farm' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'target' },
-}
+})
 
+--- Перерисовка карточки на месте (правка исходного сообщения).
+-- @tparam table ctx контекст обновления
+-- @tparam table view { text, keyboard }
 local function edit(ctx, view)
   bot:editMessageText({
     chat_id = ctx:getChatId(),
@@ -37,6 +40,8 @@ local function refresh(ctx, user_id)
   edit(ctx, render.menu(state))
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
   local action = command.arguments.action
@@ -266,7 +271,7 @@ function command.call(ctx)
     local def = crops.get(target) or animals.get(target)
     ctx:answer({
       text = ('Откроется на уровне %d'):format(def and def.min_level or 1),
-      show_alert = true
+      show_alert = true,
     })
     return
   end

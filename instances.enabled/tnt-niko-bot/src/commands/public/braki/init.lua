@@ -5,11 +5,13 @@ local log = require('log')
 local Command = require('bot.classes.Command')
 local topRender = require('src.commands.public.top.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'браки' },
   flags = { Command.enum.IN_CHAT },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local view, err = topRender.top('marriages', 1, ctx:getChatType(), ctx:getChatId())
   if err then

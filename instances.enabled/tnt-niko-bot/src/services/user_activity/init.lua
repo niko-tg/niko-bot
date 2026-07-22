@@ -12,9 +12,9 @@ local setErrType = require('src.utils.services.setErrType')
 local service = {}
 
 --- Активная задача игрока либо nil.
--- @param user_id (number)
--- @return[1] model user_activity | nil
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] ?table модель user_activity
+-- @treturn[2] table err
 function service.getByUser(user_id)
   local item, err = sql(
     [[
@@ -44,10 +44,10 @@ function service.getByUser(user_id)
 end
 
 --- Привязать message_id к задаче (после отправки сообщения о старте).
--- @param user_id (number)
--- @param message_id (number)
--- @return[1] res
--- @return[2] err
+-- @tparam number user_id
+-- @tparam number message_id
+-- @treturn[1] table res
+-- @treturn[2] table err
 function service.setMessage(user_id, message_id)
   local res, err = sql.update('user_activity', { message_id = message_id }, { user_id = user_id })
   if err then
@@ -58,9 +58,9 @@ function service.setMessage(user_id, message_id)
 end
 
 --- Удаление задачи по PK.
--- @param user_id (number)
--- @return[1] res
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table res
+-- @treturn[2] table err
 function service.delete(user_id)
   local res, err = sql(
     [[

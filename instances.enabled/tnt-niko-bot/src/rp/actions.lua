@@ -1,4 +1,4 @@
---- РП-команды: действия над собеседником (реплаем). Шаблоны с подстановкой
+--- РП-команды: действия над собеседником (реплаем). Шаблоны с подстановкой.
 -- ${userFrom} / ${userReply} / ${gender} (суффикс рода глагола: '', 'а', '(а)').
 -- Категории нужны только для группировки; вызов идёт по имени команды.
 --
@@ -229,7 +229,8 @@ for name in pairs(byName) do
   end
 end
 table.sort(rest)
-for _, name in ipairs(rest) do
+for i = 1, #rest do
+  local name = rest[i]
   table.insert(names, name)
 end
 

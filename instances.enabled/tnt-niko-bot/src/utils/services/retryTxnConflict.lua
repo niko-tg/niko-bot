@@ -1,4 +1,4 @@
--- Ретрай операции при конфликте MVCC-транзакций.
+--- Ретрай операции при конфликте MVCC-транзакций.
 --
 -- При memtx.use_mvcc_engine конкурентные апдейты одного кортежа (например,
 -- два сообщения одного юзера в параллельных файберах) откатываются с
@@ -9,7 +9,7 @@ local fiber = require('fiber')
 
 local CONFLICT_MESSAGE = 'Transaction has been aborted by conflict'
 
-local ATTEMPTS = 3
+local ATTEMPTS = 5
 -- Базовая пауза перед повтором: даёт конкурирующей транзакции закоммититься.
 local BACKOFF_SEC = 0.02
 
@@ -22,7 +22,8 @@ local function isConflict(err)
   end
 
   if type(err) == 'table' then
-    for _, item in ipairs(err) do
+    for i = 1, #err do
+      local item = err[i]
       if isConflict(item) then
         return true
       end
@@ -36,9 +37,9 @@ end
 
 --- Выполняет fn (протокол `res, err`), повторяя при конфликте транзакций.
 -- Не-конфликтные ошибки возвращаются сразу без повторов.
--- @param fn (function) () -> res, err
--- @return[1] res
--- @return[2] err (последняя ошибка, если все попытки конфликтнули)
+-- @tparam function fn () -> res, err
+-- @treturn[1] table res
+-- @treturn[2] table err (последняя ошибка, если все попытки конфликтнули)
 local function retryTxnConflict(fn)
   local res, err
 

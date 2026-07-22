@@ -1,11 +1,13 @@
----
+--- Событие chat_member: С участника снят бан.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
 local chatService = require('src.services.chats')
 local moderationLog = require('src.notifications.moderationLog')
 
-local function on_member_unbanned(ctx)
+--- С участника снят бан: обновление статуса.
+-- @tparam table ctx контекст обновления
+local function onMemberUnbanned(ctx)
   log.verbose('[event] %s', 'on_member_unbanned')
 
   local chat = ctx:getChat()
@@ -40,4 +42,4 @@ local function on_member_unbanned(ctx)
   end
 end
 
-return on_member_unbanned
+return onMemberUnbanned

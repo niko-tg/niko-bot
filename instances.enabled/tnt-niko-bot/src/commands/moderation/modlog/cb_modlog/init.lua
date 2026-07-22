@@ -11,14 +11,14 @@ local chat_member_status = require('bot.enums.chat_member_status')
 
 local showChatList = require(bot.subdir(1, ...)..'.pages.showChatList')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_modlog' },
   flags = {
     Command.enum.CALLBACK,
-    Command.enum.ADMINISTRATIVE
+    Command.enum.ADMINISTRATIVE,
   },
-  arguments_schema = { 'chat_id' }
-}
+  arguments_schema = { 'chat_id' },
+})
 
 --- Футер о статусе бота в выбранном чате: получит ли бот логи модерации.
 -- Без прав администратора Telegram не шлёт боту chat_member апдейты.
@@ -56,6 +56,8 @@ local function botStatusFooter(chat)
   })
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local selectedId = tonumber(command.arguments.chat_id)
 

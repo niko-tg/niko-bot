@@ -1,4 +1,4 @@
--- Сервис CRUD к партиям «Мины»
+--- Сервис CRUD к партиям 'Мины'.
 --
 local log = require('log')
 local sql = require('bot.libs.sql')
@@ -9,10 +9,10 @@ local setErrType = require('src.utils.services.setErrType')
 
 local service = {}
 
---- Создание партии
--- @param data (table) record
--- @return[1] model mine_session
--- @return[2] err
+--- Создание партии.
+-- @tparam table data record
+-- @treturn[1] table модель mine_session
+-- @treturn[2] table err
 function service.create(data)
   local session, errs = MineSession(data, { init = true })
   if errs then
@@ -28,9 +28,9 @@ function service.create(data)
 end
 
 --- Активная партия игрока либо nil.
--- @param user_id (number)
--- @return[1] model mine_session | nil
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] ?table модель mine_session
+-- @treturn[2] table err
 function service.getByUser(user_id)
   local item, err = sql(
     [[
@@ -60,9 +60,9 @@ function service.getByUser(user_id)
 end
 
 --- Сохранение партии (обновление; для map opened через sql.upsert).
--- @param data (table) полная запись партии
--- @return[1] model mine_session
--- @return[2] err
+-- @tparam table data полная запись партии
+-- @treturn[1] table модель mine_session
+-- @treturn[2] table err
 function service.save(data)
   local session, errs = MineSession(data, { init = true })
   if errs then
@@ -84,9 +84,9 @@ function service.save(data)
 end
 
 --- Удаление партии по PK.
--- @param user_id (number)
--- @return[1] res
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table res
+-- @treturn[2] table err
 function service.delete(user_id)
   local res, err = sql(
     [[
@@ -107,9 +107,9 @@ end
 
 --- Протухшие партии (created старше ttlSec назад).
 -- created - datetime, SQL-сравнения по нему нет -> box-скан + .timestamp.
--- @param ttlSec (number)
--- @return[1] array mine_session
--- @return[2] err
+-- @tparam number ttlSec
+-- @treturn[1] table массив mine_session
+-- @treturn[2] table err
 function service.listExpired(ttlSec)
   local cutoff = os.time() - ttlSec
 
@@ -127,7 +127,8 @@ function service.listExpired(ttlSec)
   end
 
   local sessions = {}
-  for _, item in ipairs(list) do
+  for i = 1, #list do
+    local item = list[i]
     local session, errs = MineSession(item, { init = true })
     if errs then
       log.error(errs)

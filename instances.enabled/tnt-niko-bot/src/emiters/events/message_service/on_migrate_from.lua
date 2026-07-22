@@ -1,10 +1,12 @@
 --- Группа мигрировала в супергруппу. Событие пришло в новой супергруппе,
---- в message.migrate_from_chat_id лежит id старой группы.
+-- в message.migrate_from_chat_id лежит id старой группы.
 --
 local log = require('log')
 local chatService = require('src.services.chats')
 
-local function on_migrate_from(ctx)
+--- Событие миграции в новой супергруппе: перенос данных со старой группы.
+-- @tparam table ctx контекст обновления
+local function onMigrateFrom(ctx)
   log.verbose('[event] %s', 'on_migrate_from')
 
   local chat = ctx:getChat()
@@ -25,4 +27,4 @@ local function on_migrate_from(ctx)
   end
 end
 
-return on_migrate_from
+return onMigrateFrom

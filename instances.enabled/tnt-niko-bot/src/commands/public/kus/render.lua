@@ -44,7 +44,7 @@ function render.cantBot()
 end
 
 --- Кулдаун: сколько ещё ждать.
--- @param nextTs (number) unix-секунды, когда можно снова
+-- @tparam number nextTs unix-секунды, когда можно снова
 function render.cooldown(nextTs)
   local left = nextTs - os.time()
   if left < 1 then
@@ -55,8 +55,8 @@ function render.cooldown(nextTs)
 end
 
 --- Промах: случайный текст без засчёта укуса.
--- @param biter (table) кто кусал
--- @param victim (table) кого пытались укусить
+-- @tparam table biter кто кусал
+-- @tparam table victim кого пытались укусить
 function render.miss(biter, victim)
   local text = MISSES[math.random(#MISSES)]
 
@@ -67,10 +67,10 @@ function render.miss(biter, victim)
 end
 
 --- Подпись к удачному укусу.
--- @param biter (table) кто кусал
--- @param victim (table) кого укусили
--- @param bite (table) выбранный укус (label, description, power, crit)
--- @param totalKuses (number) сколько всего укусов теперь у кусавшего
+-- @tparam table biter кто кусал
+-- @tparam table victim кого укусили
+-- @tparam table bite выбранный укус (label, description, power, crit)
+-- @tparam number totalKuses сколько всего укусов теперь у кусавшего
 function render.caption(biter, victim, bite, totalKuses)
   local powerline = (bite.crit and '💥 Крит! ' or '')
     ..'+'..bite.power..' | твоих укусов: '..totalKuses

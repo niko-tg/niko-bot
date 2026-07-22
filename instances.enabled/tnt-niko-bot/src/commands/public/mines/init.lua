@@ -1,4 +1,4 @@
---- Мини-игра «Мины» (PVE): ставка -> меню риска -> доска с забором.
+--- Мини-игра 'Мины' (PVE): ставка -> меню риска -> доска с забором.
 --
 local log = require('log')
 local hdec = require('bot.libs.hdec')
@@ -8,10 +8,10 @@ local decodeMoneyString = require('src.utils.decodeMoneyString')
 local mineSessionsService = require('src.services.mine_sessions')
 local render = require('src.commands.public.mines.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/mines', 'мины' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
 local USAGE = ([[
 💣 <b>Мины</b>
@@ -26,6 +26,8 @@ ${sep}
   sep = hdec.sep,
 })
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
 
@@ -66,7 +68,7 @@ function command.call(ctx)
 
   if bid < config.mines.min_bid then
     ctx:replyToMessage(('💸 Минимальная ставка: <b>${min_bid}</b>р'):f({
-      min_bid = config.mines.min_bid
+      min_bid = config.mines.min_bid,
     }))
 
     return

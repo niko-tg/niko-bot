@@ -1,8 +1,13 @@
---- Модель PVP игровой сессии
+--- Модель PVP игровой сессии.
 --
 local datetime = require('datetime')
 local Errors = require('src.models.Errors')
 
+--- Конструктор модели GameSession.
+-- @tparam table data сырые поля (из запроса или из БД)
+-- @tparam[opt] table opts опции { init = true } - инициализация всех полей
+-- @treturn[1] table model
+-- @treturn[2] table errs
 local function GameSession(data, opts)
   local init = opts and opts.init
 

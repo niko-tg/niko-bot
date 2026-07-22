@@ -1,8 +1,13 @@
---- Модель лайка (кто кому поставил)
+--- Модель лайка (кто кому поставил).
 --
 local datetime = require('datetime')
 local Errors = require('src.models.Errors')
 
+--- Конструктор модели Like.
+-- @tparam table data сырые поля (из запроса или из БД)
+-- @tparam[opt] table opts опции { init = true } - инициализация всех полей
+-- @treturn[1] table model
+-- @treturn[2] table errs
 local function Like(data, opts)
   local init = opts and opts.init
 

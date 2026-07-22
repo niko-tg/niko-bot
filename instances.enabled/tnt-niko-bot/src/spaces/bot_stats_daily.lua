@@ -1,7 +1,7 @@
 --- Дневные снапшоты статистики бота (для дельт в /botstats).
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- Начало дня (unix), первичный ключ
   { name = 'date',            type = 'number' },
@@ -22,19 +22,19 @@ local formatSpace = {
   { name = 'active_today',    type = 'unsigned' },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'date',
     options = {
       parts = { 'date' },
       unique = true,
-      if_not_exists = true
-    }
-  }
+      if_not_exists = true,
+    },
+  },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

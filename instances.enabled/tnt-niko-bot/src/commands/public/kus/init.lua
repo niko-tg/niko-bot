@@ -10,14 +10,16 @@ local render = require('src.commands.public.kus.render')
 local usersService = require('src.services.users')
 local userGameStatsService = require('src.services.user_game_stats')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/kus', 'кусь', 'кукусь', 'кукуси', 'кукусики' },
   flags = {
     Command.enum.IN_CHAT,
-    Command.enum.REPLY
-  }
-}
+    Command.enum.REPLY,
+  },
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local reply = ctx.message.reply_to_message
 

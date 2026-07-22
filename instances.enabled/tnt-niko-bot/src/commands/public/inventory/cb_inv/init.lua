@@ -9,11 +9,11 @@ local inventoryService = require('src.services.inventory')
 local gatheringService = require('src.services.gathering')
 local render = require('src.commands.public.inventory.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_inv' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'item' },
-}
+})
 
 --- Перерисовка экрана инвентаря актуальным состоянием.
 local function refresh(ctx, user_id)
@@ -33,6 +33,8 @@ local function refresh(ctx, user_id)
   })
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Читаем до первого yield: command - общий объект (см. cb_mines).
   local user = command.user

@@ -6,10 +6,10 @@ local Command = require('bot.classes.Command')
 local botStatsService = require('src.services.bot_stats')
 local render = require('src.commands.maint.botstats.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/botstats' },
   flags = { Command.enum.MAINTENANCE },
-}
+})
 
 --- Начало текущего дня (server-local) - база для "активных сегодня".
 local function startOfToday()
@@ -18,6 +18,8 @@ local function startOfToday()
   return os.time(d)
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local current, err = botStatsService.computeCurrent(startOfToday())
   if err then

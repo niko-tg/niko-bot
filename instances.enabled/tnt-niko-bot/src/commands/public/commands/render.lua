@@ -11,24 +11,27 @@ local inlineCallbackKeyboard = require('bot.middlewares.inlineCallbackKeyboard')
 local CATEGORIES = {
   public = {
     title = '📋 Публичные',
-    note = nil
+    note = nil,
   },
   moderation = {
     title = '🛡 Модераторские',
-    note = 'Работают в группах, нужна роль модератора или админа'
+    note = 'Работают в группах, нужна роль модератора или админа',
   },
   private = {
     title = '🔐 Личные',
-    note = 'Работают в личке с ботом'
+    note = 'Работают в личке с ботом',
   },
   maint = {
     title = '🔧 Обслуживание',
-    note = 'Только для владельца бота'
+    note = 'Только для владельца бота',
   },
 }
 
 local MENU_ORDER = { 'public', 'moderation', 'private' }
 
+--- Категория команды по её флагам.
+-- @tparam table cmd описание команды
+-- @treturn string ключ категории
 local function categoryOf(cmd)
   if cmd:hasFlag(F.MAINTENANCE) then
     return 'maint'
@@ -47,14 +50,14 @@ local function categoryOf(cmd)
   return 'public'
 end
 
--- Уникальные команды (bot.commands ключуется каждым алиасом) по категориям, без callback.
+--- Уникальные команды (bot.commands ключуется каждым алиасом) по категориям, без callback.
 local function collect()
   local seen = {}
   local groups = {
     public = {},
     moderation = {},
     private = {},
-    maint = {}
+    maint = {},
   }
 
   for _, cmd in pairs(bot.commands) do
@@ -69,7 +72,7 @@ local function collect()
   return groups
 end
 
--- Бейдж к команде в зависимости от категории (scope для публичных, роль для модераторских).
+--- Бейдж к команде в зависимости от категории (scope для публичных, роль для модераторских).
 local function badge(cmd, catKey)
   if catKey == 'public' and cmd:hasFlag(F.IN_CHAT) then
     return ' | <i>в группе</i>'
@@ -86,24 +89,28 @@ local function badge(cmd, catKey)
   return ''
 end
 
+--- Кнопка перехода в категорию.
+-- @tparam string catKey ключ категории
+-- @treturn table описание кнопки
 local function catButton(catKey)
   return {
     text = CATEGORIES[catKey].title,
     callback = {
       command = 'cb_commands',
       arguments = {
-        action = catKey
-      }
+        action = catKey,
+      },
     },
   }
 end
 
 local render = {}
 
---- Главное меню категорий. isOwner -> добавляет «Обслуживание».
+--- Главное меню категорий. isOwner -> добавляет 'Обслуживание'.
 function render.menu(isOwner)
   local rows = {}
-  for _, key in ipairs(MENU_ORDER) do
+  for i = 1, #MENU_ORDER do
+    local key = MENU_ORDER[i]
     table.insert(rows, { catButton(key) })
   end
   if isOwner then
@@ -117,7 +124,7 @@ function render.menu(isOwner)
 end
 
 --- Страница категории. maint доступна только владельцу (isOwner).
--- @return { text, keyboard } | nil (нет доступа/категории)
+-- @treturn ?table { text, keyboard } (нет доступа/категории)
 function render.category(catKey, isOwner)
   local meta = CATEGORIES[catKey]
   if not meta or (catKey == 'maint' and not isOwner) then
@@ -133,7 +140,8 @@ function render.category(catKey, isOwner)
   end
   table.insert(lines, hdec.sep)
 
-  for _, cmd in ipairs(list) do
+  for idx = 1, #list do
+    local cmd = list[idx]
     local primary = cmd.commands[1]
 
     -- info на самой команде = самодостаточное описание.
@@ -160,16 +168,16 @@ function render.category(catKey, isOwner)
         callback = {
           command = 'cb_commands',
           arguments = {
-            action = 'menu'
-          }
-        }
-      }
+            action = 'menu',
+          },
+        },
+      },
     },
   })
 
   return {
     text = table.concat(lines, '\n'),
-    keyboard = keyboard
+    keyboard = keyboard,
   }
 end
 

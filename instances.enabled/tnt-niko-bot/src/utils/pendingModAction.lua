@@ -26,6 +26,11 @@ local pending = {}
 
 local M = {}
 
+--- Ключ записи об отложенном мод-действии.
+-- @tparam number chatId id чата
+-- @tparam number userId id пользователя
+-- @tparam string action имя действия
+-- @treturn string ключ
 local function makeKey(chatId, userId, action)
   return chatId..':'..userId..':'..action
 end

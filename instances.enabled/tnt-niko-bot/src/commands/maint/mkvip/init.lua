@@ -1,4 +1,4 @@
---- Выдача / продление VIP подписки
+--- Выдача / продление VIP подписки.
 --
 -- /mkvip user_id=123 date=2m
 -- /mkvip username=@oxniko date=1w
@@ -16,10 +16,10 @@ local resolveTargetUser = require('src.utils.resolveTargetUser')
 local vipUsersService = require('src.services.vip_users')
 local notifyVipActivated = require('src.notifications.vipActivated')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/mkvip' },
   flags = { Command.enum.MAINTENANCE },
-}
+})
 
 local USAGE = ([[
 ℹ️ <b>Использование</b>
@@ -38,6 +38,9 @@ ${sep}
 ⏳ До: <code>${untilDate}</code>
 ]]
 
+--- Разбор аргументов вида key=value из текста команды.
+-- @tparam string text текст сообщения
+-- @treturn table пары ключ-значение
 local function parseArgs(text)
   local args = {}
 
@@ -48,6 +51,9 @@ local function parseArgs(text)
   return args
 end
 
+--- Условие поиска пользователя по разобранным аргументам.
+-- @tparam table args пары ключ-значение
+-- @treturn table { user_id, username }
 local function buildQuery(args)
   return {
     user_id = args.user_id and tonumber(args.user_id) or nil,
@@ -55,6 +61,8 @@ local function buildQuery(args)
   }
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local args = parseArgs(ctx.message.text)
 
@@ -64,7 +72,7 @@ function command.call(ctx)
     return
   end
 
-  -- Требуем явный суффикс единицы, иначе parseUnit вернёт «голое» число секунд
+  -- Требуем явный суффикс единицы, иначе parseUnit вернёт 'голое' число секунд
   if not args.date:match('^%d+[dwmyDWMY]$') then
     ctx:replyToMessage('🤷🏼‍♀️ Формат date: число + суффикс (d/w/m/y), напр. <code>2m</code>')
     return

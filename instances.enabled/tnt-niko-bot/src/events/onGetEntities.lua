@@ -1,4 +1,4 @@
---- Событие получение сущностей
+--- Событие получение сущностей.
 --
 local utf8 = require('utf8')
 local bot = require('bot')
@@ -8,6 +8,8 @@ local processCommand = require('bot.processes.processCommand')
 -- Ex: /profile@niko_rp_bot
 local PATTERN_BOT_CMD = '(/.+)@'..config.bot.username
 
+--- Обработчик сообщений с сущностями: запуск команды по entity.
+-- @tparam table ctx контекст обновления
 local function onGetEntities(ctx)
   local entities = ctx:getEntities()
   local entity = entities and entities[1]
@@ -54,7 +56,7 @@ local function onGetEntities(ctx)
 
     return processCommand(ctx, {
       is_text_command = true,
-      command = bot.commands[commandName]
+      command = bot.commands[commandName],
     })
   end
 

@@ -3,11 +3,13 @@
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.shop.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/shop', 'магазин' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
 

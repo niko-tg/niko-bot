@@ -11,13 +11,13 @@ local usersService = require('src.services.users')
 local getErrType = require('src.utils.services.getErrType')
 local services_error_type = require('src.enums.services.services_error_type')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/pay', 'дать' },
   flags = {
     Command.enum.IN_CHAT,
-    Command.enum.REPLY
-  }
-}
+    Command.enum.REPLY,
+  },
+})
 
 local USAGE = ([[
 ℹ️ <b>Перевод валюты</b>
@@ -33,6 +33,8 @@ ${title}
   ╰ Кому: ${user_reply}
 ]]
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local message = ctx.message
   local reply = message.reply_to_message

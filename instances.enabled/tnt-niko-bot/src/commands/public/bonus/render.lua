@@ -31,9 +31,9 @@ local function formatCountdown(sec)
 end
 
 --- Успешное начисление бонуса.
--- @param amount (number) сумма начисления
--- @param balance (number) новый баланс
--- @param crystals (number) сколько кристаллов выпало (0 = не выпал)
+-- @tparam number amount сумма начисления
+-- @tparam number balance новый баланс
+-- @tparam number crystals сколько кристаллов выпало (0 = не выпал)
 function render.claimed(amount, balance, crystals)
   local crystal = ''
   if crystals and crystals > 0 then
@@ -49,7 +49,7 @@ function render.claimed(amount, balance, crystals)
 end
 
 --- Бонус уже получен: обратный отсчёт до nextAvailableTs (unix-секунды).
--- @param nextAvailableTs (number) время следующего получения, unix-секунды
+-- @tparam number nextAvailableTs время следующего получения, unix-секунды
 function render.alreadyClaimed(nextAvailableTs)
   return ALREADY:f({
     remaining = formatCountdown(nextAvailableTs - os.time()),

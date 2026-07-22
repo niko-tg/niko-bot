@@ -1,4 +1,4 @@
--- Сервис игровой статистики (W/L и пр., хранится в map)
+--- Сервис игровой статистики (W/L и пр., хранится в map).
 --
 local sql = require('bot.libs.sql')
 local UserGameStats = require('src.models.UserGameStats')
@@ -8,10 +8,10 @@ local setErrType = require('src.utils.services.setErrType')
 
 local service = {}
 
---- Чтение статистики игрока
--- @param user_id (number)
--- @return[1] model user_game_stats | nil
--- @return[2] err
+--- Чтение статистики игрока.
+-- @tparam number user_id
+-- @treturn[1] ?table модель user_game_stats
+-- @treturn[2] table err
 function service.read(user_id)
   local item, err = sql(
     [[
@@ -40,10 +40,10 @@ function service.read(user_id)
   return stats, nil
 end
 
---- Вставка/обновление (меняет только переданные поля)
--- @param data (table) { user_id, stats }
--- @return[1] model user_game_stats
--- @return[2] err
+--- Вставка/обновление (меняет только переданные поля).
+-- @tparam table data { user_id, stats }
+-- @treturn[1] table модель user_game_stats
+-- @treturn[2] table err
 function service.upsert(data)
   local defaultStats, errs = UserGameStats(data, { init = true })
   if errs then
@@ -70,10 +70,10 @@ local OUTCOME_KEY = {
 }
 
 --- Учёт исхода игры: инкремент счётчика исхода + games.
--- @param user_id (number)
--- @param outcome (string) 'win' | 'loss' | 'draw'
--- @return[1] model user_game_stats
--- @return[2] err
+-- @tparam number user_id
+-- @tparam string outcome 'win' | 'loss' | 'draw'
+-- @treturn[1] table модель user_game_stats
+-- @treturn[2] table err
 function service.record(user_id, outcome)
   local existing, err = service.read(user_id)
   if err then
@@ -94,10 +94,10 @@ end
 
 --- Заявка на ежедневный бонус: если кулдаун прошёл - штампит время выдачи в map.
 -- last_bonus_at - unix-секунды последнего получения (нет ключа = ни разу).
--- @param user_id (number)
--- @param cooldown (number) кулдаун в секундах
--- @return[1] table { granted = boolean, lastBonusAt = number }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam number cooldown кулдаун в секундах
+-- @treturn[1] table { granted = boolean, lastBonusAt = number }
+-- @treturn[2] table err
 function service.claimDailyBonus(user_id, cooldown)
   local existing, err = service.read(user_id)
   if err then
@@ -126,10 +126,10 @@ end
 -- last_kus_at - unix-секунды последнего укуса (нет ключа = ни разу).
 -- Штампим на каждую успешную заявку (в т.ч. перед промахом), чтобы анти-спам
 -- не обходился рероллом.
--- @param user_id (number)
--- @param cooldown (number) кулдаун в секундах
--- @return[1] table { granted = boolean, lastKusAt = number }
--- @return[2] err
+-- @tparam number user_id
+-- @tparam number cooldown кулдаун в секундах
+-- @treturn[1] table { granted = boolean, lastKusAt = number }
+-- @treturn[2] table err
 function service.claimKus(user_id, cooldown)
   local existing, err = service.read(user_id)
   if err then
@@ -155,9 +155,9 @@ function service.claimKus(user_id, cooldown)
 end
 
 --- Активный пазл игрока + время следующего пазла (кулдаун).
--- @param user_id (number)
--- @return[1] table { active = table|nil, next = number }
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] table { active = table|nil, next = number }
+-- @treturn[2] table err
 function service.readPuzzle(user_id)
   local existing, err = service.read(user_id)
   if err then
@@ -170,10 +170,10 @@ function service.readPuzzle(user_id)
 end
 
 --- Сохранить/обновить активный пазл в map.
--- @param user_id (number)
--- @param puzzle (table) { seq, pos, phase, win }
--- @return[1] model user_game_stats
--- @return[2] err
+-- @tparam number user_id
+-- @tparam table puzzle { seq, pos, phase, win }
+-- @treturn[1] table модель user_game_stats
+-- @treturn[2] table err
 function service.savePuzzle(user_id, puzzle)
   local existing, err = service.read(user_id)
   if err then
@@ -187,10 +187,10 @@ function service.savePuzzle(user_id, puzzle)
 end
 
 --- Завершить пазл: убрать активный + поставить кулдаун (unix-секунды).
--- @param user_id (number)
--- @param cooldownTs (number)
--- @return[1] model user_game_stats
--- @return[2] err
+-- @tparam number user_id
+-- @tparam number cooldownTs
+-- @treturn[1] table модель user_game_stats
+-- @treturn[2] table err
 function service.finishPuzzle(user_id, cooldownTs)
   local existing, err = service.read(user_id)
   if err then

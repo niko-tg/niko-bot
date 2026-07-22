@@ -1,4 +1,4 @@
--- Сервис CRUD к друзьям. Дружба двунаправленна: на пару - две записи.
+--- Сервис CRUD к друзьям. Дружба двунаправленна: на пару - две записи.
 --
 local sql = require('bot.libs.sql')
 local Friend = require('src.models.Friend')
@@ -10,10 +10,10 @@ local service = {}
 
 --- Чтение одной стороны дружбы по паре (чей, кто) - первичный ключ.
 -- Используется для проверки "уже друзья" и для карточки друга.
--- @param user_id (number) чьи друзья
--- @param friend_id (number) кто в друзьях
--- @return[1] model friend (или nil, если дружбы нет)
--- @return[2] err
+-- @tparam number user_id чьи друзья
+-- @tparam number friend_id кто в друзьях
+-- @treturn[1] ?table модель friend (или nil, если дружбы нет)
+-- @treturn[2] table err
 function service.read(user_id, friend_id)
   local item, err = sql(
     [[
@@ -45,11 +45,11 @@ end
 
 --- Заключение дружбы: две записи (в обе стороны) и счётчик friends обоим.
 -- Всё в одной транзакции - дружба либо целиком есть, либо её нет.
--- @param user_id (number) первый
--- @param friend_id (number) второй
--- @param chat_id (number) чат, где заключили
--- @return[1] true
--- @return[2] err
+-- @tparam number user_id первый
+-- @tparam number friend_id второй
+-- @tparam number chat_id чат, где заключили
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.add(user_id, friend_id, chat_id)
   local rowA, errsA = Friend({
     user_id = user_id,
@@ -93,10 +93,10 @@ end
 
 --- Удаление дружбы: обе записи и счётчик friends обоим (с гейтом от ухода в минус).
 -- Вызывать только когда дружба точно есть, иначе счётчик уедет вниз без записи.
--- @param user_id (number) первый
--- @param friend_id (number) второй
--- @return[1] true
--- @return[2] err
+-- @tparam number user_id первый
+-- @tparam number friend_id второй
+-- @treturn[1] boolean true
+-- @treturn[2] table err
 function service.remove(user_id, friend_id)
   local _, err = sql.atomic(function()
     sql.check(sql([[
@@ -125,11 +125,11 @@ end
 
 --- Список друзей пользователя (свежие сверху). Фильтр по user_id идёт через
 -- индекс by_user, он же даёт порядок по created.
--- @param user_id (number) чьи друзья
--- @param limit (number)
--- @param offset (number)
--- @return[1] array { friend_id } (может быть пустым)
--- @return[2] err
+-- @tparam number user_id чьи друзья
+-- @tparam number limit
+-- @tparam number offset
+-- @treturn[1] table массив { friend_id } (может быть пустым)
+-- @treturn[2] table err
 function service.listFriends(user_id, limit, offset)
   local rows, err = sql(
     [[
@@ -153,9 +153,9 @@ end
 
 --- Кол-во друзей пользователя - для пагинации списка.
 -- Считается по диапазону индекса by_user.
--- @param user_id (number) чьи друзья
--- @return[1] number
--- @return[2] err
+-- @tparam number user_id чьи друзья
+-- @treturn[1] number
+-- @treturn[2] table err
 function service.countFriends(user_id)
   local rows, err = sql(
     [[

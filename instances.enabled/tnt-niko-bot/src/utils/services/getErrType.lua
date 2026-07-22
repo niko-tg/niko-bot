@@ -1,4 +1,4 @@
--- Чтение метаполя с типизированной ошибкой (парное к setErrType)
+--- Чтение метаполя с типизированной ошибкой (парное к setErrType).
 --
 local function getErrType(err)
   if err == nil then

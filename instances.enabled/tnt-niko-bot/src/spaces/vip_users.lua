@@ -1,7 +1,7 @@
---- Пользователи с VIP подпиской
+--- Пользователи с VIP подпиской.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   {
     name = 'user_id',
@@ -19,35 +19,35 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'user_id',
     options = {
       parts = {'user_id'},
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   {
     name = 'until_date',
     options = {
       parts = {'until_date'},
       unique = false,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   {
     name = 'reminder_sent',
     options = {
       parts = {'reminder_sent'},
       unique = false,
-      if_not_exists = true
-    }
-  }
+      if_not_exists = true,
+    },
+  },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

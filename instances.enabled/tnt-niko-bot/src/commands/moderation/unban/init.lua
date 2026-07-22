@@ -16,13 +16,13 @@ local missingRightsWarner = require('src.utils.missingRightsWarner')
 local tgErrors = require('src.utils.tgErrors')
 local pendingModAction = require('src.utils.pendingModAction')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/unban', 'разбан', 'анбан' },
   flags = {
     Command.enum.IN_CHAT,
     Command.enum.MODERATION,
   },
-}
+})
 
 local USAGE = ([[
 ℹ️ <b>Использование</b>
@@ -70,6 +70,8 @@ local function parseArgs(text)
   return asTarget(tokens[1])
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local message = ctx.message
   local reply = message.reply_to_message

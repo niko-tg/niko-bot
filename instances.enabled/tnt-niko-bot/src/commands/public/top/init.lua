@@ -5,10 +5,10 @@ local utf8 = require('utf8')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.top.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/top', 'топ' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
 -- Алиасы аргумента -> which.
 local ALIASES = {
@@ -50,6 +50,8 @@ local ALIASES = {
   ['rich']     = 'rich',
 }
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   -- Второй токен после команды: "/top донатов" -> "донатов".
   local arg = ctx.message.text:match('^%S+%s+(%S+)')

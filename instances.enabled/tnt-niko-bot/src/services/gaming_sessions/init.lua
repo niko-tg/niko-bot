@@ -1,4 +1,4 @@
--- Сервис CRUD к игровым сессиям
+--- Сервис CRUD к игровым сессиям.
 --
 local log = require('log')
 local sql = require('bot.libs.sql')
@@ -9,10 +9,10 @@ local setErrType = require('src.utils.services.setErrType')
 
 local service = {}
 
---- Создание сессии
--- @param data (table) record
--- @return[1] model game_session
--- @return[2] err
+--- Создание сессии.
+-- @tparam table data record
+-- @treturn[1] table модель game_session
+-- @treturn[2] table err
 function service.create(data)
   local session, errs = GameSession(data, { init = true })
   if errs then
@@ -27,7 +27,7 @@ function service.create(data)
   return session, nil
 end
 
--- Чтение сессии по индексированному полю (player1_id PK либо player2_id).
+--- Чтение сессии по индексированному полю (player1_id PK либо player2_id).
 local function readByField(field, value)
   local item, err = sql(
     ('SELECT * FROM gaming_sessions WHERE %s = ${value}'):format(field), {
@@ -51,9 +51,9 @@ local function readByField(field, value)
 end
 
 --- Активная сессия игрока (как player1 или player2) либо nil.
--- @param user_id (number)
--- @return[1] model game_session | nil
--- @return[2] err
+-- @tparam number user_id
+-- @treturn[1] ?table модель game_session
+-- @treturn[2] table err
 function service.getByPlayer(user_id)
   local session, err = readByField('player1_id', user_id)
   if err then
@@ -68,10 +68,10 @@ function service.getByPlayer(user_id)
 end
 
 --- Обновление поля data (map). SQL UPDATE для map непригоден -> нативный box.
--- @param player1_id (number) PK сессии
--- @param data (table) новое состояние
--- @return[1] true | nil
--- @return[2] err
+-- @tparam number player1_id PK сессии
+-- @tparam table data новое состояние
+-- @treturn[1] ?boolean true
+-- @treturn[2] table err
 function service.updateData(player1_id, data)
   local ok, res = pcall(function()
     return box.space.gaming_sessions:update(player1_id, {
@@ -92,9 +92,9 @@ end
 
 --- Сессии, протухшие по TTL (created старше ttlSec секунд назад).
 -- created - datetime, SQL-сравнения по нему нет -> box-скан + .timestamp.
--- @param ttlSec (number) возраст в секундах, после которого сессия протухла
--- @return[1] array game_session
--- @return[2] err
+-- @tparam number ttlSec возраст в секундах, после которого сессия протухла
+-- @treturn[1] table массив game_session
+-- @treturn[2] table err
 function service.listExpired(ttlSec)
   local cutoff = os.time() - ttlSec
 
@@ -112,7 +112,8 @@ function service.listExpired(ttlSec)
   end
 
   local sessions = {}
-  for _, item in ipairs(list) do
+  for i = 1, #list do
+    local item = list[i]
     local session, errs = GameSession(item, { init = true })
     if errs then
       log.error(errs)
@@ -125,9 +126,9 @@ function service.listExpired(ttlSec)
 end
 
 --- Удаление сессии по PK.
--- @param player1_id (number)
--- @return[1] res
--- @return[2] err
+-- @tparam number player1_id
+-- @treturn[1] table res
+-- @treturn[2] table err
 function service.delete(player1_id)
   local res, err = sql(
     [[

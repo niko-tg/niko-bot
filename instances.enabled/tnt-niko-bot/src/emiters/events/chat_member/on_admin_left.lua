@@ -1,11 +1,13 @@
----
+--- Событие chat_member: Администратор вышел из чата.
 --
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
 local chatService = require('src.services.chats')
 
 -- luacheck: ignore ctx
-local function on_admin_left(ctx)
+--- Администратор вышел из чата.
+-- @tparam table ctx контекст обновления
+local function onAdminLeft(ctx)
   log.verbose('[event] %s', 'on_admin_left')
 
   local chat = ctx:getChat()
@@ -35,4 +37,4 @@ local function on_admin_left(ctx)
   --
 end
 
-return on_admin_left
+return onAdminLeft

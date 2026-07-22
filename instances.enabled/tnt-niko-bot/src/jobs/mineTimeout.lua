@@ -1,4 +1,4 @@
---- Чистка протухших партий «Мины».
+--- Чистка протухших партий 'Мины'.
 --
 -- Раз в минуту удаляет партии старше TTL и гасит доску ("истекла").
 -- Деньги не трогаем: ставка списывается при первом вскрытии, забор/мина её уже разрулили,
@@ -47,6 +47,7 @@ local function expire(session)
   end
 end
 
+--- Один проход: закрытие партий "Мины", у которых вышел TTL.
 local function tick()
   local sessions, err = mineSessionsService.listExpired(config.mines.ttl)
 
@@ -59,12 +60,14 @@ local function tick()
     return
   end
 
-  for _, session in ipairs(sessions) do
+  for i = 1, #sessions do
+    local session = sessions[i]
     expire(session)
     fiber.sleep(SEND_DELAY)
   end
 end
 
+--- Запуск фонового файбера контроля TTL партий.
 local function start()
   fiber.create(function()
     fiber.self():name('mine-timeout')

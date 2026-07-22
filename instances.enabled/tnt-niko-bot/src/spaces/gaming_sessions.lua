@@ -1,7 +1,7 @@
 --- Активные PVP игровые сессии.
 --
 
---- Схема спейса
+--- Схема спейса.
 local formatSpace = {
   -- Инициатор (PK - одна инициированная игра на игрока).
   {
@@ -37,15 +37,15 @@ local formatSpace = {
   },
 }
 
---- Индексы спейса
+--- Индексы спейса.
 local index = {
   {
     name = 'primary',
     options = {
       parts = { 'player1_id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
   -- Поиск сессии по оппоненту (при броске dice).
   {
@@ -53,12 +53,12 @@ local index = {
     options = {
       parts = { 'player2_id' },
       unique = true,
-      if_not_exists = true
-    }
+      if_not_exists = true,
+    },
   },
 }
 
---- export
+-- Экспорт модуля.
 --
 return {
   format_space = formatSpace,

@@ -1,4 +1,4 @@
---- Мини-игра «Пазл» (память, PVE): запомни порядок эмодзи и повтори.
+--- Мини-игра 'Пазл' (память, PVE): запомни порядок эмодзи и повтори.
 --
 local log = require('log')
 local Command = require('bot.classes.Command')
@@ -6,11 +6,13 @@ local userGameStatsService = require('src.services.user_game_stats')
 local vipUsersService = require('src.services.vip_users')
 local render = require('src.commands.public.puzzle.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/puzzle', 'пазл' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local user = command.user
 
@@ -32,7 +34,7 @@ function command.call(ctx)
 
     ctx:replyToMessage({
       text = view.text,
-      reply_markup = view.keyboard
+      reply_markup = view.keyboard,
     })
 
     return
@@ -48,7 +50,7 @@ function command.call(ctx)
   local view = render.menu(isVip)
   ctx:replyToMessage({
     text = view.text,
-    reply_markup = view.keyboard
+    reply_markup = view.keyboard,
   })
 end
 

@@ -3,8 +3,10 @@
 local log = require('log')
 
 -- luacheck: ignore ctx
-local function on_forum_topic_closed(ctx)
+--- Закрыт топик форума. Заглушка.
+-- @tparam table ctx контекст обновления
+local function onForumTopicClosed(ctx)
   log.verbose('[event] %s', 'on_forum_topic_closed')
 end
 
-return on_forum_topic_closed
+return onForumTopicClosed

@@ -7,13 +7,13 @@ local Command = require('bot.classes.Command')
 local usersService = require('src.services.users')
 local render = require('src.commands.public.profile.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_set_race' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'race', 'owner', 'mode' },
-}
+})
 
--- Редактирует текущее сообщение в переданный view { text, keyboard }.
+--- Редактирует текущее сообщение в переданный view { text, keyboard }.
 local function editView(ctx, view)
   bot:editMessageText({
     chat_id = ctx:getChatId(),
@@ -23,7 +23,7 @@ local function editView(ctx, view)
   })
 end
 
--- Экран выбора расы для режима: change -> приглашение команды, иначе профиль.
+--- Экран выбора расы для режима: change -> приглашение команды, иначе профиль.
 local function choiceView(ctx, user, mode)
   if mode == 'change' then
     return {
@@ -35,7 +35,7 @@ local function choiceView(ctx, user, mode)
   return render.profile(user, ctx:getChat(), { raceChoice = true })
 end
 
--- Запись расы. true при успехе, иначе отвечает алертом.
+--- Запись расы. true при успехе, иначе отвечает алертом.
 local function saveRace(ctx, owner, raceKey)
   if not render.isRace(raceKey) then
     ctx:answer({ text = 'Неизвестная раса', show_alert = true })
@@ -52,6 +52,8 @@ local function saveRace(ctx, owner, raceKey)
   return true
 end
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arguments = command.arguments
   local owner = tonumber(arguments.owner)

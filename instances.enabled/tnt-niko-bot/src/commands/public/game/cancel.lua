@@ -1,4 +1,4 @@
---- Принудительная отмена игровой сессии игрока в конкретном чате
+--- Принудительная отмена игровой сессии игрока в конкретном чате.
 -- (игрока замутили/забанили). Возврат ставок обоим, без победителя.
 --
 local log = require('log')
@@ -8,9 +8,9 @@ local usersService = require('src.services.users')
 local tgErrors = require('src.utils.tgErrors')
 local render = require('src.commands.public.game.render')
 
---- @param chatId (number) чат, где сработала причина отмены
--- @param actor (table) telegram-объект игрока (для упоминания)
--- @param verb (string) причина: 'замучен' | 'забанен'
+--- @tparam number chatId чат, где сработала причина отмены
+-- @tparam table actor telegram-объект игрока (для упоминания)
+-- @tparam string verb причина: 'замучен' | 'забанен'
 local function cancelForUser(chatId, actor, verb)
   local session, err = gamingService.getByPlayer(actor.id)
   if err then

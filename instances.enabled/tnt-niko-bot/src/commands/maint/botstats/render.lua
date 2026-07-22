@@ -50,13 +50,16 @@ end
 
 local render = {}
 
---- Текст статистики: текущее + дельты к снапшоту (latest может быть nil = всё «новое»).
--- @param current (table) computeCurrent
--- @param latest (table|nil) последний снапшот
--- @return string
+--- Текст статистики: текущее + дельты к снапшоту (latest может быть nil = всё 'новое').
+-- @tparam table current computeCurrent
+-- @tparam ?table latest последний снапшот
+-- @treturn string
 function render.report(current, latest)
   latest = latest or {}
 
+  --- Дельта поля относительно прошлого снапшота.
+  -- @tparam string field имя поля
+  -- @treturn string отформатированная дельта
   local function d(field)
     return fmtDelta(num(current[field]) - num(latest[field]))
   end

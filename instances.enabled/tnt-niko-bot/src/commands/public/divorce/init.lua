@@ -4,11 +4,13 @@ local log = require('log')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.divorce.render')
 
-local command = Command:new {
+local command = Command:new({
   commands = { '/divorce', 'развод', 'развестись' },
   flags = { Command.enum.PUBLIC },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local view, err = render.confirm(command.user.id)
   if err then

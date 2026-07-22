@@ -21,12 +21,16 @@ local LINK_ENTITY_TYPES = {
   [entity_type.TEXT_LINK] = true,
 }
 
+--- Есть ли среди сущностей сообщения ссылки.
+-- @tparam ?table entities сущности сообщения
+-- @treturn boolean
 local function hasLinks(entities)
   if not entities then
     return false
   end
 
-  for _, entity in ipairs(entities) do
+  for i = 1, #entities do
+    local entity = entities[i]
     if LINK_ENTITY_TYPES[entity.type] then
       return true
     end

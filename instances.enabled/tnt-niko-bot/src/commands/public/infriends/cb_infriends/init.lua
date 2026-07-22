@@ -8,12 +8,14 @@ local usersService = require('src.services.users')
 local friendsService = require('src.services.friends')
 local userMention = require('src.render.userMention')
 
-local command = Command:new {
+local command = Command:new({
   commands = { 'cb_infriends' },
   flags = { Command.enum.CALLBACK },
   arguments_schema = { 'action', 'proposer', 'invited' },
-}
+})
 
+--- Точка входа команды.
+-- @tparam table ctx контекст обновления
 function command.call(ctx)
   local arguments = command.arguments
   local action = arguments.action
@@ -55,7 +57,7 @@ function command.call(ctx)
     bot:editMessageText({
       chat_id = chatId,
       message_id = messageId,
-      text = render.failed()
+      text = render.failed(),
     })
     return
   end
@@ -64,7 +66,7 @@ function command.call(ctx)
     bot:editMessageText({
       chat_id = chatId,
       message_id = messageId,
-      text = render.already()
+      text = render.already(),
     })
     return
   end
@@ -76,7 +78,7 @@ function command.call(ctx)
     bot:editMessageText({
       chat_id = chatId,
       message_id = messageId,
-      text = render.failed()
+      text = render.failed(),
     })
     return
   end

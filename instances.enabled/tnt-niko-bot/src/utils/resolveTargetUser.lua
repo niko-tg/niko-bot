@@ -5,11 +5,11 @@
 --
 local usersService = require('src.services.users')
 
---- @param query (table) { user_id = number?, username = string? }
+--- @tparam table query { user_id = number?, username = string? }
 --   username ожидается без '@' и в нижнем регистре (нормализация на стороне вызывающего)
--- @return[1] user, nil - найден
--- @return[2] nil, nil - не передан таргет или пользователь отсутствует в БД
--- @return[3] nil, err - ошибка чтения
+-- @treturn[1] table user, nil - найден
+-- @treturn[2] table nil, nil - не передан таргет или пользователь отсутствует в БД
+-- @treturn[3] table nil, err - ошибка чтения
 local function resolveTargetUser(query)
   if query.user_id then
     return usersService.read(query.user_id)
