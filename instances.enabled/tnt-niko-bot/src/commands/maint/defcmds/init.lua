@@ -47,6 +47,7 @@ local PRIVATE_COMMANDS = {
 local GROUP_COMMANDS = {
   BotCommand({ 'profile',   '👤 Профиль' }),
   BotCommand({ 'balance',   '💵 Баланс' }),
+  BotCommand({ 'boss',      '🐌 Вызвать босса' }),
   BotCommand({ 'top',       '🏆 Топы' }),
   BotCommand({ 'bonus',     '🎁 Бонус' }),
   BotCommand({ 'farm',      '🌾 Ферма' }),
