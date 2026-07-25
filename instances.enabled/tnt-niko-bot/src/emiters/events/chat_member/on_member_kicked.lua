@@ -5,6 +5,7 @@ local uicService = require('src.services.user_in_chat')
 local chatService = require('src.services.chats')
 local moderationLog = require('src.notifications.moderationLog')
 local cancelGame = require('src.commands.public.game.cancel')
+local captchaFlow = require('src.commands.moderation.captcha.flow')
 
 --- Участник исключён из чата: обновление статуса и счётчика участников.
 -- @tparam table ctx контекст обновления
@@ -44,6 +45,10 @@ local function onMemberKicked(ctx)
 
   -- Забаненный больше не в чате -> отменяем его игру в этом чате.
   cancelGame(chat.id, newChatMember.user, 'забанен')
+
+  -- Кикнут не пройдя капчу (админом либо джобом таймаута) -
+  -- убираем кнопку и сессию
+  captchaFlow.cleanup(chat.id, newChatMember.user.id)
 end
 
 return onMemberKicked

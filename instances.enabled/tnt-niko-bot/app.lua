@@ -149,6 +149,7 @@ commandLoader({
   },
   moderation = {
     settings = { callback_commands = { 'cb_settings', 'cb_set_setting' } },
+    captcha = {},
     modlog = { callback_commands = { 'cb_modlog' } },
     reload = {},
     mkhello = {},
@@ -182,6 +183,7 @@ require('src.jobs.mineTimeout').start()
 require('src.jobs.bossTimeout').start()
 require('src.jobs.dailyStats').start()
 require('src.jobs.petsDecay').start()
+require('src.jobs.captchaTimeout').start()
 
 -- ----------------------------
 -- Запуск
