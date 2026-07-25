@@ -6,7 +6,7 @@ local DOMAIN = 'niko-bot.ru'
 local HOST = ('https://%s.%s'):format(SUBDOMAIN, DOMAIN)
 
 local config = {
-  admin_id = os.getenv('BOT_ADMIN_ID'),
+  admin_id = tonumber(os.getenv('BOT_ADMIN_ID')),
 
   bot = {
     username = 'Niko_rp_bot',
