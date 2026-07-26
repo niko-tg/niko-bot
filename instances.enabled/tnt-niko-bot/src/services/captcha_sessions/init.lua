@@ -78,6 +78,41 @@ function service.delete(chat_id, user_id)
   return res, nil
 end
 
+--- Атомарное обновление полей сессии по композитному PK.
+-- Через box.update: отсутствующая запись не воскрешается (в отличие
+-- от upsert) - вернёт nil, если сессию уже забрали обработчик успеха
+-- или job таймаута.
+-- @tparam number chat_id
+-- @tparam number user_id
+-- @tparam table fields обновляемые поля { name = value }
+-- @treturn[1] table модель captcha_session (nil - сессии уже нет)
+-- @treturn[2] nil, table err
+function service.update(chat_id, user_id, fields)
+  local ops = {}
+  for name, value in pairs(fields) do
+    table.insert(ops, { '=', name, value })
+  end
+
+  local ok, res = pcall(function()
+    return box.space.captcha_sessions:update({ chat_id, user_id }, ops)
+  end)
+
+  if not ok then
+    return nil, setErrType({ res }, services_error_type.STORAGE_ERROR)
+  end
+
+  if res == nil then
+    return nil, nil
+  end
+
+  local session, errs = CaptchaSession(res:tomap({ names_only = true }), { init = true })
+  if errs then
+    return nil, setErrType(errs, services_error_type.INTERNAL_VALIDATION_ERROR)
+  end
+
+  return session, nil
+end
+
 --- Атомарно забирает сессию: удаляет и возвращает удалённую запись.
 -- box-delete возвращает удалённый кортеж, поэтому из двух конкурентных
 -- обработчиков (нажатие кнопки vs job таймаута) сессию получит только один.

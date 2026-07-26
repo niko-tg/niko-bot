@@ -44,6 +44,26 @@ local function CaptchaSession(data, opts)
     model.created = datetime.new({ timestamp = os.time() })
   end
 
+  -- answer - пустая строка у сессий старого формата (кнопка "Я не бот"),
+  -- обработчик нажатий трактует её как "пройдено одним нажатием"
+  if data.answer ~= nil then
+    model.answer = tostring(data.answer)
+  elseif init then
+    model.answer = ''
+  end
+
+  if tonumber(data.progress) then
+    model.progress = tonumber(data.progress)
+  elseif init then
+    model.progress = 0
+  end
+
+  if tonumber(data.attempts) then
+    model.attempts = tonumber(data.attempts)
+  elseif init then
+    model.attempts = 3
+  end
+
   if errors:has_errors() then
     return nil, errors:get_compact()
   end

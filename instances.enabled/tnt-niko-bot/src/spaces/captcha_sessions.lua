@@ -26,6 +26,25 @@ local formatSpace = {
     name = 'created',
     type = 'datetime',
   },
+  -- answer - символы с картинки, которые нужно нажать по порядку.
+  -- Nullable: сессии старого формата (кнопка "Я не бот") поля не имеют.
+  {
+    name = 'answer',
+    type = 'string',
+    is_nullable = true,
+  },
+  -- progress - сколько символов ответа уже нажато верно
+  {
+    name = 'progress',
+    type = 'number',
+    is_nullable = true,
+  },
+  -- attempts - оставшиеся попытки (ошибка - минус попытка, новая картинка)
+  {
+    name = 'attempts',
+    type = 'number',
+    is_nullable = true,
+  },
 }
 
 --- Индексы спейса.
