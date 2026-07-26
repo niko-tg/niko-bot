@@ -39,6 +39,10 @@ end
 -- Хранилище
 -- ----------------------------
 do
+  -- Миграции строго до бутстрапа спейсов:
+  -- Дропнутый миграцией спейс пересоздаётся ниже с актуальным форматом
+  require('src.migrations').apply()
+
   local spaces = require('src.spaces')
 
   for spaceName, space in pairs(spaces) do
