@@ -49,7 +49,10 @@ echo  "-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 tools::tt_install "http" "scm-1"
 
 # https://github.com/uriid1/lua-multipart-post
-tools::luarocks_install "lua-multipart-post" "1.0-0"
+tools::luarocks_install "lua-multipart-post" "2.0-0"
+
+# https://github.com/uriid1/cairo-luajit-ffi
+tools::luarocks_install "cairo-luajit-ffi" "0.1.0-1"
 
 # https://github.com/wahern/luaossl
 CC="gcc -std=gnu99" \

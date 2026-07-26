@@ -21,6 +21,7 @@ local pet_supplies = require('src.spaces.pet_supplies')
 local user_farm = require('src.spaces.user_farm')
 local boss_sessions = require('src.spaces.boss_sessions')
 local boss_hits = require('src.spaces.boss_hits')
+local captcha_sessions = require('src.spaces.captcha_sessions')
 
 return {
   users = users,
@@ -43,4 +44,5 @@ return {
   user_farm = user_farm,
   boss_sessions = boss_sessions,
   boss_hits = boss_hits,
+  captcha_sessions = captcha_sessions,
 }

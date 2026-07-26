@@ -26,6 +26,7 @@ RUN set -x \
     gcc \
     libssl-dev \
     liblua5.1-0-dev \
+    libcairo2-dev \
   #
   # Cleanup
   #

@@ -14,6 +14,7 @@ ${sep}
 ${sep}
 Антифлуд: ${has_enable_antiflood}
 Модераторские команды: ${has_enable_moderation_commands}
+Капча для новых участников: ${has_enable_captcha}
 ${sep}
 Для изменения параметра - нажмите на него.
 ]]):f({ sep = hdec.sep })
@@ -40,11 +41,13 @@ local function showVipSettingsPage(ctx, arguments, pchat)
 
   local hasEnableAntiflood = pchat.settings.has_enable_antiflood
   local hasEnableModerationCommands = pchat.settings.has_enable_moderation_commands
+  local hasEnableCaptcha = pchat.settings.has_enable_captcha
 
   local template = TEMPLATE:f({
     sep = hdec.sep,
     has_enable_antiflood = flagToText(hasEnableAntiflood),
     has_enable_moderation_commands = flagToText(hasEnableModerationCommands),
+    has_enable_captcha = flagToText(hasEnableCaptcha),
   })
 
   local keyboard = inlineCallbackKeyboard({
@@ -71,6 +74,19 @@ local function showVipSettingsPage(ctx, arguments, pchat)
           page = arguments_dict.page.settings,
           param = arguments_dict.param.has_enable_moderation_commands,
           value = tostring(not hasEnableModerationCommands),
+        },
+      },
+    },
+    {
+      text = ('Капча: ${has_enable_captcha}'):f({
+        has_enable_captcha = flagToText(hasEnableCaptcha),
+      }),
+      callback = {
+        command = 'cb_set_setting',
+        arguments = {
+          page = arguments_dict.page.settings,
+          param = arguments_dict.param.has_enable_captcha,
+          value = tostring(not hasEnableCaptcha),
         },
       },
     },

@@ -14,6 +14,7 @@ local arguments_dict = {
   param = {
     has_enable_antiflood            = 'hea',
     has_enable_moderation_commands  = 'hemc',
+    has_enable_captcha              = 'hec',
     has_enable_hello_message        = 'hehm',
     -- VIP
     has_delete_links                = 'hdl',

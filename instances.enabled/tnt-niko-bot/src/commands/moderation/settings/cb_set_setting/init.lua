@@ -69,6 +69,9 @@ function command.call(ctx)
 
   elseif arguments.param == arguments_dict.param.has_enable_moderation_commands then
     pChat.settings.has_enable_moderation_commands = value
+
+  elseif arguments.param == arguments_dict.param.has_enable_captcha then
+    pChat.settings.has_enable_captcha = value
   end
 
   -- Приветственно сообщение

@@ -3,6 +3,7 @@
 local log = require('log')
 local uicService = require('src.services.user_in_chat')
 local chatService = require('src.services.chats')
+local captchaFlow = require('src.commands.moderation.captcha.flow')
 
 -- luacheck: ignore ctx
 --- Участник вышел из чата сам.
@@ -35,6 +36,10 @@ local function onMemberLeft(ctx)
     log.error(err)
   end
   --
+
+  -- Вышел не пройдя капчу - убираем кнопку и сессию (рестрикт снимет
+  -- сам Telegram по until_date)
+  captchaFlow.cleanup(chat.id, newChatMember.user.id)
 end
 
 return onMemberLeft

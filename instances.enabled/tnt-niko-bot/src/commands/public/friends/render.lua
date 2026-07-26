@@ -9,7 +9,6 @@ local inlineCallbackKeyboard = require('bot.middlewares.inlineCallbackKeyboard')
 local friendsService = require('src.services.friends')
 local usersService = require('src.services.users')
 local chatsService = require('src.services.chats')
-local userMention = require('src.render.userMention')
 
 local PER_PAGE = 10
 local BUTTON_NAME_MAX = 25
@@ -55,7 +54,7 @@ local function resolveName(userId)
   end
 
   if user then
-    return userMention(user)
+    return hdec.user(user)
   end
 
   return '<code>#'..userId..'</code>'
@@ -231,7 +230,7 @@ function render.card(ownerId, friendId, page)
     log.error(readErr)
   end
 
-  local friendMention = friend and userMention(friend) or ('<code>#'..friendId..'</code>')
+  local friendMention = friend and hdec.user(friend) or ('<code>#'..friendId..'</code>')
 
   local text = CARD:f({
     sep = hdec.sep,

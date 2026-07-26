@@ -30,7 +30,7 @@ credentials:
         - permissions: [execute]
           universe: true
         - permissions: [read]
-          spaces: [sessions, users, notifications]
+          spaces: [sessions, users, chats, user_in_chat, notifications, captcha_sessions]
 
 app:
   file: 'app.lua'
