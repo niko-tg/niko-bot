@@ -58,4 +58,17 @@ local function retryTxnConflict(fn)
   return res, err
 end
 
-return retryTxnConflict
+-- Модуль вызывается как функция: retryTxnConflict(fn).
+-- Поле isConflict нужно вызывающей стороне, чтобы отличить исчерпавший ретраи
+-- конфликт (штатная ситуация горячего кортежа) от настоящей ошибки хранилища.
+local M = {
+  isConflict = isConflict,
+}
+
+setmetatable(M, {
+  __call = function(_, fn)
+    return retryTxnConflict(fn)
+  end,
+})
+
+return M
