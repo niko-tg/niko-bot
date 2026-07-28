@@ -13,13 +13,12 @@ ${sep}
   ╰ Чатов: <b>${chats}</b> | ${dChats}
   ╰ Участников: <b>${members}</b> | ${dMembers}
 ${sep}
-<b>✉️ Активность</b>
-  ╰ Сообщений: <b>${messages}</b> | ${dMessages}
-  ╰ Команд: <b>${commands}</b> | ${dCommands}
-  ╰ Активны сегодня: <b>${activeToday}</b>
+<b>✉️ Активность за день</b>
+  ╰ Сообщений: <b>${dayMessages}</b> | всего: ${messages}
+  ╰ Команд: <b>${dayCommands}</b> | всего: ${commands}
+  ╰ Активны: <b>${activeToday}</b>
 ${sep}
 <b>💰 Экономика</b>
-  ╰ Баланс в обороте: <b>${balance}</b>р | ${dBalance}
   ╰ Кристаллов: <b>${crystals}</b> | ${dCrystals}
   ╰ Кассы казино: <b>${cashbox}</b>р | ${dCashbox}
   ╰ Донатов: <b>${donations}</b> ⭐ | ${dDonations}
@@ -113,6 +112,14 @@ function render.report(current, latest)
     return fmtDelta(num(current[field]) - num(latest[field]))
   end
 
+  --- Значение поля за день: тотал минус снапшот начала дня.
+  -- Счётчики монотонны; без снапшота (первый запуск) - весь тотал.
+  -- @tparam string field имя поля
+  -- @treturn string
+  local function day(field)
+    return separateNumbers(math.max(0, num(current[field]) - num(latest[field])))
+  end
+
   return TEMPLATE:f({
     date = os.date('%d.%m.%Y %H:%M'),
     sep = hdec.sep,
@@ -127,13 +134,11 @@ function render.report(current, latest)
     dMembers = d('members_total'),
 
     messages = separateNumbers(current.messages_total),
-    dMessages = d('messages_total'),
+    dayMessages = day('messages_total'),
     commands = separateNumbers(current.commands_total),
-    dCommands = d('commands_total'),
+    dayCommands = day('commands_total'),
     activeToday = separateNumbers(current.active_today),
 
-    balance = separateNumbers(current.balance_total),
-    dBalance = d('balance_total'),
     crystals = separateNumbers(current.crystals_total),
     dCrystals = d('crystals_total'),
     cashbox = separateNumbers(current.cashbox_total),

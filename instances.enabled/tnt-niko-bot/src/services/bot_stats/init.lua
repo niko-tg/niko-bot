@@ -14,6 +14,8 @@ local SNAPSHOT_FIELDS = {
   'members_total',
   'messages_total',
   'commands_total',
+  -- balance_total больше не считаем: поле осталось в формате спейса
+  -- (не nullable), saveSnapshot пишет в него 0
   'balance_total',
   'crystals_total',
   'cashbox_total',
@@ -99,7 +101,7 @@ function service.computeCurrent(sinceTs, beforeTs)
       { now = os.time() },
     },
     usersSum   = {
-      [[ SELECT SUM(balance) AS "balance", SUM(crystals) AS "crystals" FROM SEQSCAN users ]],
+      [[ SELECT SUM(crystals) AS "crystals" FROM SEQSCAN users ]],
     },
     chatsSum   = {
       [[ SELECT SUM(members) AS "members", SUM(total_messages) AS "messages", SUM(casino_cashier) AS "cashbox"]]
@@ -146,7 +148,6 @@ function service.computeCurrent(sinceTs, beforeTs)
     -- inc_total_messages). Команды считаем отдельно (commands_total).
     messages_total  = numOr0(r.chatsSum.messages),
     commands_total  = numOr0(r.commandsRow.cnt),
-    balance_total   = numOr0(r.usersSum.balance),
     crystals_total  = numOr0(r.usersSum.crystals),
     cashbox_total   = numOr0(r.chatsSum.cashbox),
     donations_total = numOr0(r.donatSum.donations),
