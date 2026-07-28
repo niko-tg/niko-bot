@@ -152,22 +152,80 @@ function service.ensure(data)
   return service.create(data)
 end
 
+--- Upsert чата с атомарным +1 к total_messages той же операцией.
+-- sql.upsert умеет только '='-ops, а отдельный UPDATE счётчика был второй
+-- записью в самый контендящийся кортеж (все сообщения чата бьют в одну
+-- запись) и удваивал окно MVCC-конфликта. Здесь box.space:upsert:
+-- телеграм-поля обновляются и счётчик растёт одной записью.
+-- @tparam table defaultChat полная модель для случая вставки
+-- @tparam table data сырые поля для '='-ops (как update_fields у sql.upsert)
+-- @treturn[1] boolean true
+-- @treturn[2] table err
+local function upsertIncMessages(defaultChat, data)
+  local space = box.space.chats
+
+  local tuple = {}
+  local ops = { { '+', 'total_messages', 1 } }
+
+  local format = space:format()
+  for i = 1, #format do
+    local name = format[i].name
+    local value = defaultChat[name]
+
+    if value == nil or value == box.NULL then
+      tuple[i] = box.NULL
+    else
+      tuple[i] = value
+    end
+
+    -- id - первичный ключ, менять его ops-ами нельзя;
+    -- total_messages занят '+'-оп-ом выше
+    if name ~= 'id' and name ~= 'total_messages' and data[name] ~= nil then
+      table.insert(ops, { '=', name, data[name] })
+    end
+  end
+
+  local ok, err = pcall(space.upsert, space, tuple, ops)
+  if not ok then
+    return nil, err
+  end
+
+  return true, nil
+end
+
 --- Добавление или обновление записи.
 -- При вставке создаёт полную запись с дефолтами
 -- При обновлении меняет только переданные поля
 -- data обязан содержать id и type - обязательные поля модели Chat
 -- @tparam table data fields
+-- @tparam[opt] table opts { inc_total_messages = true } - учесть сообщение
+--   в total_messages той же записью (горячий путь onChatMessage)
 -- @treturn[1] table модель chat
 -- @treturn[2] table err
-function service.upsert(data)
+function service.upsert(data, opts)
+  local incTotal = opts and opts.inc_total_messages
+
   -- Полная модель с дефолтами для случая вставки
   local defaultChat, errs = Chat(data, { init = true })
   if errs then
     return nil, setErrType(errs, services_error_type.VALIDATION_ERROR)
   end
 
-  -- Атомарная вставка / обновление
-  local _, err = sql.upsert('chats', defaultChat, data)
+  local _, err
+
+  if incTotal then
+    -- Вставка = первое сообщение чата: счётчик сразу с единицы,
+    -- '+'-ops при вставке не применяются
+    defaultChat.total_messages = 1
+
+    _, err = retryTxnConflict(function()
+      return upsertIncMessages(defaultChat, data)
+    end)
+  else
+    -- Атомарная вставка / обновление
+    _, err = sql.upsert('chats', defaultChat, data)
+  end
+
   if err then
     return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)
   end
@@ -246,32 +304,6 @@ function service.takeCashbox(chat_id)
   end
 
   return taken, nil
-end
-
---- Атомарный инкремент счётчика активности чата (+1 на сообщение).
--- Самый контендящийся кортеж: все сообщения чата бьют в одну запись,
--- под MVCC параллельные файберы конфликтуют - ретраим.
--- @tparam number chat_id
--- @treturn[1] boolean true
--- @treturn[2] table err
-function service.incTotalMessages(chat_id)
-  local _, err = retryTxnConflict(function()
-    return sql([[
-      UPDATE chats
-      SET
-        total_messages = total_messages + 1
-      WHERE
-        id = ${chat_id}
-    ]], {
-      chat_id = chat_id,
-    })
-  end)
-
-  if err then
-    return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)
-  end
-
-  return true, nil
 end
 
 --- Атомарный +1 к числу участников чата (вход/возврат участника).

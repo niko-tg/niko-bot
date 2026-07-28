@@ -108,8 +108,8 @@ function service.computeCurrent(sinceTs, beforeTs)
     chats_total     = numOr0(r.chatsRow.cnt),
     members_total   = numOr0(r.chatsSum.members),
     -- Сообщения = чистые сообщения. Команды в total_messages не попадают:
-    -- incTotalMessages вызывается только в onChatMessage. Команды считаем
-    -- отдельно (commands_total).
+    -- счётчик растёт только в onChatMessage (chats.upsert с
+    -- inc_total_messages). Команды считаем отдельно (commands_total).
     messages_total  = numOr0(r.chatsSum.messages),
     commands_total  = numOr0(r.commandsRow.cnt),
     balance_total   = numOr0(r.usersSum.balance),

@@ -1,8 +1,9 @@
 --- Обработчик не-команд сообщений в групповых чатах.
 --
--- Делает chatService.upsert (актуальные settings + cold-start sync) и
--- прогоняет message через цепочку фильтров. Первый фильтр, который вернул
--- true (consume сообщение), останавливает цепочку.
+-- Делает chatService.upsert (актуальные settings + cold-start sync + учёт
+-- сообщения в total_messages той же записью) и прогоняет message через
+-- цепочку фильтров. Первый фильтр, который вернул true (consume сообщение),
+-- останавливает цепочку.
 --
 local log = require('log')
 local chat_type = require('bot.enums.chat_type')
@@ -52,12 +53,23 @@ local function onChatMessage(ctx)
     return
   end
 
-  -- Подтягиваем актуальный chatItem (settings, staff_synced)
+  -- Считаемый автор: реальный юзер, не бот/канал/аноним
+  local author = ctx:getUserFrom()
+  local isCountable = author ~= nil
+    and not author.is_bot
+    and ctx:getSenderChat() == nil
+
+  -- Подтягиваем актуальный chatItem (settings, staff_synced). Сообщение
+  -- считаемого автора учитываем в total_messages той же записью: отдельный
+  -- инкремент был бы второй записью в горячий кортеж чата и удваивал бы
+  -- окно MVCC-конфликта.
   --
-  local chatItem, chatErr = chatService.upsert(chat)
+  local chatItem, chatErr = chatService.upsert(chat, {
+    inc_total_messages = isCountable,
+  })
 
   if chatErr then
-    log.error(chatErr)
+    logCounterErr(chatErr)
     return
   end
 
@@ -66,17 +78,11 @@ local function onChatMessage(ctx)
   end
   --
 
-  -- Учёт активности: считаем сообщение автору (реальный юзер, не бот/канал/аноним).
-  local author = ctx:getUserFrom()
-  if author and not author.is_bot and not ctx:getSenderChat() then
+  -- Учёт активности автора (кортежи user_in_chat и users)
+  if isCountable then
     local _, incErr = userInChatService.incMessages(chat.id, author.id)
     if incErr then
       logCounterErr(incErr)
-    end
-
-    local _, chatIncErr = chatService.incTotalMessages(chat.id)
-    if chatIncErr then
-      logCounterErr(chatIncErr)
     end
 
     local _, touchErr = usersService.touchActivity(author.id)
