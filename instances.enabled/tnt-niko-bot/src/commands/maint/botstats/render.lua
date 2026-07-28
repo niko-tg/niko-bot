@@ -26,6 +26,7 @@ ${sep}
 <b>🎮 Сейчас</b>
   ╰ Активных игр: <b>${liveGames}</b>
   ╰ Активных VIP: <b>${vip}</b>
+  ╰ Живых питомцев: <b>${pets}</b>
 ${sep}
 <b>⚙️ Включено в чатах</b>
 ${chatSettings}
@@ -148,6 +149,7 @@ function render.report(current, latest)
 
     liveGames = separateNumbers(current.live_games),
     vip = separateNumbers(current.vip_users),
+    pets = separateNumbers(current.pets_alive),
 
     chatSettings = fmtChatSettings(current.chat_settings),
   })

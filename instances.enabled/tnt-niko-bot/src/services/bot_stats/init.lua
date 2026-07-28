@@ -1,6 +1,7 @@
 --- Сервис статистики бота: живой расчёт агрегатов, дневные снапшоты, дельты.
 --
 local sql = require('bot.libs.sql')
+local petStates = require('src.pets.states')
 local services_error_type = require('src.enums.services.services_error_type')
 local setErrType = require('src.utils.services.setErrType')
 
@@ -100,6 +101,10 @@ function service.computeCurrent(sinceTs, beforeTs)
       [[ SELECT COUNT(*) AS "cnt" FROM vip_users WHERE until_date > ${now} ]],
       { now = os.time() },
     },
+    petsRow    = {
+      [[ SELECT COUNT(*) AS "cnt" FROM SEQSCAN pets WHERE status = ${alive} ]],
+      { alive = petStates.status.ALIVE },
+    },
     usersSum   = {
       [[ SELECT SUM(crystals) AS "crystals" FROM SEQSCAN users ]],
     },
@@ -156,6 +161,7 @@ function service.computeCurrent(sinceTs, beforeTs)
     -- live (в снапшот не пишем, дельт нет)
     live_games      = numOr0(r.gamesRow.cnt) + numOr0(r.minesRow.cnt),
     vip_users       = numOr0(r.vipRow.cnt),
+    pets_alive      = numOr0(r.petsRow.cnt),
     chat_settings   = chatSettings,
   }, nil
 end
