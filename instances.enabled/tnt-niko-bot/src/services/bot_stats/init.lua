@@ -40,6 +40,35 @@ local function selectRow(query, params)
   return rows and rows[1], nil
 end
 
+--- Счётчик включённых настроек по чатам: { имя_настройки = кол-во }.
+-- settings - map, SQL по ключам map не фильтрует - поэтому box-итерация.
+-- Полный скан chats; для maintenance-команды и дневной джобы это дёшево.
+-- @treturn[1] table counts
+-- @treturn[2] table err
+function service.countChatSettings()
+  local counts = {}
+
+  local ok, err = pcall(function()
+    for _, tuple in box.space.chats:pairs() do
+      local settings = tuple.settings
+
+      if settings ~= nil then
+        for key, enabled in pairs(settings) do
+          if enabled == true then
+            counts[key] = (counts[key] or 0) + 1
+          end
+        end
+      end
+    end
+  end)
+
+  if not ok then
+    return nil, setErrType({ err }, services_error_type.STORAGE_ERROR)
+  end
+
+  return counts, nil
+end
+
 --- Живой расчёт всех метрик.
 -- @tparam number sinceTs нижняя граница окна "активных" (unix-ts)
 -- @tparam ?number beforeTs верхняя граница окна. Без неё - открытое окно
@@ -102,6 +131,11 @@ function service.computeCurrent(sinceTs, beforeTs)
     r[key] = row or {}
   end
 
+  local chatSettings, settingsErr = service.countChatSettings()
+  if settingsErr then
+    return nil, settingsErr
+  end
+
   return {
     users_total     = numOr0(r.usersRow.cnt),
     started_total   = numOr0(r.startedRow.cnt),
@@ -121,6 +155,7 @@ function service.computeCurrent(sinceTs, beforeTs)
     -- live (в снапшот не пишем, дельт нет)
     live_games      = numOr0(r.gamesRow.cnt) + numOr0(r.minesRow.cnt),
     vip_users       = numOr0(r.vipRow.cnt),
+    chat_settings   = chatSettings,
   }, nil
 end
 

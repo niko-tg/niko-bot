@@ -27,7 +27,21 @@ ${sep}
 <b>🎮 Сейчас</b>
   ╰ Активных игр: <b>${liveGames}</b>
   ╰ Активных VIP: <b>${vip}</b>
+${sep}
+<b>⚙️ Включено в чатах</b>
+${chatSettings}
 ]]
+
+-- Подписи настроек чата в порядке вывода (ключи - как в settings map).
+local SETTINGS_LABELS = {
+  { key = 'has_enable_moderation_commands', label = 'Модераторские команды' },
+  { key = 'has_enable_antiflood',           label = 'Антифлуд' },
+  { key = 'has_enable_captcha',             label = 'Капча' },
+  { key = 'has_delete_links',               label = 'Удаление ссылок' },
+  { key = 'has_delete_forward_message',     label = 'Запрет пересылки' },
+  { key = 'has_ban_sender_chat',            label = 'Запрет писать от лица чатов' },
+  { key = 'has_enable_hello_message',       label = 'Приветственное сообщение' },
+}
 
 --- cdata/nil -> number.
 local function num(value)
@@ -46,6 +60,41 @@ local function fmtDelta(delta)
     return '-'..separateNumbers(-delta)
   end
   return '0'
+end
+
+--- Строки секции настроек: известные - с подписью по порядку,
+-- неизвестные ключи (настройка есть, подпись забыли) - сырым именем в хвост.
+-- @tparam ?table counts { имя_настройки = кол-во } из countChatSettings
+-- @treturn string
+local function fmtChatSettings(counts)
+  counts = counts or {}
+
+  local lines = {}
+  local known = {}
+
+  for i = 1, #SETTINGS_LABELS do
+    local item = SETTINGS_LABELS[i]
+    known[item.key] = true
+    table.insert(lines, ('  ╰ %s: <b>%s</b>'):format(
+      item.label, separateNumbers(num(counts[item.key]))
+    ))
+  end
+
+  local extra = {}
+  for key in pairs(counts) do
+    if not known[key] then
+      table.insert(extra, key)
+    end
+  end
+  table.sort(extra)
+
+  for i = 1, #extra do
+    table.insert(lines, ('  ╰ %s: <b>%s</b>'):format(
+      extra[i], separateNumbers(num(counts[extra[i]]))
+    ))
+  end
+
+  return table.concat(lines, '\n')
 end
 
 local render = {}
@@ -94,6 +143,8 @@ function render.report(current, latest)
 
     liveGames = separateNumbers(current.live_games),
     vip = separateNumbers(current.vip_users),
+
+    chatSettings = fmtChatSettings(current.chat_settings),
   })
 end
 
