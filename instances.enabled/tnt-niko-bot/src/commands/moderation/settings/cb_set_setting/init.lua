@@ -4,10 +4,8 @@ local log = require('log')
 local bot = require('bot')
 local Command = require('bot.classes.Command')
 local chatService = require('src.services.chats')
-local vipUsersService = require('src.services.vip_users')
 
 local showChatSettings = require(bot.subdir(1, ...)..'.pages.showChatSettings')
-local showVipSettingsPage = require(bot.subdir(1, ...)..'.pages.showVipSettingsPage')
 local showHelloMessagePage = require(bot.subdir(1, ...)..'.pages.showHelloMessagePage')
 local arguments_dict = require(bot.subdir(1, ...)..'.arguments_dict')
 
@@ -39,24 +37,6 @@ function command.call(ctx)
   -- Значение параметра
   local value = arguments.value == 'true'
 
-  -- VIP-настройки меняет только обладатель активного VIP.
-  -- Без VIP - alert юзеру, ничего не сохраняем и UI не обновляем.
-  --
-  if arguments.page == arguments_dict.page.vip_settings then
-    local isVip, vipErr = vipUsersService.isActive(command.user.id)
-
-    if vipErr then
-      log.error(vipErr)
-      isVip = false
-    end
-
-    if not isVip then
-      ctx:answer({ text = '👅 Эта настройка только для VIP', show_alert = true })
-      return
-    end
-  end
-  --
-
   -- Ответ на нажатие кнопки
   ctx:answer(mkAnswerText(value))
 
@@ -72,17 +52,8 @@ function command.call(ctx)
 
   elseif arguments.param == arguments_dict.param.has_enable_captcha then
     pChat.settings.has_enable_captcha = value
-  end
 
-  -- Приветственно сообщение
-  --
-  if arguments.param == arguments_dict.param.has_enable_hello_message then
-    pChat.settings.has_enable_hello_message = value
-  end
-
-  -- VIP настройки
-  --
-  if arguments.param == arguments_dict.param.has_delete_links then
+  elseif arguments.param == arguments_dict.param.has_delete_links then
     pChat.settings.has_delete_links = value
 
   elseif arguments.param == arguments_dict.param.has_delete_forward_message then
@@ -90,6 +61,12 @@ function command.call(ctx)
 
   elseif arguments.param == arguments_dict.param.has_ban_sender_chat then
     pChat.settings.has_ban_sender_chat = value
+  end
+
+  -- Приветственно сообщение
+  --
+  if arguments.param == arguments_dict.param.has_enable_hello_message then
+    pChat.settings.has_enable_hello_message = value
   end
 
   -- Обновление настроек чата
@@ -105,12 +82,6 @@ function command.call(ctx)
   if arguments.page == arguments_dict.page.settings then
     showChatSettings(ctx, {
       page = arguments_dict.page.settings,
-      action = arguments_dict.action.show,
-    }, command.chat)
-
-  elseif arguments.page == arguments_dict.page.vip_settings then
-    showVipSettingsPage(ctx, {
-      page = arguments_dict.page.vip_settings,
       action = arguments_dict.action.show,
     }, command.chat)
 

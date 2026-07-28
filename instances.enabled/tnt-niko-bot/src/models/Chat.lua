@@ -9,7 +9,7 @@ local DEFAULT_CHAT_SETTINGS = {
   has_enable_antiflood = false,
   has_enable_captcha = false,
 
-  -- Параметры доступные VIP пользователям
+  -- Фильтры сообщений
   has_delete_links = false,
   has_delete_forward_message = false,
   has_ban_sender_chat = false,

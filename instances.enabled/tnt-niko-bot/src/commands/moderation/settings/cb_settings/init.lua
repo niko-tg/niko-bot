@@ -5,7 +5,6 @@ local Command = require('bot.classes.Command')
 
 local showMainPage = require(bot.subdir(1, ...)..'.pages.showMainPage')
 local showChatSettings = require(bot.subdir(1, ...)..'.pages.showChatSettings')
-local showVipSettingsPage = require(bot.subdir(1, ...)..'.pages.showVipSettingsPage')
 local showHelloMessagePage = require(bot.subdir(1, ...)..'.pages.showHelloMessagePage')
 
 local arguments_dict = require(bot.subdir(1, ...)..'.arguments_dict')
@@ -33,9 +32,6 @@ function command.call(ctx)
 
   elseif arguments.page == arguments_dict.page.settings then
     showChatSettings(ctx, arguments, command.chat)
-
-  elseif arguments.page == arguments_dict.page.vip_settings then
-    showVipSettingsPage(ctx, arguments, command.chat)
 
   elseif arguments.page == arguments_dict.page.hello_message then
     showHelloMessagePage(ctx, arguments, command.chat)

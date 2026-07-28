@@ -1,11 +1,20 @@
 --- Главная страница настроек чата: выбор раздела.
 --
 local bot = require('bot')
+local hdec = require('bot.libs.hdec')
 local inlineCallbackKeyboard = require('bot.middlewares.inlineCallbackKeyboard')
 
-local TEMPLATE = [[
-<b>Настройки</b>
-]]
+local TEMPLATE = ([[
+🛠 <b>Настройки</b>
+${sep}
+  * Антифлуд
+  * Модераторские команды
+  * Капча
+  * Фильтры сообщений
+  * Приветственное сообщение
+${sep}
+Выбери раздел - нажми на кнопку.
+]]):f({ sep = hdec.sep })
 
 --- Показ главной страницы настроек.
 -- @tparam table ctx контекст обновления
@@ -18,16 +27,6 @@ local function showMainPage(ctx, arguments)
         command = 'cb_settings',
         arguments = {
           page = 'settings',
-          action = 'show',
-        },
-      },
-    },
-    {
-      text = '👑 VIP настройки',
-      callback = {
-        command = 'cb_settings',
-        arguments = {
-          page = 'vip_settings',
           action = 'show',
         },
       },
