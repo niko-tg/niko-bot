@@ -54,6 +54,8 @@ function command.call(ctx)
   end
 
   -- Шанс получить кристалл сверху
+  --
+  math.randomseed(os.time() * os.clock())
   local crystals = 0
   if math.random(1, 10000) <= bonus.crystal_chance then
     crystals = 1

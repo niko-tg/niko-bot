@@ -70,7 +70,7 @@ local config = {
     cooldown = 24 * 60 * 60,
 
     -- Шанс выронить кристалл при получении бонуса, из 10000 (100 = 1%)
-    crystal_chance = 200,
+    crystal_chance = 1000,
   },
 
   -- Команда 'Кусь'
@@ -260,8 +260,8 @@ local config = {
     dmg_max = 140,
 
     -- Бонус уровня: +level_coef за уровень, уровни выше level_cap не считаются
-    level_coef = 0.04,
-    level_cap = 50,
+    level_coef = 0.06,
+    level_cap = 150,
 
     -- Максимальный бонус лучшего питомца (при идеальном состоянии), доля
     pet_max_bonus = 0.25,
