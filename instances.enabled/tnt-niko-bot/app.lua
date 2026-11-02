@@ -226,6 +226,7 @@ bot:sendMessage({
 
 local _, err = bot:startWebHook({
   url = config.bot.url_webhook,
+  certificate = config.bot.cert_webhook,
   path = '/updates/',
   drop_pending_updates = true,
   allowed_updates = ALLOWED_UPDATES,

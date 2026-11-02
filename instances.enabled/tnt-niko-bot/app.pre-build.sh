@@ -48,6 +48,9 @@ echo  "-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 # https://github.com/tarantool/http
 tools::tt_install "http" "scm-1"
 
+# https://github.com/tarantool/metrics-export-role
+tools::tt_install "metrics-export-role" "scm-1"
+
 # https://github.com/uriid1/lua-multipart-post
 tools::luarocks_install "lua-multipart-post" "2.0-0"
 

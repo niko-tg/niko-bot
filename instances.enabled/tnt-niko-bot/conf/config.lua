@@ -2,7 +2,7 @@
 --
 
 local SUBDOMAIN = 'niko'
-local DOMAIN = 'niko-bot.ru'
+local DOMAIN = 'niko-bot.uriid1.ru'
 local HOST = ('https://%s.%s'):format(SUBDOMAIN, DOMAIN)
 
 local config = {
@@ -13,13 +13,16 @@ local config = {
 
     -- Ссылка на ассеты с экранированием
     url_assets = HOST .. '/assets/',
-    -- Webhook url
-    url_webhook = HOST .. '/updates/',
+    -- Webhook url (со схемой: https://...)
+    url_webhook = os.getenv('WEBHOOK_URL'),
+    -- Путь к публичной части self-signed сертификата (внутри контейнера).
+    -- Если задан - загружается в Telegram при setWebhook.
+    cert_webhook = os.getenv('WEBHOOK_CERT'),
   },
 
   server = {
     host = os.getenv('BOT_SERVER_HOST') or '0.0.0.0',
-    port = os.getenv('BOT_SERVER_PORT') or 9091,
+    port = os.getenv('BOT_SERVER_PORT') or 8081,
   },
 
   -- Ссылки для /help (чат, новости, гайды)
