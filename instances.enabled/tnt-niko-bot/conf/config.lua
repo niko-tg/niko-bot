@@ -1,8 +1,8 @@
 --- Конфиг.
 --
 
-local SUBDOMAIN = 'niko'
-local DOMAIN = 'niko-bot.uriid1.ru'
+local SUBDOMAIN = 'niko-bot'
+local DOMAIN = 'uriid1.ru'
 local HOST = ('https://%s.%s'):format(SUBDOMAIN, DOMAIN)
 
 local config = {
