@@ -1,7 +1,7 @@
 --- Callback зоомагазина: навигация по экранам + покупки питомцев и зоотоваров.
 --
 local log = require('log')
-local bot = require('bot')
+local media = require('src.media')
 local Command = require('bot.classes.Command')
 local config = require('conf.config')
 local render = require('src.commands.public.zoo.render')
@@ -20,7 +20,7 @@ local function showView(ctx, view)
     return
   end
 
-  local _, err = bot:editMessageMedia({
+  local _, err = media.editMessageMedia({
     chat_id = ctx:getChatId(),
     message_id = ctx:getMessageId(),
     media = {

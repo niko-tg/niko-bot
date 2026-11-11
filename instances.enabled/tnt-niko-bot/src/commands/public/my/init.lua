@@ -2,7 +2,7 @@
 -- слову; переиспользует рендеры одноимённых команд.
 --
 local log = require('log')
-local bot = require('bot')
+local media = require('src.media')
 local utf8 = require('utf8')
 local Command = require('bot.classes.Command')
 local marriageRender = require('src.commands.public.marriage.render')
@@ -60,7 +60,7 @@ local function showPets(ctx, userId)
     return
   end
 
-  bot:sendPhoto({
+  media.sendPhoto({
     chat_id = ctx:getChatId(),
     photo = view.image,
     caption = view.caption,

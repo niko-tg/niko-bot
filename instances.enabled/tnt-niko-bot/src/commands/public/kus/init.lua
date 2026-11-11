@@ -2,7 +2,7 @@
 -- даёт кусающему +силу укуса в счётчик. Есть шанс промаха и анти-спам кулдаун.
 --
 local log = require('log')
-local bot = require('bot')
+local media = require('src.media')
 local Command = require('bot.classes.Command')
 local config = require('conf.config')
 local bites = require('src.commands.public.kus.bites')
@@ -74,7 +74,7 @@ function command.call(ctx)
 
   local totalKuses = biter.kuses + bite.power
 
-  bot:sendAnimation({
+  media.sendAnimation({
     chat_id = ctx:getChatId(),
     animation = bite.animation,
     caption = render.caption(biter, victim, bite, totalKuses),

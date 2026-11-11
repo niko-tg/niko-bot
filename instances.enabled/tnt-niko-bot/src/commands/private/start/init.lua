@@ -3,6 +3,7 @@
 --
 local log = require('log')
 local bot = require('bot')
+local media = require('src.media')
 local hdec = require('bot.libs.hdec')
 local config = require('conf.config')
 local Command = require('bot.classes.Command')
@@ -43,9 +44,9 @@ end
 
 --- Экран старта (фото + приглашение + кнопки).
 local function sendStart(chatId)
-  bot:sendPhoto({
+  media.sendPhoto({
     chat_id = chatId,
-    photo = config.bot.url_assets..'start/start.jpeg?v=2',
+    photo = 'start/start.jpeg',
     caption = START,
     reply_markup = startKeyboard(),
     link_preview_options = { is_disabled = true },

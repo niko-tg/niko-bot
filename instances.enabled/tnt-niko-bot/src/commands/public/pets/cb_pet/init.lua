@@ -2,7 +2,7 @@
 -- Всё над питомцами вызвавшего (command.user) - чужими не поуправляешь.
 --
 local log = require('log')
-local bot = require('bot')
+local media = require('src.media')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.pets.render')
 local petsService = require('src.services.pets')
@@ -21,7 +21,7 @@ local function showView(ctx, view)
     return
   end
 
-  local _, err = bot:editMessageMedia({
+  local _, err = media.editMessageMedia({
     chat_id = ctx:getChatId(),
     message_id = ctx:getMessageId(),
     media = {

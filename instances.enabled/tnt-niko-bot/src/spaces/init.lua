@@ -22,6 +22,7 @@ local user_farm = require('src.spaces.user_farm')
 local boss_sessions = require('src.spaces.boss_sessions')
 local boss_hits = require('src.spaces.boss_hits')
 local captcha_sessions = require('src.spaces.captcha_sessions')
+local media_cache = require('src.spaces.media_cache')
 
 return {
   users = users,
@@ -45,4 +46,5 @@ return {
   boss_sessions = boss_sessions,
   boss_hits = boss_hits,
   captcha_sessions = captcha_sessions,
+  media_cache = media_cache,
 }

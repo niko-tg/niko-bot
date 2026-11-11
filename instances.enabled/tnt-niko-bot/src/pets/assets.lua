@@ -1,15 +1,11 @@
---- Сборка URL картинок питомцев. База - config.bot.url_assets (с / на конце).
--- ?v - обход кэша CDN Telegram при обновлении ассетов.
+--- Пути картинок питомцев относительно assets/ (отправка - через src.media).
+-- При замене файла кэш file_id сбрасывается сам (по размеру и mtime).
 --
-local config = require('conf.config')
-
-local BASE = config.bot.url_assets
-
 local assets = {}
 
 -- Витрина магазина и обложка списка питомцев.
-assets.shop = BASE..'pets/shop.jpg'
-assets.checklist = BASE..'pets/checklist.jpg'
+assets.shop = 'pets/shop.jpg'
+assets.checklist = 'pets/checklist.jpg'
 
 --- Картинка питомца: порода/цвет/время суток/состояние.
 -- @tparam string breed
@@ -17,8 +13,7 @@ assets.checklist = BASE..'pets/checklist.jpg'
 -- @tparam string timeType day/evening/night
 -- @tparam string state состояние питомца (имя файла)
 function assets.pet(breed, color, timeType, state)
-  return ('${base}pets/${breed}/${color}/room-${timeType}/${state}.jpg?v=2'):f({
-    base = BASE,
+  return ('pets/${breed}/${color}/room-${timeType}/${state}.jpg'):f({
     breed = breed,
     color = color,
     timeType = timeType,
@@ -29,8 +24,7 @@ end
 --- Пустая комната (для экрана после удаления питомца).
 -- @tparam string timeType day/evening/night
 function assets.room(timeType)
-  return ('${base}pets/backgrounds/room-${timeType}.jpg?v=1'):f({
-    base = BASE,
+  return ('pets/backgrounds/room-${timeType}.jpg'):f({
     timeType = timeType,
   })
 end

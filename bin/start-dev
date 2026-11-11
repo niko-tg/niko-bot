@@ -9,11 +9,13 @@ readonly LOG_FORMAT="${TT_LOG_FORMAT:-plain}"
 
 log::info "[DEV] Log level: ${LOG_LEVEL}"
 log::info "[DEV] Log format: ${LOG_FORMAT}"
+log::info "[DEV] Container name: ${PREF}-${BASENAME}-dev"
+log::info "[DEV] Network: 127.0.0.1:8071:8071"
 
 docker run -it --rm \
-  --name "${PREF}-${BASENAME}" \
+  --name "${PREF}-${BASENAME}-dev" \
   \
-  -p 127.0.0.1:8081:8081 \
+  -p 127.0.0.1:8071:8071 \
   \
   -v "${INSTANCE_DIR}:/opt/tarantool/instances.enabled/${INSTANCE_NAME}" \
   -v "${INSTANCE_DIR}/.rocks:/opt/tarantool/instances.enabled/${INSTANCE_NAME}/.rocks" \

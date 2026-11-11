@@ -1,7 +1,7 @@
 --- Список питомцев игрока с переходом в карточку. Работает везде.
 --
 local log = require('log')
-local bot = require('bot')
+local media = require('src.media')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.pets.render')
 
@@ -24,7 +24,7 @@ function command.call(ctx)
     return
   end
 
-  bot:sendPhoto({
+  media.sendPhoto({
     chat_id = ctx:getChatId(),
     photo = view.image,
     caption = view.caption,

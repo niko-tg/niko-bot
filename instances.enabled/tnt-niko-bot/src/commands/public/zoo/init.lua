@@ -1,7 +1,7 @@
 --- Зоомагазин: питомцы и зоотовары. Работает везде.
 --
 local log = require('log')
-local bot = require('bot')
+local media = require('src.media')
 local Command = require('bot.classes.Command')
 local render = require('src.commands.public.zoo.render')
 
@@ -18,10 +18,9 @@ local command = Command:new({
 function command.call(ctx)
   local view = render.menu()
 
-  local _, err = bot:sendPhoto({
+  local _, err = media.sendPhoto({
     chat_id = ctx:getChatId(),
-    -- photo = view.image,
-    photo = 'https://niko-bot.uriid1.ru/assets/pets/shop.jpg',
+    photo = view.image,
     caption = view.caption,
     reply_markup = view.keyboard,
     reply_parameters = { message_id = ctx:getMessageId() },

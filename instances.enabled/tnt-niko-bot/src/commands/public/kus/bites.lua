@@ -1,9 +1,7 @@
 --- Данные укусов: тиры редкости (вес + сила + варианты анимаций) и выбор укуса.
 -- Сила укуса (power) - сколько кусей прибавится кусающему.
+-- media - путь анимации относительно assets/ (отправка - через src.media).
 --
-local config = require('conf.config')
-
-local ASSETS = config.bot.url_assets
 
 -- Тиры от обычного к легендарному. weight - вес во взвешенном рандоме,
 -- power - прибавка к счётчику. variants - описание (с эмодзи) + файл анимации.
@@ -78,7 +76,7 @@ function bites.roll()
     power = chosen.power,
     crit = chosen.crit == true,
     description = variant.description,
-    animation = ASSETS .. variant.media,
+    animation = variant.media,
   }
 end
 

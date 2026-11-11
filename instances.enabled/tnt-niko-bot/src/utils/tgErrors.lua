@@ -110,6 +110,18 @@ function M.isFloodWait(err)
   return descriptionContains(err, 'Too Many Requests')
 end
 
+--- file_id не принят Telegram (протух, от другого бота, битый).
+-- Повод сбросить кэш и загрузить файл заново.
+function M.isBadFileId(err)
+  if not err or err.error_code ~= 400 then
+    return false
+  end
+
+  return descriptionContains(err, 'file identifier')
+    or descriptionContains(err, 'FILE_REFERENCE')
+    or descriptionContains(err, 'file_id')
+end
+
 --- Сколько секунд Telegram просит подождать (retry_after). Если поля нет - 1.
 function M.retryAfter(err)
   local retry = err and err.parameters and err.parameters.retry_after

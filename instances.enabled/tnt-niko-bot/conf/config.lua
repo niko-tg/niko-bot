@@ -11,8 +11,12 @@ local config = {
   bot = {
     username = 'Niko_rp_bot',
 
-    -- Ссылка на ассеты с экранированием
+    -- Ссылка на ассеты с экранированием.
+    -- Используется только в sendInvoice: photo_url принимает лишь URL,
+    -- файлом картинку счёта не передать.
     url_assets = HOST .. '/assets/',
+    -- Локальные ассеты (относительно каталога инстанса), шлются через src.media
+    assets_dir = 'assets',
     -- Webhook url (со схемой: https://...)
     url_webhook = os.getenv('WEBHOOK_URL'),
     -- Путь к публичной части self-signed сертификата (внутри контейнера).
